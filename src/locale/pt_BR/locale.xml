@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * locale.xml
+  *
+  * Copyright (c) 2019 Lepidus Tecnologia
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localization strings for the pt_BR locale.
+  -->
+
+<locale name="pt_BR" full_name="Português (Brasil)">
+	  <message key="plugins.reports.submissions.displayName">Relatório de Submissões</message>
+	  <message key="plugins.reports.submissions.description">Este plugin implementa um relatório no formato CSV (planilha eletrônica) contendo informações que no geral são solicitadas pelo Scielo. Desenvolvido por Lepidus Tecnologia.</message>        
+    <message key="plugins.reports.submissions.dateStart">Data de Inicio:</message>
+    <message key="plugins.reports.submissions.dateEnd">Data Final:</message>
+    <message key="plugins.reports.submissions.generate">Gerar Relatório</message>
+    <message key="plugins.reports.submissions.type">Tipo de Relatório</message>
+    <message key="plugins.reports.submissions.period">Período</message>
+    <message key="plugins.reports.submissions.sections">Seções</message>
+</locale>
