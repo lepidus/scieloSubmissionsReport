@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * locale.xml
+  *
+  * Copyright (c) 2019 Lepidus Tecnologia
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localization strings for the en_US (U.S. English) locale.
+  -->
+
+<locale name="en_US" full_name="U.S. English">
+  	<message key="plugins.reports.submissions.displayName">Submission Report</message>
+    <message key="plugins.reports.submissions.description">This plugin implements a .csv format sheet report that contains information that Scielo usually request. Developed by Lepidus Tecnologia.</message>        
+    <message key="plugins.reports.submissions.dateStart">Start Date:</message>
+    <message key="plugins.reports.submissions.dateEnd">End Date:</message>
+    <message key="plugins.reports.submissions.type">Report Type</message>
+    <message key="plugins.reports.submissions.generate">Generate Report</message>
+    <message key="plugins.reports.submissions.period">Period</message>
+    <message key="plugins.reports.submissions.sections">Sections</message>
+</locale>
+

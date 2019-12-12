@@ -1,0 +1,18 @@
+/**
+ * Copyright (c) 2019 Lepidus Tecnologia
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ */
+
+form {
+    padding: 0 10px 0 30px;
+}
+
+table.data td{
+    padding: 0 5px 2px 0;
+}
+
+#actionsButton{
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}
