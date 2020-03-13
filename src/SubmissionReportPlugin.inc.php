@@ -13,7 +13,7 @@
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
-import('classes.article.Article');
+import('classes.submission.Submission');
 class SubmissionReportPlugin extends ReportPlugin {
 	//public $form;
 	/**
