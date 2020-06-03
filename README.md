@@ -1,4 +1,4 @@
-# Plugin de relatório de submissões - v3.2.0.0
+# Plugin de relatório de submissões 
 
 Este plugin gera uma planilha **csv** com as seguintes informações : 
 - Id do artigo
@@ -13,7 +13,8 @@ __Copyright (c) Lepidus Tecnologia__
 
 ## Pré-Requisitos
 
-* OJS 3.2.0.0
+* OJS 3.2.0.0 ou OJS 3.2.1.0
+
 
 ## Download do Plugin
 
