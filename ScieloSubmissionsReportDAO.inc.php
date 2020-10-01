@@ -1,19 +1,19 @@
 <?php
 
 /**
- * @file plugins/reports/submissions/SubmissionReportDAO.inc.php
+ * @file plugins/reports/scieloSubmissions/ScieloSubmissionsReportDAO.inc.php
  *
  * Copyright (c) 2019 Lepidus Tecnologia
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class SubmissionReportDAO
- * @ingroup plugins_reports_submission
+ * @class ScieloSubmissionsReportDAO
+ * @ingroup plugins_reports_scieloSubmissions
  *
- * @brief Submission report DAO
+ * @brief SciELO Submissions report DAO
  */
 
 import('lib.pkp.classes.db.DBRowIterator');
-class SubmissionReportDAO extends DAO
+class ScieloSubmissionsReportDAO extends DAO
 {
 
     /**

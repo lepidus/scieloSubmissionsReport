@@ -9,7 +9,7 @@
   -->
 
 <version>
-	<application>SubmissionReportPlugin</application>
+	<application>ScieloSubmissionsReportPlugin</application>
 	<type>plugins.reports</type>
 	<lazy-load>0</lazy-load>
 	<release>3.2.0.0</release>

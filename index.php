@@ -1,22 +1,22 @@
 <?php
 
 /**
- * @defgroup plugins_reports_Submission Submission Report Plugin
+ * @defgroup plugins_reports_ScieloSubmissionsReport SciELO Submissions Report Plugin
  */
  
 /**
- * @file plugins/reports/submissions/index.php
+ * @file plugins/reports/scieloSubmissions/index.php
  *
  * Copyright (c) 2019 Lepidus Tecnologia
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @ingroup plugins_reports_submission
- * @brief Wrapper for Submission report plugin.
+ * @ingroup plugins_reports_scieloSubmissions
+ * @brief Wrapper for SciELO Submissions report plugin.
  *
  */ 
 
-require_once('SubmissionReportPlugin.inc.php');
+require_once('ScieloSubmissionsReportPlugin.inc.php');
 
-return new SubmissionReportPlugin();
+return new ScieloSubmissionsReportPlugin();
 
 

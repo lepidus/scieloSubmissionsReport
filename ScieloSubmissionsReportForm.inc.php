@@ -1,17 +1,17 @@
 <?php
  /**
- * @file plugins/reports/submissions/SubmissionReportForm.inc.php
+ * @file plugins/reports/scieloSubmissions/ScieloSubmissionsReportForm.inc.php
  *
  * Copyright (c) 2019 Lepidus Tecnologia
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class SubmissionReportDAO
- * @ingroup plugins_reports_submission
+ * @class ScieloSubmissionsReportDAO
+ * @ingroup plugins_reports_scieloSubmissions
  *
- * @brief Submission report DAO
+ * @brief SciELO Submissions report Form
  */
  import('lib.pkp.classes.form.Form');
- require('SubmissionReportDAO.inc.php');
+ require('ScieloSubmissionsReportDAO.inc.php');
 	/*
 	* Function to verify date
 	* @param String data formato Y-m-d
@@ -36,7 +36,7 @@
 		}
 	}
 
- class SubmissionReportForm extends Form {
+ class ScieloSubmissionsReportForm extends Form {
     /* @var int Associated context ID */
 	private $_contextId;
 
@@ -49,7 +49,7 @@
 	 */
 	function __construct($plugin) {
 		$this->_plugin = $plugin;
-		parent::__construct($plugin->getTemplateResource('submissionReportPlugin.tpl'));
+		parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
     }
@@ -60,16 +60,16 @@
 	function initData() {
 		$contextId = $this->_contextId;
 		$plugin = $this->_plugin;
-        $this->setData('submissionReport', $plugin->getSetting($contextId, 'submissionReport'));
+        $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
 	}
 	function generateReport($dataStart,$dataEnd,$request,$sessions){
 		$journal = $request->getJournal();
 		header('content-type: text/comma-separated-values');
 		$acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $journal->getLocalizedAcronym());
 		header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
-		$submissionReportDAO = DAORegistry::getDAO('SubmissionReportDAO');
+		$scieloSubmissionsReportDAO = DAORegistry::getDAO('ScieloSubmissionsReportDAO');
 		if(validaData($dataStart)===true && validaData($dataEnd)===true && dataInicialMenorqueFinal($dataStart,$dataEnd)===true){
-		 	$articlesIterator = $submissionReportDAO->getReportWithSections($journal->getId(),$dataStart,$dataEnd,$sessions);
+		 	$articlesIterator = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataStart,$dataEnd,$sessions);
 		}
 		else{
 			echo "Datas invalidas por favor coloque uma data correta;";
@@ -78,7 +78,7 @@
 
     function display($request= NULL, $template = NULL) {
 		$templateManager = TemplateManager::getManager();
-		$reviewerReportDao = DAORegistry::getDAO("SubmissionReportDAO");
+		$reviewerReportDao = DAORegistry::getDAO("ScieloSubmissionsReportDAO");
 		$journalRequest = Application::getRequest();
 		$journal = $journalRequest->getJournal();
 		$sessions = $reviewerReportDao->getSession($journal->getId());
@@ -86,7 +86,7 @@
 		$templateManager->assign('sessions',$sessions);
 		$templateManager->assign('sessions_options',$sessions_options);
 		$templateManager->assign('years', array(0=>$request[0], 1=>$request[1]));
-		$templateManager->display($this->_plugin->getTemplateResource('submissionReportPlugin.tpl'));
+		$templateManager->display($this->_plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
 	}
  }
 

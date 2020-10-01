@@ -1,7 +1,7 @@
 {* Copyright (c) 2019 Lepidus Tecnologia
 Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 {strip}
-{assign var="pageTitle" value= "plugins.reports.submissions.displayName"}
+{assign var="pageTitle" value= "plugins.reports.scieloSubmissionsReport.displayName"}
 {include file="common/header.tpl"}
 {/strip}
 
@@ -10,17 +10,17 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 	<form method="post" action="">
 		{include file="common/formErrors.tpl"}
 
-		<h2>{translate key="plugins.reports.submissions.period"}</h2>
+		<h2>{translate key="plugins.reports.scieloSubmissionsReport.period"}</h2>
 		<table class="data">
 		<tr valign="top">
-		 	<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.submissions.dateStart" translate=true}</td> 
+		 	<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateStart" translate=true}</td> 
 			<td>
 				<input type="date" id='dateStart' name='dataInicio' from=$dateStart defaultValue=$dateStart value="{$years[0]}"/>
 			</td>
 
 		</tr>
 		<tr valign="top">
-			<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.submissions.dateEnd"  }</td>
+			<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateEnd"  }</td>
 			<td>
 				<input type="date" id='dateEnd' name='dataFim' from=$dateEnd defaultValue=$dateEnd value="{$years[1]}"/>
 			</td>
@@ -28,7 +28,7 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 		</table>
 
 		{if $sessions|@count > 0}
-			<h2>{translate key="plugins.reports.submissions.sections"}</h2>
+			<h2>{translate key="plugins.reports.scieloSubmissionsReport.sections"}</h2>
 			<table> 
 			<div class= "pkpListPanel"> 
 				<tr>
@@ -44,7 +44,7 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 		
 		<p id="actionsButton">
 			<input type="hidden" name="generate" value="1" type="generate" />
-			<input class="pkp_button submitFormButton" type="submit" value="{translate key="plugins.reports.submissions.generate"}" class="button defaultButton" />
+			<input class="pkp_button submitFormButton" type="submit" value="{translate key="plugins.reports.scieloSubmissionsReport.generate"}" class="button defaultButton" />
 			<input type="button" class="pkp_button submitFormButton" value="{translate key="common.cancel"}" class="button" onclick="document.location.href='{url path="index" escape=false}'" /> 
 		</p>
 	</form>

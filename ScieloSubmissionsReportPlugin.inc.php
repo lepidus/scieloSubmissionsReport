@@ -1,20 +1,20 @@
 <?php
 
 /**
- * @file plugins/reports/submissions/SubmissionReportPlugin.inc.php
+ * @file plugins/reports/scieloSubmissions/ScieloSubmissionsReportPlugin.inc.php
  *
  * Copyright (c) 2019 Lepidus Tecnologia
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class SubmissionReportPlugin
- * @ingroup plugins_reports_article
+ * @class ScieloSubmissionsReportPlugin
+ * @ingroup plugins_reports_scieloSubmissions
  *
- * @brief Submission report plugin
+ * @brief SciELO Submissions report plugin
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
 import('classes.submission.Submission');
-class SubmissionReportPlugin extends ReportPlugin {
+class ScieloSubmissionsReportPlugin extends ReportPlugin {
 	//public $form;
 	/**
 	 * @copydoc Plugin::register()
@@ -24,17 +24,17 @@ class SubmissionReportPlugin extends ReportPlugin {
 
 		if ($success && Config::getVar('general', 'installed')) {
 
-			$this->import('SubmissionReportForm');
-			$this->import('SubmissionReportDAO');
+			$this->import('ScieloSubmissionsReportForm');
+			$this->import('ScieloSubmissionsReportDAO');
 			
-			$form = new SubmissionReportForm($this);
-			$submissionReportDAO = new SubmissionReportDAO();
-			DAORegistry::registerDAO('SubmissionReportDAO', $submissionReportDAO);
+			$form = new ScieloSubmissionsReportForm($this);
+			$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
+			DAORegistry::registerDAO('ScieloSubmissionsReportDAO', $scieloSubmissionsReportDAO);
 			
 			$request = Application::getRequest();
-			$url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/templates/submissionStyleSheet.css';
+			$url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
 			$templateMgr = TemplateManager::getManager($request);
-			$templateMgr->addStyleSheet('submissionStyleSheet', $url, array(
+			$templateMgr->addStyleSheet('scieloSubmissionsStyleSheet', $url, array(
 				'priority' => STYLE_SEQUENCE_CORE,
 				'contexts' => 'backend',
 			));
@@ -50,33 +50,33 @@ class SubmissionReportPlugin extends ReportPlugin {
 	 * @return String name of plugin
 	 */
 	function getName() {
-		return 'SubmissionReportPlugin';
+		return 'SciELOSubmissionsReportPlugin';
 	}
 
 	/**
 	 * @copydoc Plugin::getDisplayName()
 	 */
 	function getDisplayName() {
-		return __('plugins.reports.submissions.displayName');
+		return __('plugins.reports.scieloSubmissionsReport.displayName');
 	}
 
 	/**
 	 * @copydoc Plugin::getDescriptionName()
 	 */
 	function getDescription() {
-		return __('plugins.reports.submissions.description');
+		return __('plugins.reports.scieloSubmissionsReport.description');
 	}
 
 
 	function getSettingsForm($context) {
-		$this->import('SubmissionReportForm');
-		return new SubmissionReportForm($this);
+		$this->import('ScieloSubmissionsReportForm');
+		return new ScieloSubmissionsReportForm($this);
 	}
 	/**
 	 * @copydoc ReportPlugin::display()
 	 */
 	function display($args, $request) {
-		$form    = new SubmissionReportForm($this);
+		$form    = new ScieloSubmissionsReportForm($this);
 		$dateStart = date("Y-01-01");
 		$dateEnd   = date("Y-m-d");
 		$datas     = array($dateStart, $dateEnd);
