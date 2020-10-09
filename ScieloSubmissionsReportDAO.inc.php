@@ -51,6 +51,21 @@ class ScieloSubmissionsReportDAO extends DAO
         }
     }
 
+    public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
+        $locale = AppLocale::getLocale();
+
+        $querySubmissoes = "SELECT submission_id,date_submitted,date_last_activity,status,current_publication_id FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
+        $querySubmissoes .= " AND date_submitted > '{$dataSubmissaoInicial}' AND date_submitted < '{$dataSubmissaoFinal}' AND date_last_activity > '{$dataDecisaoInicial}' AND date_last_activity < '{$dataDecisaoFinal}'";
+
+        $resultSubmissoes = $this->retrieve($querySubmissoes);
+
+        while($rowSubmissao = $resultSubmissoes->FetchRow()) {
+            $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($rowSubmissao['submission_id']);
+
+            //A partir daqui já podemos ir obtendo os demais dados
+        }
+    }
+
     public function getSession($journalId)
     {
         import('classes.core.Services');

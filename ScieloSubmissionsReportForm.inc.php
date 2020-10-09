@@ -68,7 +68,8 @@
 		$acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $journal->getLocalizedAcronym());
 		header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
 		$scieloSubmissionsReportDAO = DAORegistry::getDAO('ScieloSubmissionsReportDAO');
-		if(validaData($dataStart)===true && validaData($dataEnd)===true && dataInicialMenorqueFinal($dataStart,$dataEnd)===true){
+		
+		if(validaData($dataStart) && validaData($dataEnd) && dataInicialMenorqueFinal($dataStart,$dataEnd)){
 		 	$articlesIterator = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataStart,$dataEnd,$sessions);
 		}
 		else{
