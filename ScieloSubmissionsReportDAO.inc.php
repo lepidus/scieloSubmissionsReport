@@ -54,13 +54,22 @@ class ScieloSubmissionsReportDAO extends DAO
     public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
         $locale = AppLocale::getLocale();
 
-        $querySubmissoes = "SELECT submission_id,date_submitted,date_last_activity,status,current_publication_id FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
+        $querySubmissoes = "SELECT submission_id,date_submitted,date_last_activity, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status,current_publication_id FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
         $querySubmissoes .= " AND date_submitted > '{$dataSubmissaoInicial}' AND date_submitted < '{$dataSubmissaoFinal}' AND date_last_activity > '{$dataDecisaoInicial}' AND date_last_activity < '{$dataDecisaoFinal}'";
-
+        $querySubmissoes .= " date_submitted AS 'Data de submissão', date_last_activity 'Data da modificação de Status', DATEDIFF(date_last_activity,date_submitted) AS 'Dias até a última mudança de status' ";
+        
         $resultSubmissoes = $this->retrieve($querySubmissoes);
 
         while($rowSubmissao = $resultSubmissoes->FetchRow()) {
             $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($rowSubmissao['submission_id']);
+            $publicacao = DAORegistry::getDAO('PublicationDAO')->getById($rowSubmissao['current_publication_id']);
+            $statusSubmissao = __($submissao->getStatusKey());
+            $titulo = $submissao->getTitle($locale);
+            $idioma = $submissao->getLocale();
+
+            $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
+            $nomeSecao = $secao->getTitle($locale);
+            $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedTitle();
 
             //A partir daqui já podemos ir obtendo os demais dados
         }
