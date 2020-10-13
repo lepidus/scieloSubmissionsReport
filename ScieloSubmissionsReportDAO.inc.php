@@ -24,8 +24,8 @@ class ScieloSubmissionsReportDAO extends DAO
     public function getReportWithSections($journalId, $dataStart, $dataEnd, $sections)
     {
         $locale = AppLocale::getLocale();
-        
-        if (is_null($sections)) {
+        $this->getReports($journalId, $dataStart, $dataEnd, $dataStart, $dataEnd);
+        /*if (is_null($sections)) {
             $queryResult = " SELECT submission_id AS Id, ss.setting_value AS 'Seção', ";
             $queryResult.= " CASE STATUS WHEN '1' THEN 'Avaliação' WHEN '4' THEN 'Rejeitado' WHEN '3' THEN 'Publicado' END AS Status, ";
             $queryResult.= " CASE stage_id WHEN '1' THEN 'Submissão' WHEN '3' THEN 'Avaliação' WHEN '4' THEN 'Edição de texto' WHEN '5' THEN 'Editoração' END AS 'Estágio', ";
@@ -48,31 +48,77 @@ class ScieloSubmissionsReportDAO extends DAO
             $queryResult.= " AND ss.locale = '{$locale}' AND s.section_id = ss.section_id  AND ss.setting_value IN ({$newSections}) AND s.context_id = {$journalId} ORDER BY date_submitted ASC ";
             $result = $this->retrieve($queryResult);
             echo $result;   
-        }
+        }*/
     }
 
-    public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
-        $locale = AppLocale::getLocale();
-
-        $querySubmissoes = "SELECT submission_id,date_submitted,date_last_activity, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status,current_publication_id FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
+    public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal) {
+        $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
         $querySubmissoes .= " AND date_submitted > '{$dataSubmissaoInicial}' AND date_submitted < '{$dataSubmissaoFinal}' AND date_last_activity > '{$dataDecisaoInicial}' AND date_last_activity < '{$dataDecisaoFinal}'";
-        $querySubmissoes .= " date_submitted AS 'Data de submissão', date_last_activity 'Data da modificação de Status', DATEDIFF(date_last_activity,date_submitted) AS 'Dias até a última mudança de status' ";
         
         $resultSubmissoes = $this->retrieve($querySubmissoes);
 
+        //Adicionar um echo para imprimir os títulos de cada coluna
+
         while($rowSubmissao = $resultSubmissoes->FetchRow()) {
-            $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($rowSubmissao['submission_id']);
-            $publicacao = DAORegistry::getDAO('PublicationDAO')->getById($rowSubmissao['current_publication_id']);
-            $statusSubmissao = __($submissao->getStatusKey());
-            $titulo = $submissao->getTitle($locale);
-            $idioma = $submissao->getLocale();
-
-            $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
-            $nomeSecao = $secao->getTitle($locale);
-            $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedTitle();
-
-            //A partir daqui já podemos ir obtendo os demais dados
+            echo $this->getSubmissionString($journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status']) . "\n";
         }
+    }
+
+    private function getSubmissionString($journalId, $submissionId, $diasMudancaStatus) {
+        $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
+        $locale = AppLocale::getLocale();
+        
+        $statusSubmissao = __($submissao->getStatusKey());
+        $titulo = $submissao->getTitle($locale);
+        $dataSubmissao = $submissao->getDateSubmitted();
+        $dataDecisao = $submissao->getDateStatusModified();
+        $idioma = $submissao->getLocale();
+        $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
+        $nomeSecao = $secao->getTitle($locale);
+        $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
+
+        $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
+        $notas = "";
+        if($resultNotes->numRows == 0) {
+            $notas = 'Sem Notas';
+        }
+        else{
+            while($note = $resultNotes->FetchRow()) {
+                $note = $note[0];
+                $notas .= "Nota: " . trim(preg_replace('/\s+/', ' ', $note));
+            }
+
+        }
+
+        $listaAutores = array();
+        foreach($submissao->getAuthors() as $autor) {
+            $nomeAutor = "Autor: " .  $autor->getFullName(true, false, $locale);
+            $paisAutor = "País: " . $autor->getCountryLocalized();
+            $afiliacaoAutor = "Afiliação: " . $autor->getLocalizedAffiliation();
+
+            $listaAutores[] = "{$nomeAutor},{$paisAutor},{$afiliacaoAutor}";
+        }
+        $stringAutores = $this->stringVirgulas($listaAutores);
+
+        return $this->stringVirgulas([
+            $submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$nomeJournal,$nomeSecao,$idioma,$stringAutores,$notas
+        ]);
+    }
+
+    private function stringVirgulas($lista) {
+        $retorno = "";
+        $primeiro = true;
+
+        foreach($lista as $elemento) {
+            if($primeiro)
+                $primeiro = false;
+            else
+                $retorno .= ",";
+
+            $retorno .= $elemento;
+        }
+
+        return $retorno;
     }
 
     public function getSession($journalId)
