@@ -53,8 +53,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
     public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal) {
         $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
-        $querySubmissoes .= " AND date_submitted > '{$dataSubmissaoInicial}' AND date_submitted < '{$dataSubmissaoFinal}' AND date_last_activity > '{$dataDecisaoInicial}' AND date_last_activity < '{$dataDecisaoFinal}'";
-        
+        $querySubmissoes .= " AND date_submitted >= '{$dataSubmissaoInicial} 23:59:59' AND date_submitted <= '{$dataSubmissaoFinal} 23:59:59' AND date_last_activity >= '{$dataDecisaoInicial}  23:59:59' AND date_last_activity <= '{$dataDecisaoFinal} 23:59:59'";
         $resultSubmissoes = $this->retrieve($querySubmissoes);
 
         //Adicionar um echo para imprimir os títulos de cada coluna
@@ -67,7 +66,9 @@ class ScieloSubmissionsReportDAO extends DAO
     private function getSubmissionString($journalId, $submissionId, $diasMudancaStatus) {
         $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $locale = AppLocale::getLocale();
-        
+        AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION);
+
         $statusSubmissao = __($submissao->getStatusKey());
         $titulo = $submissao->getTitle($locale);
         $dataSubmissao = $submissao->getDateSubmitted();
@@ -92,7 +93,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
         $listaAutores = array();
         foreach($submissao->getAuthors() as $autor) {
-            $nomeAutor = "Autor: " .  $autor->getFullName(true, false, $locale);
+            $nomeAutor = "Autor: " .  $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
             $paisAutor = "País: " . $autor->getCountryLocalized();
             $afiliacaoAutor = "Afiliação: " . $autor->getLocalizedAffiliation();
 
