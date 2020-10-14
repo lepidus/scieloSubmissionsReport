@@ -90,7 +90,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 			$postVars = $requestHandler->getUserVars($request);
 			if ($postVars['generate'] === "1") {
 				array_key_exists('sessions', $postVars) ? $sessions = $postVars['sessions'] : $sessions = NULL;
-				$form->generateReport($postVars['dataInicio'],$postVars['dataFim'],$request, $sessions);
+				$form->generateReport($postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal'],$postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal'],$request, $sessions);
 			}
 
 		}

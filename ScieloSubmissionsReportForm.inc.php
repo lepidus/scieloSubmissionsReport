@@ -62,15 +62,21 @@
 		$plugin = $this->_plugin;
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
 	}
-	function generateReport($dataStart,$dataEnd,$request,$sessions){
+	function generateReport($dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $request,$sessions){
 		$journal = $request->getJournal();
 		header('content-type: text/comma-separated-values');
 		$acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $journal->getLocalizedAcronym());
 		header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
 		$scieloSubmissionsReportDAO = DAORegistry::getDAO('ScieloSubmissionsReportDAO');
 		
-		if(validaData($dataStart) && validaData($dataEnd) && dataInicialMenorqueFinal($dataStart,$dataEnd)){
-		 	$articlesIterator = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataStart,$dataEnd,$sessions);
+		if(validaData($dataSubmissaoInicial) && 
+			validaData($dataSubmissaoFinal) &&
+			validaData($dataDecisaoInicial) &&
+			validaData($dataDecisaoFinal) &&
+			dataInicialMenorqueFinal($dataSubmissaoInicial,$dataSubmissaoFinal) &&
+			dataInicialMenorqueFinal($dataDecisaoInicial,$dataDecisaoFinal)
+		){
+		 	$articlesIterator = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
 		}
 		else{
 			echo "Datas invalidas por favor coloque uma data correta;";

@@ -21,37 +21,7 @@ class ScieloSubmissionsReportDAO extends DAO
      * @param $journalId int
      * @return array
      */
-    public function getReportWithSections($journalId, $dataStart, $dataEnd, $sections)
-    {
-        $locale = AppLocale::getLocale();
-        $this->getReports($journalId, $dataStart, $dataEnd, $dataStart, $dataEnd, $sections);
-        /*if (is_null($sections)) {
-            $queryResult = " SELECT submission_id AS Id, ss.setting_value AS 'Seção', ";
-            $queryResult.= " CASE STATUS WHEN '1' THEN 'Avaliação' WHEN '4' THEN 'Rejeitado' WHEN '3' THEN 'Publicado' END AS Status, ";
-            $queryResult.= " CASE stage_id WHEN '1' THEN 'Submissão' WHEN '3' THEN 'Avaliação' WHEN '4' THEN 'Edição de texto' WHEN '5' THEN 'Editoração' END AS 'Estágio', ";
-            $queryResult.= " date_submitted AS 'Data de submissão', date_last_activity 'Data da modificação de Status' , DATEDIFF(date_last_activity,date_submitted) AS 'Dias até a última mudança de status' ";
-            $queryResult.= " FROM submissions s JOIN section_settings AS ss WHERE date_submitted BETWEEN ";
-            $queryResult.= " '{$dataStart}' AND '{$dataEnd}' AND ss.setting_name = 'title' AND ss.locale = '{$locale}' AND s.section_id = ss.section_id AND s.context_id = '{$journalId}' ORDER BY date_submitted ASC ";
-
-            $result = $this->retrieve($queryResult);
-            echo $result;
-        } else {
-
-            $newSections = "'" . implode("','", $sections) . "'";
-
-            $queryResult = " SELECT submission_id AS Id, ss.setting_value AS 'Seção', ";
-            $queryResult.= " CASE STATUS WHEN '1' THEN 'Avaliação' WHEN '4' THEN 'Rejeitado' WHEN '3' THEN 'Publicado' END AS Status, ";
-            $queryResult.= " CASE stage_id WHEN '1' THEN 'Submissão' WHEN '3' THEN 'Avaliação' WHEN '4' THEN 'Edição de texto' WHEN '5' THEN 'Editoração' END AS 'Estágio', ";
-            $queryResult.= " date_submitted AS 'Data de submissão', date_last_activity 'Data da modificação de Status', DATEDIFF(date_last_activity,date_submitted) AS 'Dias até a última mudança de status' ";
-            $queryResult.= " FROM submissions s JOIN section_settings AS ss WHERE date_submitted BETWEEN ";
-            $queryResult.= " '{$dataStart}' AND '{$dataEnd}' AND ss.setting_name = 'title' ";
-            $queryResult.= " AND ss.locale = '{$locale}' AND s.section_id = ss.section_id  AND ss.setting_value IN ({$newSections}) AND s.context_id = {$journalId} ORDER BY date_submitted ASC ";
-            $result = $this->retrieve($queryResult);
-            echo $result;   
-        }*/
-    }
-
-    public function getReports($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
+    public function getReportWithSections($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
         $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
         $querySubmissoes .= " AND date_submitted >= '{$dataSubmissaoInicial} 23:59:59' AND date_submitted <= '{$dataSubmissaoFinal} 23:59:59' AND date_last_activity >= '{$dataDecisaoInicial}  23:59:59' AND date_last_activity <= '{$dataDecisaoFinal} 23:59:59'";
         $resultSubmissoes = $this->retrieve($querySubmissoes);
