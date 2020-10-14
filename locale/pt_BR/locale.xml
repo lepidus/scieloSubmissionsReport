@@ -13,8 +13,15 @@
 <locale name="pt_BR" full_name="Português (Brasil)">
 	  <message key="plugins.reports.scieloSubmissionsReport.displayName">Relatório de Submissões SciELO</message>
 	  <message key="plugins.reports.scieloSubmissionsReport.description">Este plugin implementa um relatório no formato CSV (planilha eletrônica) contendo informações que no geral são solicitadas pelo Scielo. Desenvolvido por Lepidus Tecnologia.</message>        
-    <message key="plugins.reports.scieloSubmissionsReport.dateStart">Data de Inicio:</message>
-    <message key="plugins.reports.scieloSubmissionsReport.dateEnd">Data Final:</message>
+    
+   <!-- MUDEI AS ID dateStart/End para dateSubmittedStart/End -->
+   <!--ACRESCENTEI MAIS DUAS MENSAGENS COM ID dateDecisionStart/End -->
+    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedStart">Data de submissão inicial:</message>
+    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedEnd">Data de submissão final:</message>
+
+    <message key="plugins.reports.scieloSubmissionsReport.dateDecisionStart">Data de decisão inicial:</message>
+    <message key="plugins.reports.scieloSubmissionsReport.dateDecisionEnd">Data de decisão final:</message>
+    
     <message key="plugins.reports.scieloSubmissionsReport.generate">Gerar Relatório</message>
     <message key="plugins.reports.scieloSubmissionsReport.type">Tipo de Relatório</message>
     <message key="plugins.reports.scieloSubmissionsReport.period">Período</message>

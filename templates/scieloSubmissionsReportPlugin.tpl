@@ -13,18 +13,34 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 		<h2>{translate key="plugins.reports.scieloSubmissionsReport.period"}</h2>
 		<table class="data">
 		<tr valign="top">
-		 	<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateStart" translate=true}</td> 
+		 	<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateSubmittedStart" translate=true}</td> 
 			<td>
-				<input type="date" id='dateStart' name='dataInicio' from=$dateStart defaultValue=$dateStart value="{$years[0]}"/>
+				<input type="date" id='dateSubmittedStart' name='dataSubmissaoInicial' from=$dateSubmittedStart defaultValue=$dateSubmittedStart value="{$years[0]}"/>
+			</td>
+		</tr>
+		
+		<tr valign="top">
+			<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateSubmittedEnd"  }</td>
+			<td>
+				<input type="date" id='dateSubmittedEnd' name='dataSubmissaoFinal' from=$dateSubmittedEnd defaultValue=$dateSubmittedEnd value="{$years[1]}"/>
+			</td>
+		</tr>
+		
+		<!-- novos dois campos -->
+		<tr valign="top">
+		 	<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateDecisionStart" translate=true}</td> 
+			<td>
+				<input type="date" id='dateDecisionStart' name='dataDecisaoInicial' from=$dateDecisionStart defaultValue=$dateDecisionStart value="{$years[0]}"/>
 			</td>
 
 		</tr>
 		<tr valign="top">
-			<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateEnd"  }</td>
+			<td class="label">{fieldLabel name="lastYear" required="true"  key="plugins.reports.scieloSubmissionsReport.dateDecisionEnd"  }</td>
 			<td>
-				<input type="date" id='dateEnd' name='dataFim' from=$dateEnd defaultValue=$dateEnd value="{$years[1]}"/>
+				<input type="date" id='dateDecisionEnd' name='dataDecisaoFinal' from=$dateDecisionEnd defaultValue=$dateDecisionEnd value="{$years[1]}"/>
 			</td>
 		</tr>
+
 		</table>
 
 		{if $sessions|@count > 0}
