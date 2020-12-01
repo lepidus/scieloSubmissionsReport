@@ -76,7 +76,13 @@
 			dataInicialMenorqueFinal($dataSubmissaoInicial,$dataSubmissaoFinal) &&
 			dataInicialMenorqueFinal($dataDecisaoInicial,$dataDecisaoFinal)
 		){
-		 	$articlesIterator = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
+			$dadosSubmissoes = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
+			 
+			$fp = fopen('php://output', 'wt');
+			foreach($dadosSubmissoes as $linhaSubmissao){
+				fputcsv($fp, $linhaSubmissao);
+			}
+			fclose($fp);
 		}
 		else{
 			echo "Datas invalidas por favor coloque uma data correta;";

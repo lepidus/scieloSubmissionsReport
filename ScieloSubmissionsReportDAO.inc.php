@@ -27,16 +27,18 @@ class ScieloSubmissionsReportDAO extends DAO
         $resultSubmissoes = $this->retrieve($querySubmissoes);
 
         //Adicionar um echo para imprimir os títulos de cada coluna
-
+        $dadosSubmissoes = array();
         while($rowSubmissao = $resultSubmissoes->FetchRow()) {
-            $strSubmissao = $this->getSubmissionString($journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
+            $arraySubmissao = $this->getSubmissionArray($journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
 
-            if($strSubmissao)
-                echo $strSubmissao . "\n";
+            if($arraySubmissao)
+                $dadosSubmissoes[] = $arraySubmissao;
         }
+
+        return $dadosSubmissoes;
     }
 
-    private function getSubmissionString($journalId, $submissionId, $diasMudancaStatus, $sections) {
+    private function getSubmissionArray($journalId, $submissionId, $diasMudancaStatus, $sections) {
         $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $locale = AppLocale::getLocale();
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
@@ -52,7 +54,16 @@ class ScieloSubmissionsReportDAO extends DAO
         $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
 
         if(!in_array($nomeSecao, $sections))
-            return "";
+            return null;
+
+        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$nomeJournal,$nomeSecao,$idioma];   
+        foreach($submissao->getAuthors() as $autor) {
+            $nomeAutor = "Autor: " .  $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
+            $paisAutor = "País: " . $autor->getCountryLocalized();
+            $afiliacaoAutor = "Afiliação: " . $autor->getLocalizedAffiliation();
+
+            $arraySubmissao = array_merge($arraySubmissao, [$nomeAutor, $paisAutor, $afiliacaoAutor]);
+        }
 
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
         $notas = "";
@@ -64,38 +75,10 @@ class ScieloSubmissionsReportDAO extends DAO
                 $note = $note[0];
                 $notas .= "Nota: " . trim(preg_replace('/\s+/', ' ', $note));
             }
-
         }
+        $arraySubmissao[] = $notas;
 
-        $listaAutores = array();
-        foreach($submissao->getAuthors() as $autor) {
-            $nomeAutor = "Autor: " .  $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
-            $paisAutor = "País: " . $autor->getCountryLocalized();
-            $afiliacaoAutor = "Afiliação: " . $autor->getLocalizedAffiliation();
-
-            $listaAutores[] = "{$nomeAutor},{$paisAutor},{$afiliacaoAutor}";
-        }
-        $stringAutores = $this->stringVirgulas($listaAutores);
-
-        return $this->stringVirgulas([
-            $submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$nomeJournal,$nomeSecao,$idioma,$stringAutores,$notas
-        ]);
-    }
-
-    private function stringVirgulas($lista) {
-        $retorno = "";
-        $primeiro = true;
-
-        foreach($lista as $elemento) {
-            if($primeiro)
-                $primeiro = false;
-            else
-                $retorno .= ",";
-
-            $retorno .= $elemento;
-        }
-
-        return $retorno;
+        return $arraySubmissao;
     }
 
     public function getSession($journalId)
