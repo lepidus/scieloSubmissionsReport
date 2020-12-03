@@ -62,6 +62,26 @@
 		$plugin = $this->_plugin;
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
 	}
+
+	private function imprimeCabecalhoCSV($fp) {
+		$cabecalho = [
+			__("plugins.reports.scieloSubmissionsReport.header.submissionId"),
+			__("submission.submissionTitle"),
+			__("common.dateSubmitted"),
+			__("common.dateDecided"),
+			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
+			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
+			__("plugins.reports.scieloSubmissionsReport.header.moderators"),
+			__("plugins.reports.scieloSubmissionsReport.header.context"),
+			__("plugins.reports.scieloSubmissionsReport.header.section"),
+			__("common.language"),
+			__("submission.authors"),
+			__("submission.notes"),
+		];
+
+		fputcsv($fp, $cabecalho);
+	}
+
 	function generateReport($dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $request,$sessions){
 		$journal = $request->getJournal();
 		header('content-type: text/comma-separated-values');
@@ -79,6 +99,7 @@
 			$dadosSubmissoes = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
 			 
 			$fp = fopen('php://output', 'wt');
+			$this->imprimeCabecalhoCSV($fp);
 			foreach($dadosSubmissoes as $linhaSubmissao){
 				fputcsv($fp, $linhaSubmissao);
 			}
