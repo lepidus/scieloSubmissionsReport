@@ -56,7 +56,9 @@ class ScieloSubmissionsReportDAO extends DAO
         if(!in_array($nomeSecao, $sections))
             return null;
 
-        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$nomeJournal,$nomeSecao,$idioma];   
+        $moderadores = $this->obterModeradores($submissionId);
+        $arraySubmissao = array_merge([$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao], $moderadores, [$nomeJournal,$nomeSecao,$idioma]);
+        
         foreach($submissao->getAuthors() as $autor) {
             $nomeAutor = "Autor: " .  $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
             $paisAutor = "País: " . $autor->getCountryLocalized();
@@ -79,6 +81,23 @@ class ScieloSubmissionsReportDAO extends DAO
         $arraySubmissao[] = $notas;
 
         return $arraySubmissao;
+    }
+
+    private function obterModeradores($submissionId) {
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $iteradorModeradores = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR);
+        $idModeradores = $moderadores = array();
+
+        while($moderador = $iteradorModeradores->next()){
+            if(!in_array($moderador->getId(), $idModeradores)){
+                $idModeradores[] = $moderador->getId();
+                $userDao = DAORegistry::getDAO('UserDAO');
+                $usuario = $userDao->getById($moderador->getUserId());
+                $moderadores[] = $usuario->getFullName();
+            }
+        }
+
+        return (!empty($moderadores)) ? ($moderadores) : ([__("plugins.reports.scieloSubmissionsReport.warning.noModerators")]);
     }
 
     public function getSession($journalId)

@@ -24,6 +24,8 @@
     <message key="plugins.reports.scieloSubmissionsReport.period">Period</message>
     <message key="plugins.reports.scieloSubmissionsReport.sections">Sections</message>
 
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">No moderators assigned</message>
+
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionId">Submission's ID</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.daysChangeStatus">Days until status changing</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionStatus">Submission's status</message>
