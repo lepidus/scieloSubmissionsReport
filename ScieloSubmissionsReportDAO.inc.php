@@ -57,15 +57,8 @@ class ScieloSubmissionsReportDAO extends DAO
             return null;
 
         $moderadores = $this->obterModeradores($submissionId);
-        $arraySubmissao = array_merge([$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao], $moderadores, [$nomeJournal,$nomeSecao,$idioma]);
-        
-        foreach($submissao->getAuthors() as $autor) {
-            $nomeAutor = "Autor: " .  $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
-            $paisAutor = "País: " . $autor->getCountryLocalized();
-            $afiliacaoAutor = "Afiliação: " . $autor->getLocalizedAffiliation();
-
-            $arraySubmissao = array_merge($arraySubmissao, [$nomeAutor, $paisAutor, $afiliacaoAutor]);
-        }
+        $autores = $this->obterAutores($submissao->getAuthors());
+        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
 
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
         $notas = "";
@@ -83,6 +76,19 @@ class ScieloSubmissionsReportDAO extends DAO
         return $arraySubmissao;
     }
 
+    private function obterAutores($autores) {
+        $dadosAutores = array();
+        foreach($autores as $autor) {
+            $nomeAutor = $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
+            $paisAutor = $autor->getCountryLocalized();
+            $afiliacaoAutor = $autor->getLocalizedAffiliation();
+
+            $dadosAutores[] = implode(", ", [$nomeAutor, $paisAutor, $afiliacaoAutor]);
+        }
+
+        return implode("; ", $dadosAutores);
+    }
+
     private function obterModeradores($submissionId) {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $iteradorModeradores = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR);
@@ -97,7 +103,7 @@ class ScieloSubmissionsReportDAO extends DAO
             }
         }
 
-        return (!empty($moderadores)) ? ($moderadores) : ([__("plugins.reports.scieloSubmissionsReport.warning.noModerators")]);
+        return (!empty($moderadores)) ? (implode(", ", $moderadores)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
     }
 
     public function getSession($journalId)
