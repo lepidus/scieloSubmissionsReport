@@ -29,6 +29,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionId">ID da submissão</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.daysChangeStatus">Dias até mudança de status</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionStatus">Estado da submissão</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.areaModerator">Moderador de área</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.moderators">Moderadores</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Periódico / Servidor</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Seção</message>

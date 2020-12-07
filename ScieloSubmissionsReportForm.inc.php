@@ -71,6 +71,7 @@
 			__("common.dateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
+			__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
 			__("plugins.reports.scieloSubmissionsReport.header.moderators"),
 			__("plugins.reports.scieloSubmissionsReport.header.context"),
 			__("plugins.reports.scieloSubmissionsReport.header.section"),

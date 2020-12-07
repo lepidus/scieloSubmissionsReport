@@ -56,9 +56,9 @@ class ScieloSubmissionsReportDAO extends DAO
         if(!in_array($nomeSecao, $sections))
             return null;
 
-        $moderadores = $this->obterModeradores($submissionId);
+        list($moderadorArea, $moderadores) = $this->obterModeradores($submissionId);
         $autores = $this->obterAutores($submissao->getAuthors());
-        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
+        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
 
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
         $notas = "";
@@ -91,19 +91,29 @@ class ScieloSubmissionsReportDAO extends DAO
 
     private function obterModeradores($submissionId) {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $iteradorModeradores = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR);
-        $idModeradores = $moderadores = array();
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $nomeModeradoresPorGrupo = array();
 
-        while($moderador = $iteradorModeradores->next()){
-            if(!in_array($moderador->getId(), $idModeradores)){
-                $idModeradores[] = $moderador->getId();
-                $userDao = DAORegistry::getDAO('UserDAO');
-                $usuario = $userDao->getById($moderador->getUserId());
-                $moderadores[] = $usuario->getFullName();
-            }
+        while($designado = $iteradorDesignados->next()){
+            $moderador = $userDao->getById($designado->getUserId());
+            
+            if(array_key_exists($designado->getUserGroupId(), $nomeModeradoresPorGrupo))
+                $nomeModeradoresPorGrupo[$designado->getUserGroupId()][] = $moderador->getFullName();
+            else
+                $nomeModeradoresPorGrupo[$designado->getUserGroupId()] = [$moderador->getFullName()];
         }
 
-        return (!empty($moderadores)) ? (implode(", ", $moderadores)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
+        if($nomeModeradoresPorGrupo == [])
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
+
+        $nomesGrupo1 = array_shift($nomeModeradoresPorGrupo);
+        $nomesGrupo2 = array_shift($nomeModeradoresPorGrupo);
+
+        if(count($nomesGrupo1) == 1)     //Há apenas um moderador de área
+            return [$nomesGrupo1[0], implode(", ", $nomesGrupo2)];
+        else
+            return [$nomesGrupo2[0], implode(", ", $nomesGrupo1)];
     }
 
     public function getSession($journalId)
