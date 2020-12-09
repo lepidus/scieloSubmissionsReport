@@ -67,6 +67,7 @@
 		$cabecalho = [
 			__("plugins.reports.scieloSubmissionsReport.header.submissionId"),
 			__("submission.submissionTitle"),
+			__("submission.submitter"),
 			__("common.dateSubmitted"),
 			__("common.dateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),

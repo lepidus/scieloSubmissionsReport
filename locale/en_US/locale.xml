@@ -25,6 +25,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.sections">Sections</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">No moderators assigned</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">The submitting author was not found</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionId">Submission's ID</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.daysChangeStatus">Days until status changing</message>

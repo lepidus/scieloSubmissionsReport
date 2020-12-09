@@ -57,8 +57,9 @@ class ScieloSubmissionsReportDAO extends DAO
             return null;
 
         list($moderadorArea, $moderadores) = $this->obterModeradores($submissionId);
+        $usuarioSubmissor = $this->obterUsuarioSubmissor($submissionId);
         $autores = $this->obterAutores($submissao->getAuthors());
-        $arraySubmissao = [$submissionId,$titulo,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
+        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
 
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
         $notas = "";
@@ -74,6 +75,21 @@ class ScieloSubmissionsReportDAO extends DAO
         $arraySubmissao[] = $notas;
 
         return $arraySubmissao;
+    }
+
+    private function obterUsuarioSubmissor($submissionId) {
+        $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $iteradorEventos = $submissionEventLogDao->getBySubmissionId($submissionId);
+
+        while($evento = $iteradorEventos->next()) {
+            if($evento->getEventType() == SUBMISSION_LOG_SUBMISSION_SUBMIT){
+                $usuarioSubmissor = $userDao->getById($evento->getUserId());
+                return $usuarioSubmissor->getFullName();
+            }
+        }
+        
+        return __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
     }
 
     private function obterAutores($autores) {
