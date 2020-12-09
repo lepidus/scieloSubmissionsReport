@@ -56,10 +56,11 @@ class ScieloSubmissionsReportDAO extends DAO
         if(!in_array($nomeSecao, $sections))
             return null;
 
+        list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
         list($moderadorArea, $moderadores) = $this->obterModeradores($submissionId);
         $usuarioSubmissor = $this->obterUsuarioSubmissor($submissionId);
         $autores = $this->obterAutores($submissao->getAuthors());
-        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
+        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$estadoPublicacao,$doiPublicacao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
 
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
         $notas = "";
@@ -90,6 +91,26 @@ class ScieloSubmissionsReportDAO extends DAO
         }
         
         return __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+    }
+
+    private function obterDadosPublicacao($submissao) {
+        $publicacao = $submissao->getCurrentPublication();
+        $opcoesRelacao = Services::get('publication')->getRelationOptions();
+        $idRelacao = $publicacao->getData('relationStatus');
+        $estadoPublicacao = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
+        $doiPublicacao = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+
+        if($idRelacao){
+            foreach($opcoesRelacao as $opcao){
+                if($opcao['value'] == $idRelacao)
+                    $estadoPublicacao = $opcao['label'];
+            }
+
+            if($publicacao->getData('vorDoi'))
+                $doiPublicacao = $publicacao->getData('vorDoi');
+        }
+
+        return [$estadoPublicacao, $doiPublicacao];
     }
 
     private function obterAutores($autores) {

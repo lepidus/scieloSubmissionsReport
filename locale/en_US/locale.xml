@@ -26,10 +26,14 @@
 
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">No moderators assigned</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">The submitting author was not found</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus">No publication's status</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI">No publication's DOI</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionId">Submission's ID</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.daysChangeStatus">Days until status changing</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionStatus">Submission's status</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.publicationStatus">Publication's status</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.publicationDOI">Publication's DOI</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.areaModerator">Area moderator</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.moderators">Moderators</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Journal / Server</message>
