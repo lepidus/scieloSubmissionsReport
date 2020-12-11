@@ -43,12 +43,15 @@
 	/* @var ReviewersReport  */
 	private $_plugin;
 
+	private $_aplicacao;
+
 	/**
 	 * Constructor
 	 * @param $plugin ReviewersReport Manual payment plugin
 	 */
-	function __construct($plugin) {
+	function __construct($plugin, $aplicacao) {
 		$this->_plugin = $plugin;
+		$this->_aplicacao = $aplicacao;
 		parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
@@ -72,16 +75,21 @@
 			__("common.dateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
-			__("plugins.reports.scieloSubmissionsReport.header.publicationStatus"),
-			__("plugins.reports.scieloSubmissionsReport.header.publicationDOI"),
 			__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
 			__("plugins.reports.scieloSubmissionsReport.header.moderators"),
 			__("plugins.reports.scieloSubmissionsReport.header.context"),
 			__("plugins.reports.scieloSubmissionsReport.header.section"),
 			__("common.language"),
 			__("submission.authors"),
-			__("submission.notes"),
 		];
+		
+		if($this->_aplicacao == "ops") {
+			$cabecalho = array_merge($cabecalho,[
+				__("plugins.reports.scieloSubmissionsReport.header.publicationStatus"),
+				__("plugins.reports.scieloSubmissionsReport.header.publicationDOI"),
+				__("submission.notes"),
+			]);
+		}
 
 		fputcsv($fp, $cabecalho);
 	}
@@ -100,7 +108,7 @@
 			dataInicialMenorqueFinal($dataSubmissaoInicial,$dataSubmissaoFinal) &&
 			dataInicialMenorqueFinal($dataDecisaoInicial,$dataDecisaoFinal)
 		){
-			$dadosSubmissoes = $scieloSubmissionsReportDAO->getReportWithSections($journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
+			$dadosSubmissoes = $scieloSubmissionsReportDAO->getReportWithSections($this->_aplicacao, $journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
 			 
 			$fp = fopen('php://output', 'wt');
 			$this->imprimeCabecalhoCSV($fp);

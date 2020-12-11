@@ -27,7 +27,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 			$this->import('ScieloSubmissionsReportForm');
 			$this->import('ScieloSubmissionsReportDAO');
 			
-			$form = new ScieloSubmissionsReportForm($this);
+			$aplicacao = substr(Application::getName(), 0, 3);
+			$form = new ScieloSubmissionsReportForm($this, $aplicacao);
 			$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
 			DAORegistry::registerDAO('ScieloSubmissionsReportDAO', $scieloSubmissionsReportDAO);
 			
@@ -76,7 +77,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 	 * @copydoc ReportPlugin::display()
 	 */
 	function display($args, $request) {
-		$form    = new ScieloSubmissionsReportForm($this);
+		$aplicacao = substr(Application::getName(), 0, 3);
+		$form    = new ScieloSubmissionsReportForm($this, $aplicacao);
 		$dateStart = date("Y-01-01");
 		$dateEnd   = date("Y-m-d");
 		$datas     = array($dateStart, $dateEnd);

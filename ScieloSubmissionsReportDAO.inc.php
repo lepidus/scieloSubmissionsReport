@@ -21,7 +21,7 @@ class ScieloSubmissionsReportDAO extends DAO
      * @param $journalId int
      * @return array
      */
-    public function getReportWithSections($journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
+    public function getReportWithSections($aplicacao, $journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
         $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
         $querySubmissoes .= " AND date_submitted >= '{$dataSubmissaoInicial} 23:59:59' AND date_submitted <= '{$dataSubmissaoFinal} 23:59:59' AND date_last_activity >= '{$dataDecisaoInicial}  23:59:59' AND date_last_activity <= '{$dataDecisaoFinal} 23:59:59'";
         $resultSubmissoes = $this->retrieve($querySubmissoes);
@@ -29,7 +29,7 @@ class ScieloSubmissionsReportDAO extends DAO
         //Adicionar um echo para imprimir os títulos de cada coluna
         $dadosSubmissoes = array();
         while($rowSubmissao = $resultSubmissoes->FetchRow()) {
-            $arraySubmissao = $this->getSubmissionArray($journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
+            $arraySubmissao = $this->getSubmissionArray($aplicacao, $journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
 
             if($arraySubmissao)
                 $dadosSubmissoes[] = $arraySubmissao;
@@ -38,7 +38,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $dadosSubmissoes;
     }
 
-    private function getSubmissionArray($journalId, $submissionId, $diasMudancaStatus, $sections) {
+    private function getSubmissionArray($aplicacao, $journalId, $submissionId, $diasMudancaStatus, $sections) {
         $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $locale = AppLocale::getLocale();
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
@@ -52,28 +52,20 @@ class ScieloSubmissionsReportDAO extends DAO
         $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
         $nomeSecao = $secao->getTitle($locale);
         $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-
-        if(!in_array($nomeSecao, $sections))
-            return null;
-
-        list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
         list($moderadorArea, $moderadores) = $this->obterModeradores($submissionId);
         $usuarioSubmissor = $this->obterUsuarioSubmissor($submissionId);
         $autores = $this->obterAutores($submissao->getAuthors());
-        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$estadoPublicacao,$doiPublicacao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma, $autores];
 
-        $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissao->getId()}");
-        $notas = "";
-        if($resultNotes->NumRows() == 0) {
-            $notas = 'Sem Notas';
+        if(!in_array($nomeSecao, $sections))
+            return null;
+            
+        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma,$autores];
+        
+        if($aplicacao == 'ops') {
+            list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
+            $notas = $this->obterNotas($submissionId);
+            $arraySubmissao = array_merge($arraySubmissao, [$estadoPublicacao,$doiPublicacao,$notas]);
         }
-        else{
-            while($note = $resultNotes->FetchRow()) {
-                $note = $note[0];
-                $notas .= "Nota: " . trim(preg_replace('/\s+/', ' ', $note));
-            }
-        }
-        $arraySubmissao[] = $notas;
 
         return $arraySubmissao;
     }
@@ -151,6 +143,21 @@ class ScieloSubmissionsReportDAO extends DAO
             return [$nomesGrupo1[0], implode(", ", $nomesGrupo2)];
         else
             return [$nomesGrupo2[0], implode(", ", $nomesGrupo1)];
+    }
+
+    private function obterNotas($submissionId) {
+        $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissionId}");
+        $notas = "";
+        if($resultNotes->NumRows() == 0) {
+            $notas = 'Sem Notas';
+        }
+        else{
+            while($note = $resultNotes->FetchRow()) {
+                $note = $note[0];
+                $notas .= "Nota: " . trim(preg_replace('/\s+/', ' ', $note));
+            }
+        }
+        return $notas;
     }
 
     public function getSession($journalId)
