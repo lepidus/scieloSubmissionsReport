@@ -1,11 +1,22 @@
 # Plugin de relatório de submissões 
 
 Este plugin gera uma planilha **csv** com as seguintes informações : 
-- Id do artigo
-- Status (aprovado ou rejeitado) em qual estágio foi aprovado
-- Data da submissao
-- Data que o status foi modificado
-- Dias até a ultima mudança.
+- Id da submissão
+- Título da submissão
+- Usuário submissor
+- Data da submissão
+- Data da decisão
+- Dias até a decisão tomada
+- Estado da submissão (avaliação, aprovado, rejeitado)
+- Estado da publicação do preprint (não enviado para publicação em periódico, enviado, enviado e aceito)
+- DOI da publicação do preprint (caso este tenha sido publicado em periódico)
+- Moderador de área da submissão
+- Moderadores da submissão
+- Nome do servidor
+- Seção da submissão
+- Idioma da submissão
+- Autores (contendo seus nomes, países e afiliação)
+- Notas da submissão
 
 __Copyright (c) Lepidus Tecnologia__ 
 
@@ -13,7 +24,7 @@ __Copyright (c) Lepidus Tecnologia__
 
 ## Pré-Requisitos
 
-* OJS 3.2.0.0 ou OJS 3.2.1.0
+* OPS 3.2.1
 
 
 ## Download do Plugin
@@ -22,10 +33,10 @@ Para fazer download do plugin entre na página de Releases
 [clicando aqui](https://gitlab.lepidus.com.br/plugins_ojs/relatorioscielo/-/releases), ou vá em `RelatorioScielo > Project Overview > Releases` e confira a versão que deseja instalar.
 
 ## Instalação
-1. Entre na área de administração do seu site OJS pelo __Painel de Controle__.
+1. Entre na área de administração do seu site OPS pelo __Painel de Controle__.
 2. Navegue até o `Configurações` > `Website` > `Plugins` > `Enviar novo plugin`.
 3. Em __Enviar arquivo__ selecione o arquivo __SubmissionReportPlugin.tar.gz__.
-4. Clique em __Salvar__ e o plugin estará sendo instalado no seu OJS. 
+4. Clique em __Salvar__ e o plugin estará sendo instalado no seu OPS. 
 
 # Tecnologias Utilizadas
 
