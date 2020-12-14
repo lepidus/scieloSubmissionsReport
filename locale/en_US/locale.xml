@@ -38,5 +38,6 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.moderators">Moderators</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Journal / Server</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Section</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.reviews">Reviews</message>
 </locale>
 

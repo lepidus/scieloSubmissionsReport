@@ -90,6 +90,11 @@
 				__("submission.notes"),
 			]);
 		}
+		else if($this->_aplicacao == "ojs") {
+			$cabecalho = array_merge($cabecalho,[
+				__("plugins.reports.scieloSubmissionsReport.header.reviews"),
+			]);
+		}
 
 		fputcsv($fp, $cabecalho);
 	}

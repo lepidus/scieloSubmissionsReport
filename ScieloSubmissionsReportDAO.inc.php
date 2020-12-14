@@ -66,6 +66,10 @@ class ScieloSubmissionsReportDAO extends DAO
             $notas = $this->obterNotas($submissionId);
             $arraySubmissao = array_merge($arraySubmissao, [$estadoPublicacao,$doiPublicacao,$notas]);
         }
+        else if($aplicacao == 'ojs') {
+            $avaliacoes = $this->obterAvaliacoes($submissionId);
+            $arraySubmissao = array_merge($arraySubmissao, [$avaliacoes]);
+        }
 
         return $arraySubmissao;
     }
@@ -158,6 +162,18 @@ class ScieloSubmissionsReportDAO extends DAO
             }
         }
         return $notas;
+    }
+
+    private function obterAvaliacoes($submissionId) {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $avaliacoesSubmissao = $reviewAssignmentDao->getBySubmissionId($submissionId);
+        $avaliacoes = array();
+
+        foreach($avaliacoesSubmissao as $avaliacao) {
+            $avaliacoes[] = $avaliacao->getLocalizedRecommendation();
+        }
+
+        return implode(", ", $avaliacoes);
     }
 
     public function getSession($journalId)
