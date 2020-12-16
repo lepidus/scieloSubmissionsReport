@@ -29,17 +29,39 @@ class ScieloSubmissionsReportDAO extends DAO
         //Adicionar um echo para imprimir os títulos de cada coluna
         $dadosSubmissoes = array();
         while($rowSubmissao = $resultSubmissoes->FetchRow()) {
-            $arraySubmissao = $this->getSubmissionArray($aplicacao, $journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
+            $dadosSubmissao = $this->obterDadosSubmissao($aplicacao, $journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
 
-            if($arraySubmissao)
-                $dadosSubmissoes[] = $arraySubmissao;
+            if($dadosSubmissao)
+                $dadosSubmissoes[] = $dadosSubmissao;
         }
 
         return $dadosSubmissoes;
     }
 
-    private function getSubmissionArray($aplicacao, $journalId, $submissionId, $diasMudancaStatus, $sections) {
+    private function obterDadosSubmissao($aplicacao, $journalId, $submissionId, $diasMudancaStatus, $sections) {
         $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
+        $dadosSubmissao = $this->obterDadosComunsSubmissao($submissao, $journalId, $diasMudancaStatus, $sections);
+        
+        if(!$dadosSubmissao) return null;
+
+        if($aplicacao == 'ops') {
+            list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
+            $notas = $this->obterNotas($submissionId);
+            $dadosSubmissao = array_merge($dadosSubmissao, [$estadoPublicacao,$doiPublicacao,$notas]);
+        }
+        else if($aplicacao == 'ojs') {
+            list($avaliacoesCompletas, $avaliacoes) = $this->obterAvaliacoes($submissionId);
+
+            if(!$avaliacoesCompletas)
+                return null;
+
+            $dadosSubmissao = array_merge($dadosSubmissao, [$avaliacoes]);
+        }
+
+        return $dadosSubmissao;
+    }
+
+    private function obterDadosComunsSubmissao($submissao, $journalId, $diasMudancaStatus, $sections) {
         $locale = AppLocale::getLocale();
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION);
@@ -52,30 +74,14 @@ class ScieloSubmissionsReportDAO extends DAO
         $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
         $nomeSecao = $secao->getTitle($locale);
         $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-        list($moderadorArea, $moderadores) = $this->obterModeradores($submissionId);
-        $usuarioSubmissor = $this->obterUsuarioSubmissor($submissionId);
+        list($moderadorArea, $moderadores) = $this->obterModeradores($submissao->getId());
+        $usuarioSubmissor = $this->obterUsuarioSubmissor($submissao->getId());
         $autores = $this->obterAutores($submissao->getAuthors());
 
         if(!in_array($nomeSecao, $sections))
             return null;
-            
-        $arraySubmissao = [$submissionId,$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma,$autores];
         
-        if($aplicacao == 'ops') {
-            list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
-            $notas = $this->obterNotas($submissionId);
-            $arraySubmissao = array_merge($arraySubmissao, [$estadoPublicacao,$doiPublicacao,$notas]);
-        }
-        else if($aplicacao == 'ojs') {
-            list($avaliacoesCompletas, $avaliacoes) = $this->obterAvaliacoes($submissionId);
-
-            if(!$avaliacoesCompletas)
-                return null;
-
-            $arraySubmissao = array_merge($arraySubmissao, [$avaliacoes]);
-        }
-
-        return $arraySubmissao;
+        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma,$autores];
     }
 
     private function obterUsuarioSubmissor($submissionId) {
