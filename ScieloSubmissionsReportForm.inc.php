@@ -113,7 +113,7 @@
 			dataInicialMenorqueFinal($dataSubmissaoInicial,$dataSubmissaoFinal) &&
 			dataInicialMenorqueFinal($dataDecisaoInicial,$dataDecisaoFinal)
 		){
-			$dadosSubmissoes = $scieloSubmissionsReportDAO->getReportWithSections($this->_aplicacao, $journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
+			$dadosSubmissoes = $scieloSubmissionsReportDAO->obterRelatorioComSecoes($this->_aplicacao, $journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
 			 
 			$fp = fopen('php://output', 'wt');
 			$this->imprimeCabecalhoCSV($fp);
@@ -132,8 +132,8 @@
 		$reviewerReportDao = DAORegistry::getDAO("ScieloSubmissionsReportDAO");
 		$journalRequest = Application::getRequest();
 		$journal = $journalRequest->getJournal();
-		$sessions = $reviewerReportDao->getSession($journal->getId());
-		$sessions_options = $reviewerReportDao->getSectionsOptions($journal->getId());
+		$sessions = $reviewerReportDao->obterSecoes($journal->getId());
+		$sessions_options = $reviewerReportDao->obterOpcoesSecoes($journal->getId());
 		$templateManager->assign('sessions',$sessions);
 		$templateManager->assign('sessions_options',$sessions_options);
 		$templateManager->assign('years', array(0=>$request[0], 1=>$request[1]));

@@ -21,7 +21,7 @@ class ScieloSubmissionsReportDAO extends DAO
      * @param $journalId int
      * @return array
      */
-    public function getReportWithSections($aplicacao, $journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
+    public function obterRelatorioComSecoes($aplicacao, $journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
         $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
         $querySubmissoes .= " AND date_submitted >= '{$dataSubmissaoInicial} 23:59:59' AND date_submitted <= '{$dataSubmissaoFinal} 23:59:59' AND date_last_activity >= '{$dataDecisaoInicial}  23:59:59' AND date_last_activity <= '{$dataDecisaoFinal} 23:59:59'";
         $resultSubmissoes = $this->retrieve($querySubmissoes);
@@ -189,8 +189,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return [$avaliacoesCompletas, implode(", ", $avaliacoes)];
     }
 
-    public function getSession($journalId)
-    {
+    public function obterSecoes($journalId) {
         import('classes.core.Services');
 		$sections = Services::get('section')
             ->getSectionList($journalId);
@@ -202,8 +201,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $newSections;
     }
 
-    public function getSectionsOptions($journalId)
-    {
+    public function obterOpcoesSecoes($journalId) {
         import('classes.core.Services');
 		$sections = Services::get('section')
             ->getSectionList($journalId);
