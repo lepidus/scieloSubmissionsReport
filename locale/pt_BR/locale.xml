@@ -14,6 +14,10 @@
 	  <message key="plugins.reports.scieloSubmissionsReport.displayName">Relatório de Submissões SciELO</message>
 	  <message key="plugins.reports.scieloSubmissionsReport.description">Este plugin implementa um relatório no formato CSV (planilha eletrônica) contendo informações que no geral são solicitadas pelo Scielo. Desenvolvido por Lepidus Tecnologia.</message>        
     
+    <message key="plugins.reports.scieloSubmissionsReport.filterMessage">Selecione o intervalo desejado abaixo:</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterSubmission">Filtrar por data de submissão</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterDecision">Filtrar por data de decisão</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterBoth">Filtrar por data de submissão e decisão</message>
     <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedStart">Data de submissão inicial:</message>
     <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedEnd">Data de submissão final:</message>
     <message key="plugins.reports.scieloSubmissionsReport.dateDecisionStart">Data de decisão inicial:</message>
