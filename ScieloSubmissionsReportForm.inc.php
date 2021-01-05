@@ -77,7 +77,6 @@
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
 			__("plugins.reports.scieloSubmissionsReport.header.moderators"),
-			__("plugins.reports.scieloSubmissionsReport.header.context"),
 			__("plugins.reports.scieloSubmissionsReport.header.section"),
 			__("common.language"),
 			__("submission.authors"),

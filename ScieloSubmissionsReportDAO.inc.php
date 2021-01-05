@@ -81,7 +81,7 @@ class ScieloSubmissionsReportDAO extends DAO
         if(!in_array($nomeSecao, $sections))
             return null;
         
-        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeJournal,$nomeSecao,$idioma,$autores];
+        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeSecao,$idioma,$autores];
     }
 
     private function obterUsuarioSubmissor($submissionId) {
