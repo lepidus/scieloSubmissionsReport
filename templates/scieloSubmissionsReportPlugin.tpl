@@ -51,14 +51,12 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 	{if $sessions|@count > 0}
 		<h2>{translate key="plugins.reports.scieloSubmissionsReport.sections"}</h2>
 		<table> 
-		<div class= "pkpListPanel"> 
-			<tr>
-					
-				<td class="value" colspan="2">
-					{fbvElement type="checkBoxGroup" name="sessions" id="sessions" from=$sessions selected=$sessions_options translate=false}
-				</td>
-				
-			</tr>
+			<div class= "pkpListPanel"> 
+				<tr>	
+					<td class="value" colspan="2">
+						{fbvElement type="checkBoxGroup" name="sessions" id="sessions" from=$sessions selected=$sessions_options translate=false}
+					</td>
+				</tr>
 			</div>
 		</table> 
 	{/if}

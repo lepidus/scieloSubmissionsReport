@@ -32,6 +32,8 @@
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">The submitting author was not found</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus">No publication's status</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI">No publication's DOI</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate">The initial submitted date cannot be greater than the final submitted date</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate">The initial decision date cannot be greater than the final decision date</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.header.submissionId">Submission's ID</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.daysChangeStatus">Days until status changing</message>

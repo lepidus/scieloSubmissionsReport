@@ -84,15 +84,20 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 		$datas     = array($dateStart, $dateEnd);
 
 		$form->initData();
-		$journal = $request->getJournal();
-		$acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $journal->getLocalizedAcronym());
 		import('classes.statistics.StatisticsHelper');
 		$requestHandler = new PKPRequest();
 		if ($requestHandler->isPost($request)) {
 			$postVars = $requestHandler->getUserVars($request);
 			if ($postVars['generate'] === "1") {
 				array_key_exists('sessions', $postVars) ? $sessions = $postVars['sessions'] : $sessions = NULL;
-				$form->generateReport($postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal'],$postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal'],$request, $sessions);
+				$tipoFiltro = $postVars['selectTipoFiltragemData'];
+
+				if($tipoFiltro == 1)
+					$form->generateReport($request, $sessions, $postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal']);
+				else if($tipoFiltro == 2)
+					$form->generateReport($request, $sessions, null, null, $postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal']);
+				else
+					$form->generateReport($request, $sessions, $postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal'], $postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal']);
 			}
 
 		}
