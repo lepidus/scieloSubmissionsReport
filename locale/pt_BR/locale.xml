@@ -29,6 +29,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.sections">Seções</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">Sem moderadores designados</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noEditors">Sem editores designados</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">Não foi encontrado o(a) autor(a) submissor(a)</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus">Sem estado de publicação</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI">Sem DOI de publicação</message>
@@ -40,6 +41,8 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.publicationDOI">DOI da publicação</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.areaModerator">Moderador de área</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.moderators">Moderadores</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.magazineEditors">Editores da Revista</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.sectionEditor">Editor de Seção</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Periódico / Servidor</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Seção</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.reviews">Avaliações</message>

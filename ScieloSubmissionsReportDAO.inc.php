@@ -136,29 +136,30 @@ class ScieloSubmissionsReportDAO extends DAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $nomeModeradoresPorGrupo = array();
+        $codGrupoModeradorArea = "11";
+        $moderadorArea = array();
+        $moderadores =  array();
 
         while($designado = $iteradorDesignados->next()){
             $moderador = $userDao->getById($designado->getUserId());
-            
-            if(array_key_exists($designado->getUserGroupId(), $nomeModeradoresPorGrupo))
-                $nomeModeradoresPorGrupo[$designado->getUserGroupId()][] = $moderador->getFullName();
+
+            if($designado->getUserGroupId() === $codGrupoModeradorArea)
+                array_push($moderadorArea,$moderador->getFullName());
             else
-                $nomeModeradoresPorGrupo[$designado->getUserGroupId()] = [$moderador->getFullName()];
+                array_push($moderadores,$moderador->getFullName());
         }
+        $usuariosModeradores = [implode(",", $moderadorArea),implode(",", $moderadores)];
 
-        if($nomeModeradoresPorGrupo == [])
+        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1])=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), $usuariosModeradores[1]];
+        if((empty($usuariosModeradores[0]) === false) and (empty($usuariosModeradores[1]) === true))
+            return [$usuariosModeradores[0],__("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
+        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1]) === true))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
-
-        $nomesGrupo1 = array_shift($nomeModeradoresPorGrupo);
-        $nomesGrupo2 = array_shift($nomeModeradoresPorGrupo);
-
-        if(count($nomesGrupo1) == 1)     //Há apenas um moderador de área
-            return [$nomesGrupo1[0], implode(", ", $nomesGrupo2)];
-        else
-            return [$nomesGrupo2[0], implode(", ", $nomesGrupo1)];
+        
+        return $usuariosModeradores; 
     }
-
+    
     private function obterNotas($submissionId) {
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissionId}");
         $notas = "";
