@@ -132,18 +132,22 @@ class ScieloSubmissionsReportDAO extends DAO
         return implode("; ", $dadosAutores);
     }
 
+    /* Obter moderadores para o OPS  Pegando */
     private function obterModeradores($submissionId) {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $codGrupoModeradorArea = "11";
+        $palavraChave = "área";
         $moderadorArea = array();
         $moderadores =  array();
 
         while($designado = $iteradorDesignados->next()){
             $moderador = $userDao->getById($designado->getUserId());
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = $userGroup->getLocalizedName();
 
-            if($designado->getUserGroupId() === $codGrupoModeradorArea)
+            if( strstr($userGroup->getLocalizedName(),$palavraChave) )
                 array_push($moderadorArea,$moderador->getFullName());
             else
                 array_push($moderadores,$moderador->getFullName());
@@ -158,6 +162,41 @@ class ScieloSubmissionsReportDAO extends DAO
             return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
         
         return $usuariosModeradores; 
+    }
+
+
+    /* Obter Editores para o OJS */
+    private function obterEditores($submissionId) {
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $iteradorEditoresDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $iteradorGerentesDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
+
+        $gerentesRevista =  array();
+        $editoresSecao = array();
+
+        while($designado = $iteradorGerentesDesignados->next()){
+            $gerente = $userDao->getById($designado->getUserId());
+            array_push($gerentesRevista,$gerente->getFullName());
+            #error_log($gerente->getFullName());
+        }
+
+        while($designado = $iteradorEditoresDesignados->next()){
+            $editor = $userDao->getById($designado->getUserId());
+            array_push($editoresSecao,$editor->getFullName());
+            #error_log($editor->getFullName());       
+        }
+
+        $usuarios = [implode(",", $gerentesRevista),implode(",", $editoresSecao)];
+
+        if((empty($gerentesRevista) === true) and (empty($editoresSecao)=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $usuarios[1]];
+        if((empty($gerentesRevista) === false) and (empty($editoresSecao) === true))
+            return [$usuarios[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        if((empty($gerentesRevista) === true) and (empty($editoresSecao) === true))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), __("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        
+        return $usuarios; 
     }
     
     private function obterNotas($submissionId) {
