@@ -74,14 +74,24 @@ class ScieloSubmissionsReportDAO extends DAO
         $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
         $nomeSecao = $secao->getTitle($locale);
         $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-        list($moderadorArea, $moderadores) = $this->obterModeradores($submissao->getId());
+        list($moderadorArea_EditorRevista, $moderadores_editorSecao) = $this->controladorModeradorEditor($submissao);
         $usuarioSubmissor = $this->obterUsuarioSubmissor($submissao->getId());
         $autores = $this->obterAutores($submissao->getAuthors());
 
         if(!in_array($nomeSecao, $sections))
             return null;
         
-        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeSecao,$idioma,$autores];
+        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea_EditorRevista,$moderadores_editorSecao,$nomeSecao,$idioma,$autores];
+    }
+
+    private function controladorModeradorEditor($submissao){
+        $aplicacaoNome = Application::getName();
+        $aplicacaoNomePadrao = strtolower($aplicacaoNome);
+        
+        if(strstr($aplicacaoNomePadrao,'ops'))
+            return $this->obterModeradores($submissao->getId());
+        if(strstr($aplicacaoNomePadrao,'ojs'))
+            return $this->obterEditores($submissao->getId());
     }
 
     private function obterUsuarioSubmissor($submissionId) {
@@ -132,7 +142,6 @@ class ScieloSubmissionsReportDAO extends DAO
         return implode("; ", $dadosAutores);
     }
 
-    /* Obter moderadores para o OPS  Pegando */
     private function obterModeradores($submissionId) {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
@@ -164,27 +173,22 @@ class ScieloSubmissionsReportDAO extends DAO
         return $usuariosModeradores; 
     }
 
-
-    /* Obter Editores para o OJS */
     private function obterEditores($submissionId) {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorEditoresDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
         $iteradorGerentesDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
-
         $gerentesRevista =  array();
         $editoresSecao = array();
 
         while($designado = $iteradorGerentesDesignados->next()){
             $gerente = $userDao->getById($designado->getUserId());
             array_push($gerentesRevista,$gerente->getFullName());
-            #error_log($gerente->getFullName());
         }
 
         while($designado = $iteradorEditoresDesignados->next()){
             $editor = $userDao->getById($designado->getUserId());
             array_push($editoresSecao,$editor->getFullName());
-            #error_log($editor->getFullName());       
         }
 
         $usuarios = [implode(",", $gerentesRevista),implode(",", $editoresSecao)];
