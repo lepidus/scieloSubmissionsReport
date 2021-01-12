@@ -147,18 +147,18 @@ class ScieloSubmissionsReportDAO extends DAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $palavraChave = "área";
+        $palavrasChave = array("moderador de área","moderador");
         $moderadorArea = array();
         $moderadores =  array();
 
         while($designado = $iteradorDesignados->next()){
             $moderador = $userDao->getById($designado->getUserId());
             $userGroup = $userGroupDao->getById($designado->getUserGroupId());
-            $nomeGrupoAtual = $userGroup->getLocalizedName();
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
 
-            if( strstr($userGroup->getLocalizedName(),$palavraChave) )
+            if( strstr($nomeGrupoAtual,$palavrasChave[0]) )
                 array_push($moderadorArea,$moderador->getFullName());
-            else
+            if( $nomeGrupoAtual == $palavrasChave[1] )
                 array_push($moderadores,$moderador->getFullName());
         }
         $usuariosModeradores = [implode(",", $moderadorArea),implode(",", $moderadores)];
@@ -173,31 +173,43 @@ class ScieloSubmissionsReportDAO extends DAO
         return $usuariosModeradores; 
     }
 
+
     private function obterEditores($submissionId) {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorEditoresDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
         $iteradorGerentesDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
-        $gerentesRevista =  array();
+        $palavrasChave = array("editor da revista","editor de seção");
+        $editoresRevista =  array();
         $editoresSecao = array();
 
         while($designado = $iteradorGerentesDesignados->next()){
             $gerente = $userDao->getById($designado->getUserId());
-            array_push($gerentesRevista,$gerente->getFullName());
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+            
+            if(strstr($nomeGrupoAtual,$palavrasChave[0]))
+                array_push($editoresRevista,$gerente->getFullName());
         }
 
         while($designado = $iteradorEditoresDesignados->next()){
             $editor = $userDao->getById($designado->getUserId());
-            array_push($editoresSecao,$editor->getFullName());
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+
+            if(strstr($nomeGrupoAtual,$palavrasChave[1]))
+                array_push($editoresSecao,$editor->getFullName());
+
         }
 
-        $usuarios = [implode(",", $gerentesRevista),implode(",", $editoresSecao)];
+        $usuarios = [implode(",", $editoresRevista),implode(",", $editoresSecao)];
 
-        if((empty($gerentesRevista) === true) and (empty($editoresSecao)=== false))
+        if((empty($editoresRevista) === true) and (empty($editoresSecao)=== false))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $usuarios[1]];
-        if((empty($gerentesRevista) === false) and (empty($editoresSecao) === true))
+        if((empty($editoresRevista) === false) and (empty($editoresSecao) === true))
             return [$usuarios[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
-        if((empty($gerentesRevista) === true) and (empty($editoresSecao) === true))
+        if((empty($editoresRevista) === true) and (empty($editoresSecao) === true))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), __("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
         
         return $usuarios; 
