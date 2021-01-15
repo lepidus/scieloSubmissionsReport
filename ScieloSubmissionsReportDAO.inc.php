@@ -81,14 +81,24 @@ class ScieloSubmissionsReportDAO extends DAO
         $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
         $nomeSecao = $secao->getTitle($locale);
         $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-        list($moderadorArea, $moderadores) = $this->obterModeradores($submissao->getId());
+        list($moderadorArea_EditorRevista, $moderadores_editorSecao) = $this->controladorModeradorEditor($submissao);
         $usuarioSubmissor = $this->obterUsuarioSubmissor($submissao->getId());
         $autores = $this->obterAutores($submissao->getAuthors());
 
         if(!in_array($nomeSecao, $sections))
             return null;
         
-        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea,$moderadores,$nomeSecao,$idioma,$autores];
+        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea_EditorRevista,$moderadores_editorSecao,$nomeSecao,$idioma,$autores];
+    }
+
+    private function controladorModeradorEditor($submissao){
+        $aplicacaoNome = Application::getName();
+        $aplicacaoNomePadrao = strtolower($aplicacaoNome);
+        
+        if(strstr($aplicacaoNomePadrao,'ops'))
+            return $this->obterModeradores($submissao->getId());
+        if(strstr($aplicacaoNomePadrao,'ojs'))
+            return $this->obterEditores($submissao->getId());
     }
 
     private function obterUsuarioSubmissor($submissionId) {
@@ -140,32 +150,78 @@ class ScieloSubmissionsReportDAO extends DAO
     }
 
     private function obterModeradores($submissionId) {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $nomeModeradoresPorGrupo = array();
+        $palavrasChave = array("moderador de área","moderador");
+        $moderadorArea = array();
+        $moderadores =  array();
 
         while($designado = $iteradorDesignados->next()){
             $moderador = $userDao->getById($designado->getUserId());
-            
-            if(array_key_exists($designado->getUserGroupId(), $nomeModeradoresPorGrupo))
-                $nomeModeradoresPorGrupo[$designado->getUserGroupId()][] = $moderador->getFullName();
-            else
-                $nomeModeradoresPorGrupo[$designado->getUserGroupId()] = [$moderador->getFullName()];
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+
+            if( strstr($nomeGrupoAtual,$palavrasChave[0]) )
+                array_push($moderadorArea,$moderador->getFullName());
+            if( $nomeGrupoAtual == $palavrasChave[1] )
+                array_push($moderadores,$moderador->getFullName());
         }
+        $usuariosModeradores = [implode(",", $moderadorArea),implode(",", $moderadores)];
 
-        if($nomeModeradoresPorGrupo == [])
+        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1])=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), $usuariosModeradores[1]];
+        if((empty($usuariosModeradores[0]) === false) and (empty($usuariosModeradores[1]) === true))
+            return [$usuariosModeradores[0],__("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
+        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1]) === true))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
-
-        $nomesGrupo1 = array_shift($nomeModeradoresPorGrupo);
-        $nomesGrupo2 = array_shift($nomeModeradoresPorGrupo);
-
-        if(count($nomesGrupo1) == 1)     //Há apenas um moderador de área
-            return [$nomesGrupo1[0], implode(", ", $nomesGrupo2)];
-        else
-            return [$nomesGrupo2[0], implode(", ", $nomesGrupo1)];
+        
+        return $usuariosModeradores; 
     }
 
+
+    private function obterEditores($submissionId) {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $iteradorEditoresDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $iteradorGerentesDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
+        $palavrasChave = array("editor da revista","editor de seção");
+        $editoresRevista =  array();
+        $editoresSecao = array();
+
+        while($designado = $iteradorGerentesDesignados->next()){
+            $gerente = $userDao->getById($designado->getUserId());
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+            
+            if(strstr($nomeGrupoAtual,$palavrasChave[0]))
+                array_push($editoresRevista,$gerente->getFullName());
+        }
+
+        while($designado = $iteradorEditoresDesignados->next()){
+            $editor = $userDao->getById($designado->getUserId());
+            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
+            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+
+            if(strstr($nomeGrupoAtual,$palavrasChave[1]))
+                array_push($editoresSecao,$editor->getFullName());
+
+        }
+
+        $usuarios = [implode(",", $editoresRevista),implode(",", $editoresSecao)];
+
+        if((empty($editoresRevista) === true) and (empty($editoresSecao)=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $usuarios[1]];
+        if((empty($editoresRevista) === false) and (empty($editoresSecao) === true))
+            return [$usuarios[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        if((empty($editoresRevista) === true) and (empty($editoresSecao) === true))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), __("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        
+        return $usuarios; 
+    }
+    
     private function obterNotas($submissionId) {
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissionId}");
         $notas = "";

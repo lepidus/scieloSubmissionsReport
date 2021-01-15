@@ -61,15 +61,15 @@ class ScieloSubmissionsReportForm extends Form {
 			__("common.dateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
-			__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
-			__("plugins.reports.scieloSubmissionsReport.header.moderators"),
-			__("plugins.reports.scieloSubmissionsReport.header.section"),
-			__("common.language"),
-			__("submission.authors"),
 		];
 		
 		if($this->_aplicacao == "ops") {
 			$cabecalho = array_merge($cabecalho,[
+				__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
+				__("plugins.reports.scieloSubmissionsReport.header.moderators"),
+				__("plugins.reports.scieloSubmissionsReport.header.section"),
+				__("common.language"),
+				__("submission.authors"),
 				__("plugins.reports.scieloSubmissionsReport.header.publicationStatus"),
 				__("plugins.reports.scieloSubmissionsReport.header.publicationDOI"),
 				__("submission.notes"),
@@ -77,6 +77,11 @@ class ScieloSubmissionsReportForm extends Form {
 		}
 		else if($this->_aplicacao == "ojs") {
 			$cabecalho = array_merge($cabecalho,[
+				__("plugins.reports.scieloSubmissionsReport.header.journalEditors"),
+				__("plugins.reports.scieloSubmissionsReport.header.sectionEditor"),
+				__("plugins.reports.scieloSubmissionsReport.header.section"),
+				__("common.language"),
+				__("submission.authors"),
 				__("plugins.reports.scieloSubmissionsReport.header.reviews"),
 			]);
 		}
