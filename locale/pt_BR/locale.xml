@@ -43,7 +43,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.publicationDOI">DOI da publicação</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.areaModerator">Moderador de área</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.moderators">Moderadores</message>
-    <message key="plugins.reports.scieloSubmissionsReport.header.magazineEditors">Editores da Revista</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.journalEditors">Editores da Revista</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.sectionEditor">Editor de Seção</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Periódico / Servidor</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Seção</message>

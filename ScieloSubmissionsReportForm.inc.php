@@ -77,7 +77,7 @@ class ScieloSubmissionsReportForm extends Form {
 		}
 		else if($this->_aplicacao == "ojs") {
 			$cabecalho = array_merge($cabecalho,[
-				__("plugins.reports.scieloSubmissionsReport.header.magazineEditors"),
+				__("plugins.reports.scieloSubmissionsReport.header.journalEditors"),
 				__("plugins.reports.scieloSubmissionsReport.header.sectionEditor"),
 				__("plugins.reports.scieloSubmissionsReport.header.section"),
 				__("common.language"),
