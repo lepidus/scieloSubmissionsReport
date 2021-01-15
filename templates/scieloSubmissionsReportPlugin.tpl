@@ -12,37 +12,37 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 
 	<h2>{translate key="plugins.reports.scieloSubmissionsReport.period"}</h2>
 	<div class="data">
-		<div id="campoTipoFiltragem">	
+		<div id="filterTypeField">	
 			<p>{translate key="plugins.reports.scieloSubmissionsReport.filterMessage"}</p>
-			<select name="selectTipoFiltragemData" id="selectTipoFiltragemData">
+			<select name="selectFilterTypeDate" id="selectFilterTypeDate">
 				<option value="1">{translate key="plugins.reports.scieloSubmissionsReport.filterSubmission"}</option>
 				<option value="2">{translate key="plugins.reports.scieloSubmissionsReport.filterDecision"}</option>
 				<option value="3">{translate key="plugins.reports.scieloSubmissionsReport.filterBoth"}</option>
 			</select>
 		</div>
 
-		<div id="camposFiltragemData">
-			<!-- Submissão -->
-			<div id="camposDataSubmissao">
+		<div id="dateFilterFields">
+			<!-- Submission -->
+			<div id="dateSubmissionFields">
 				<div id="fieldDateSubmittedStart">	
 					<label for="dateSubmittedStart">{translate key="plugins.reports.scieloSubmissionsReport.dateSubmittedStart"}</label> 
-					<input type="date" id='dateSubmittedStart' name='dataSubmissaoInicial' from=$dateSubmittedStart defaultValue=$dateSubmittedStart value="{$years[0]}"/>
+					<input type="date" id='dateSubmittedStart' name='initialSubmissionDate' from=$dateSubmittedStart defaultValue=$dateSubmittedStart value="{$years[0]}"/>
 				</div>
 				<div id="fieldDateSubmittedEnd">
 					<label for="dateSubmittedEnd">{translate key="plugins.reports.scieloSubmissionsReport.dateSubmittedEnd"}</label>
-					<input type="date" id='dateSubmittedEnd' name='dataSubmissaoFinal' from=$dateSubmittedEnd defaultValue=$dateSubmittedEnd value="{$years[1]}"/>
+					<input type="date" id='dateSubmittedEnd' name='finalSubmissionDate' from=$dateSubmittedEnd defaultValue=$dateSubmittedEnd value="{$years[1]}"/>
 				</div>
 			</div>
 			
-			<!-- Decisão -->
-			<div id="camposDataDecisao" hidden="true">
+			<!-- Decision -->
+			<div id="decisionDateFields" hidden="true">
 				<div id="fieldDateDecisionStart">
 					<label for="dateDecisionStart">{translate key="plugins.reports.scieloSubmissionsReport.dateDecisionStart"}</label> 
-					<input type="date" id='dateDecisionStart' name='dataDecisaoInicial' from=$dateDecisionStart defaultValue=$dateDecisionStart value="{$years[0]}"/>
+					<input type="date" id='dateDecisionStart' name='initialDecisionDate' from=$dateDecisionStart defaultValue=$dateDecisionStart value="{$years[0]}"/>
 				</div>
 				<div id="fieldDateDecisionEnd">
 					<label for="dateDecisionEnd">{translate key="plugins.reports.scieloSubmissionsReport.dateDecisionEnd"}</label>
-					<input type="date" id='dateDecisionEnd' name='dataDecisaoFinal' from=$dateDecisionEnd defaultValue=$dateDecisionEnd value="{$years[1]}"/>
+					<input type="date" id='dateDecisionEnd' name='finalDecisionDate' from=$dateDecisionEnd defaultValue=$dateDecisionEnd value="{$years[1]}"/>
 				</div>
 			</div>
 		</div>
@@ -71,23 +71,23 @@ Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
 {include file="common/footer.tpl"}
 
 <script>
-	var selecaoTipoFiltragem = document.getElementById('selectTipoFiltragemData');
-	var divSubmissao = document.getElementById('camposDataSubmissao');
-	var divDecisao = document.getElementById('camposDataDecisao');
+	var filterTypeSelection = document.getElementById('selectFilterTypeDate');
+	var submissionDiv = document.getElementById('dateSubmissionFields');
+	var decisionDiv = document.getElementById('decisionDateFields');
 
-	selecaoTipoFiltragem.addEventListener("change", function(){ldelim}
-		var valorSelecionado = selecaoTipoFiltragem.value;
-		if(valorSelecionado == 1){ldelim}
-			divSubmissao.hidden = false;
-			divDecisao.hidden = true;
+	filterTypeSelection.addEventListener("change", function(){ldelim}
+		var selectedValue = filterTypeSelection.value;
+		if(selectedValue == 1){ldelim}
+			submissionDiv.hidden = false;
+			decisionDiv.hidden = true;
 		{rdelim}
-		else if(valorSelecionado == 2){ldelim}
-			divSubmissao.hidden = true;
-			divDecisao.hidden = false;
+		else if(selectedValue == 2){ldelim}
+			submissionDiv.hidden = true;
+			decisionDiv.hidden = false;
 		{rdelim}
 		else {ldelim}
-			divSubmissao.hidden = false;
-			divDecisao.hidden = false;
+			submissionDiv.hidden = false;
+			decisionDiv.hidden = false;
 		{rdelim}
 	{rdelim});
 </script>
