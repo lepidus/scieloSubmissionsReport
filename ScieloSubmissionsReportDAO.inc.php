@@ -33,8 +33,6 @@ class ScieloSubmissionsReportDAO extends DAO
         
         $resultSubmissions = $this->retrieve($querySubmissions);
 
-        //Adicionar um echo para imprimir os títulos de cada coluna
-        //Add a echo to print the title for each column
         $submissionsData = array();
         while($rowSubmission = $resultSubmissions->FetchRow()) {
             $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections);
