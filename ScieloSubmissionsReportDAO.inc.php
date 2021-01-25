@@ -153,7 +153,7 @@ class ScieloSubmissionsReportDAO extends DAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
         $designatedIterator = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $keywords = array("area moderator","moderator");
+        $keywords = array("moderador de área","moderador");
         $areaModerator = array();
         $moderators =  array();
 
@@ -186,7 +186,7 @@ class ScieloSubmissionsReportDAO extends DAO
         $userDao = DAORegistry::getDAO('UserDAO');
         $iteratorDesignatedEditors = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
         $iteratorDesignatedManagers = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
-        $keywords = array("journal editor","section editor");
+        $keywords = array("editor da revista","editor de seção");
         $journalEditors =  array();
         $sectionEditors = array();
 
