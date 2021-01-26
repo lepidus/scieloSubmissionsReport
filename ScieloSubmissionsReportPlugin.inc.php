@@ -27,8 +27,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 			$this->import('ScieloSubmissionsReportForm');
 			$this->import('ScieloSubmissionsReportDAO');
 			
-			$aplicacao = substr(Application::getName(), 0, 3);
-			$form = new ScieloSubmissionsReportForm($this, $aplicacao);
+			$application = substr(Application::getName(), 0, 3);
+			$form = new ScieloSubmissionsReportForm($this, $application);
 			$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
 			DAORegistry::registerDAO('ScieloSubmissionsReportDAO', $scieloSubmissionsReportDAO);
 			
@@ -77,11 +77,11 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 	 * @copydoc ReportPlugin::display()
 	 */
 	function display($args, $request) {
-		$aplicacao = substr(Application::getName(), 0, 3);
-		$form    = new ScieloSubmissionsReportForm($this, $aplicacao);
+		$application = substr(Application::getName(), 0, 3);
+		$form    = new ScieloSubmissionsReportForm($this, $application);
 		$dateStart = date("Y-01-01");
 		$dateEnd   = date("Y-m-d");
-		$datas     = array($dateStart, $dateEnd);
+		$dates     = array($dateStart, $dateEnd);
 
 		$form->initData();
 		import('classes.statistics.StatisticsHelper');
@@ -90,19 +90,19 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 			$postVars = $requestHandler->getUserVars($request);
 			if ($postVars['generate'] === "1") {
 				array_key_exists('sessions', $postVars) ? $sessions = $postVars['sessions'] : $sessions = NULL;
-				$tipoFiltro = $postVars['selectTipoFiltragemData'];
+				$filterType = $postVars['selectFilterTypeDate'];
 
-				if($tipoFiltro == 1)
-					$form->generateReport($request, $sessions, $postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal']);
-				else if($tipoFiltro == 2)
-					$form->generateReport($request, $sessions, null, null, $postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal']);
+				if($filterType == 1)
+					$form->generateReport($request, $sessions, $postVars['initialSubmissionDate'],$postVars['finalSubmissionDate']);
+				else if($filterType == 2)
+					$form->generateReport($request, $sessions, null, null, $postVars['initialDecisionDate'],$postVars['finalDecisionDate']);
 				else
-					$form->generateReport($request, $sessions, $postVars['dataSubmissaoInicial'],$postVars['dataSubmissaoFinal'], $postVars['dataDecisaoInicial'],$postVars['dataDecisaoFinal']);
+					$form->generateReport($request, $sessions, $postVars['initialSubmissionDate'],$postVars['finalSubmissionDate'], $postVars['initialDecisionDate'],$postVars['finalDecisionDate']);
 			}
 
 		}
 		else{
-			$form->display($datas);
+			$form->display($dates);
 		}
 		
 		AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);

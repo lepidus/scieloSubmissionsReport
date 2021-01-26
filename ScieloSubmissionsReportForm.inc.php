@@ -13,8 +13,8 @@
 import('lib.pkp.classes.form.Form');
 require('ScieloSubmissionsReportDAO.inc.php');
 	
-function dataInicialMenorqueFinal($dataStart,$dataEnd){
-	if($dataStart<=$dataEnd){
+function startDateLessThanEndDate($startDate,$endDate){
+	if($startDate<=$endDate){
 		return true;
 	}
 	else{
@@ -29,15 +29,15 @@ class ScieloSubmissionsReportForm extends Form {
 	/* @var ReviewersReport  */
 	private $_plugin;
 
-	private $_aplicacao;
+	private $_application;
 
 	/**
 	 * Constructor
 	 * @param $plugin ReviewersReport Manual payment plugin
 	 */
-	function __construct($plugin, $aplicacao) {
+	function __construct($plugin, $application) {
 		$this->_plugin = $plugin;
-		$this->_aplicacao = $aplicacao;
+		$this->_application = $application;
 		parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
@@ -52,8 +52,8 @@ class ScieloSubmissionsReportForm extends Form {
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
 	}
 
-	private function imprimeCabecalhoCSV($fp) {
-		$cabecalho = [
+	private function printCsvHeader($fp) {
+		$header = [
 			__("plugins.reports.scieloSubmissionsReport.header.submissionId"),
 			__("submission.submissionTitle"),
 			__("submission.submitter"),
@@ -63,8 +63,8 @@ class ScieloSubmissionsReportForm extends Form {
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
 		];
 		
-		if($this->_aplicacao == "ops") {
-			$cabecalho = array_merge($cabecalho,[
+		if($this->_application == "ops") {
+			$header = array_merge($header,[
 				__("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
 				__("plugins.reports.scieloSubmissionsReport.header.moderators"),
 				__("plugins.reports.scieloSubmissionsReport.header.section"),
@@ -75,8 +75,8 @@ class ScieloSubmissionsReportForm extends Form {
 				__("submission.notes"),
 			]);
 		}
-		else if($this->_aplicacao == "ojs") {
-			$cabecalho = array_merge($cabecalho,[
+		else if($this->_application == "ojs") {
+			$header = array_merge($header,[
 				__("plugins.reports.scieloSubmissionsReport.header.journalEditors"),
 				__("plugins.reports.scieloSubmissionsReport.header.sectionEditor"),
 				__("plugins.reports.scieloSubmissionsReport.header.section"),
@@ -86,16 +86,16 @@ class ScieloSubmissionsReportForm extends Form {
 			]);
 		}
 
-		fputcsv($fp, $cabecalho);
+		fputcsv($fp, $header);
 	}
 
-	function generateReport($request, $sessions, $dataSubmissaoInicial = null, $dataSubmissaoFinal = null, $dataDecisaoInicial = null, $dataDecisaoFinal = null){
-		if($dataSubmissaoInicial && !dataInicialMenorqueFinal($dataSubmissaoInicial,$dataSubmissaoFinal)){
+	function generateReport($request, $sessions, $initialSubmissionDate = null, $finalSubmissionDate = null, $initialDecisionDate = null, $finalDecisionDate = null){
+		if($initialSubmissionDate && !startDateLessThanEndDate($initialSubmissionDate,$finalSubmissionDate)){
 			echo __('plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate'); 
 			return;
 		}
 		
-		if($dataDecisaoInicial && !dataInicialMenorqueFinal($dataDecisaoInicial,$dataDecisaoFinal)){
+		if($initialDecisionDate && !startDateLessThanEndDate($initialDecisionDate,$finalDecisionDate)){
 			echo __('plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate'); 
 			return;
 		}
@@ -106,11 +106,11 @@ class ScieloSubmissionsReportForm extends Form {
 		header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
 		$scieloSubmissionsReportDAO = DAORegistry::getDAO('ScieloSubmissionsReportDAO');
 		
-		$dadosSubmissoes = $scieloSubmissionsReportDAO->obterRelatorioComSecoes($this->_aplicacao, $journal->getId(),$dataSubmissaoInicial,$dataSubmissaoFinal,$dataDecisaoInicial,$dataDecisaoFinal,$sessions);
+		$submissionsData = $scieloSubmissionsReportDAO->getReportWithSections($this->_application, $journal->getId(),$initialSubmissionDate,$finalSubmissionDate,$initialDecisionDate,$finalDecisionDate,$sessions);
 		$fp = fopen('php://output', 'wt');
-		$this->imprimeCabecalhoCSV($fp);
-		foreach($dadosSubmissoes as $linhaSubmissao){
-			fputcsv($fp, $linhaSubmissao);
+		$this->printCsvHeader($fp);
+		foreach($submissionsData as $submissionLine){
+			fputcsv($fp, $submissionLine);
 		}
 		fclose($fp);
 		
@@ -121,8 +121,8 @@ class ScieloSubmissionsReportForm extends Form {
 		$reviewerReportDao = DAORegistry::getDAO("ScieloSubmissionsReportDAO");
 		$journalRequest = Application::getRequest();
 		$journal = $journalRequest->getJournal();
-		$sessions = $reviewerReportDao->obterSecoes($journal->getId());
-		$sessions_options = $reviewerReportDao->obterOpcoesSecoes($journal->getId());
+		$sessions = $reviewerReportDao->getSections($journal->getId());
+		$sessions_options = $reviewerReportDao->getSectionsOptions($journal->getId());
 		$templateManager->assign('sessions',$sessions);
 		$templateManager->assign('sessions_options',$sessions_options);
 		$templateManager->assign('years', array(0=>$request[0], 1=>$request[1]));

@@ -1,49 +1,49 @@
-# Plugin de relatório de submissões 
+# Submissions Report Plugin 
 
-Este plugin gera uma planilha **csv** com as seguintes informações : 
-- Id da submissão
-- Título da submissão
-- Usuário submissor
-- Data da submissão
-- Data da decisão
-- Dias até a decisão tomada
-- Estado da submissão (avaliação, aprovado, rejeitado)
-- Estado da publicação do preprint (não enviado para publicação em periódico, enviado, enviado e aceito)
-- DOI da publicação do preprint (caso este tenha sido publicado em periódico)
-- Moderador de área da submissão
-- Moderadores da submissão
-- Nome do servidor
-- Seção da submissão
-- Idioma da submissão
-- Autores (contendo seus nomes, países e afiliação)
-- Notas da submissão
+This plugin generates a **CSV** spreadsheet with the following information:
+- Submission Id
+- Submission title
+- Submission user
+- Submission date
+- Decision date
+- Days until decision made
+- Submission status (review, approved, rejected)
+- Preprint publication status (not sent for publication in a journal, sent, sent and accepted)
+- Preprint publication DOI (if it has been published in a journal)
+- Submission area moderator
+- Submission moderators
+- Server name
+- Submission Section
+- Submission Locale
+- Authors (containing their names, countries and affiliation)
+- Submission notes
 
 __Copyright (c) Lepidus Tecnologia__ 
 
-# Primeiros Passos
+# First steps
 
-## Pré-Requisitos
+## Prerequisites
 
 * OPS 3.2.1
 
 
-## Download do Plugin
+## Plugin Download
 
-Para fazer download do plugin entre na página de Releases
-[clicando aqui](https://gitlab.lepidus.com.br/plugins_ojs/relatorioscielo/-/releases), ou vá em `RelatorioScielo > Project Overview > Releases` e confira a versão que deseja instalar.
+To download the plugin, go to the Releases page [clicking here](https://gitlab.lepidus.com.br/plugins_ojs/relatorioscielo/-/releases), or go to `RelatorioScielo> Project Overview> Releases` and check the version you want to install.
 
-## Instalação
-1. Entre na área de administração do seu site OPS pelo __Painel de Controle__.
-2. Navegue até o `Configurações` > `Website` > `Plugins` > `Enviar novo plugin`.
-3. Em __Enviar arquivo__ selecione o arquivo __SubmissionReportPlugin.tar.gz__.
-4. Clique em __Salvar__ e o plugin estará sendo instalado no seu OPS. 
+## Installation
 
-# Tecnologias Utilizadas
+1. Enter the administration area of ​​your OPS website through the __Dashboard__.
+2. Navigate to `Settings`>` Website`> `Plugins`> `Upload a new plugin`.
+3. Under __Upload file__ select the file __SubmissionReportPlugin.tar.gz__.
+4. Click __Save__ and the plugin will be installed on your OPS.
+
+# Technologies Used
 
 * CSS
 * PHP 7.2.24
 * Smarty 3.1.32
 * MariaDB 10.1.43
 
-# Licença
-__Este plugin está licenciado sob a GNU General Public License v2__
+# License
+__This plugin is licensed under the GNU General Public License v2__

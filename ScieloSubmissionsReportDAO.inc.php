@@ -21,238 +21,237 @@ class ScieloSubmissionsReportDAO extends DAO
      * @param $journalId int
      * @return array
      */
-    public function obterRelatorioComSecoes($aplicacao, $journalId, $dataSubmissaoInicial, $dataSubmissaoFinal, $dataDecisaoInicial, $dataDecisaoFinal, $sections) {
-        $querySubmissoes = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS dias_mudanca_status FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
-        if($dataSubmissaoInicial){
-            $querySubmissoes .= " AND date_submitted >= '{$dataSubmissaoInicial} 23:59:59' AND date_submitted <= '{$dataSubmissaoFinal} 23:59:59'";
+    public function getReportWithSections($application, $journalId, $initialSubmissionDate, $finalSubmissionDate, $initialDecisionDate, $finalDecisionDate, $sections) {
+        $querySubmissions = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS status_change_days FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
+        if($initialSubmissionDate){
+            $querySubmissions .= " AND date_submitted >= '{$initialSubmissionDate} 23:59:59' AND date_submitted <= '{$finalSubmissionDate} 23:59:59'";
         }
         
-        if($dataDecisaoInicial){
-            $querySubmissoes .= " AND date_last_activity >= '{$dataDecisaoInicial}  23:59:59' AND date_last_activity <= '{$dataDecisaoFinal} 23:59:59'";
+        if($initialDecisionDate){
+            $querySubmissions .= " AND date_last_activity >= '{$initialDecisionDate}  23:59:59' AND date_last_activity <= '{$finalDecisionDate} 23:59:59'";
         }
         
-        $resultSubmissoes = $this->retrieve($querySubmissoes);
+        $resultSubmissions = $this->retrieve($querySubmissions);
 
-        //Adicionar um echo para imprimir os títulos de cada coluna
-        $dadosSubmissoes = array();
-        while($rowSubmissao = $resultSubmissoes->FetchRow()) {
-            $dadosSubmissao = $this->obterDadosSubmissao($aplicacao, $journalId, $rowSubmissao['submission_id'], $rowSubmissao['dias_mudanca_status'], $sections);
+        $submissionsData = array();
+        while($rowSubmission = $resultSubmissions->FetchRow()) {
+            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections);
 
-            if($dadosSubmissao)
-                $dadosSubmissoes[] = $dadosSubmissao;
+            if($submissionData)
+                $submissionsData[] = $submissionData;
         }
 
-        return $dadosSubmissoes;
+        return $submissionsData;
     }
 
-    private function obterDadosSubmissao($aplicacao, $journalId, $submissionId, $diasMudancaStatus, $sections) {
-        $submissao = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $dadosSubmissao = $this->obterDadosComunsSubmissao($submissao, $journalId, $diasMudancaStatus, $sections);
+    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
+        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
+        $submissionData = $this->getCommonSubmissionData($submission, $journalId, $statusChangeDays, $sections);
         
-        if(!$dadosSubmissao) return null;
+        if(!$submissionData) return null;
 
-        if($aplicacao == 'ops') {
-            list($estadoPublicacao, $doiPublicacao) = $this->obterDadosPublicacao($submissao);
-            $notas = $this->obterNotas($submissionId);
-            $dadosSubmissao = array_merge($dadosSubmissao, [$estadoPublicacao,$doiPublicacao,$notas]);
+        if($application == 'ops') {
+            list($publicationStatus, $publicationDoi) = $this->getPublicationData($submission);
+            $notes = $this->getNotes($submissionId);
+            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes]);
         }
-        else if($aplicacao == 'ojs') {
-            list($avaliacoesCompletas, $avaliacoes) = $this->obterAvaliacoes($submissionId);
+        else if($application == 'ojs') {
+            list($completeReviews, $reviews) = $this->getReviews($submissionId);
 
-            if(!$avaliacoesCompletas)
+            if(!$completeReviews)
                 return null;
 
-            $dadosSubmissao = array_merge($dadosSubmissao, [$avaliacoes]);
+            $submissionData = array_merge($submissionData, [$reviews]);
         }
 
-        return $dadosSubmissao;
+        return $submissionData;
     }
 
-    private function obterDadosComunsSubmissao($submissao, $journalId, $diasMudancaStatus, $sections) {
+    private function getCommonSubmissionData($submission, $journalId, $statusChangeDays, $sections) {
         $locale = AppLocale::getLocale();
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION);
 
-        $statusSubmissao = __($submissao->getStatusKey());
-        $titulo = $submissao->getTitle($locale);
-        $dataSubmissao = $submissao->getDateSubmitted();
-        $dataDecisao = $submissao->getDateStatusModified();
-        $idioma = $submissao->getLocale();
-        $secao = DAORegistry::getDAO('SectionDAO')->getById( $submissao->getSectionId() );
-        $nomeSecao = $secao->getTitle($locale);
-        $nomeJournal = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-        list($moderadorArea_EditorRevista, $moderadores_editorSecao) = $this->controladorModeradorEditor($submissao);
-        $usuarioSubmissor = $this->obterUsuarioSubmissor($submissao->getId());
-        $autores = $this->obterAutores($submissao->getAuthors());
+        $submissionStatus = __($submission->getStatusKey());
+        $title = $submission->getTitle($locale);
+        $submissionDate = $submission->getDateSubmitted();
+        $decisionDate = $submission->getDateStatusModified();
+        $locale = $submission->getLocale();
+        $section = DAORegistry::getDAO('SectionDAO')->getById( $submission->getSectionId() );
+        $sectionName = $section->getTitle($locale);
+        $journalName = Application::getContextDAO()->getById($journalId)->getLocalizedName();
+        list($areaModerator_JournalEditor, $moderators_SectionEditor) = $this->controllerModeratorEditor($submission);
+        $submissionUser = $this->getSubmisssionUser($submission->getId());
+        $authors = $this->getAuthors($submission->getAuthors());
 
-        if(!in_array($nomeSecao, $sections))
+        if(!in_array($sectionName, $sections))
             return null;
         
-        return [$submissao->getId(),$titulo,$usuarioSubmissor,$dataSubmissao,$dataDecisao,$diasMudancaStatus,$statusSubmissao,$moderadorArea_EditorRevista,$moderadores_editorSecao,$nomeSecao,$idioma,$autores];
+        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$locale,$authors];
     }
 
-    private function controladorModeradorEditor($submissao){
-        $aplicacaoNome = Application::getName();
-        $aplicacaoNomePadrao = strtolower($aplicacaoNome);
+    private function controllerModeratorEditor($submission){
+        $applicationName = Application::getName();
+        $defaultApplicationName = strtolower($applicationName);
         
-        if(strstr($aplicacaoNomePadrao,'ops'))
-            return $this->obterModeradores($submissao->getId());
-        if(strstr($aplicacaoNomePadrao,'ojs'))
-            return $this->obterEditores($submissao->getId());
+        if(strstr($defaultApplicationName,'ops'))
+            return $this->getModerators($submission->getId());
+        if(strstr($defaultApplicationName,'ojs'))
+            return $this->getEditors($submission->getId());
     }
 
-    private function obterUsuarioSubmissor($submissionId) {
+    private function getSubmisssionUser($submissionId) {
         $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
-        $iteradorEventos = $submissionEventLogDao->getBySubmissionId($submissionId);
+        $eventsIterator = $submissionEventLogDao->getBySubmissionId($submissionId);
 
-        while($evento = $iteradorEventos->next()) {
-            if($evento->getEventType() == SUBMISSION_LOG_SUBMISSION_SUBMIT){
-                $usuarioSubmissor = $userDao->getById($evento->getUserId());
-                return $usuarioSubmissor->getFullName();
+        while($event = $eventsIterator->next()) {
+            if($event->getEventType() == SUBMISSION_LOG_SUBMISSION_SUBMIT){
+                $submissionUser = $userDao->getById($event->getUserId());
+                return $submissionUser->getFullName();
             }
         }
         
         return __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
     }
 
-    private function obterDadosPublicacao($submissao) {
-        $publicacao = $submissao->getCurrentPublication();
-        $opcoesRelacao = Services::get('publication')->getRelationOptions();
-        $idRelacao = $publicacao->getData('relationStatus');
-        $estadoPublicacao = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
-        $doiPublicacao = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+    private function getPublicationData($submission) {
+        $publication = $submission->getCurrentPublication();
+        $relationOptions = Services::get('publication')->getRelationOptions();
+        $relationId = $publication->getData('relationStatus');
+        $publicationStatus = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
+        $publicationDoi = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
 
-        if($idRelacao){
-            foreach($opcoesRelacao as $opcao){
-                if($opcao['value'] == $idRelacao)
-                    $estadoPublicacao = $opcao['label'];
+        if($relationId){
+            foreach($relationOptions as $option){
+                if($option['value'] == $relationId)
+                    $publicationStatus = $option['label'];
             }
 
-            if($publicacao->getData('vorDoi'))
-                $doiPublicacao = $publicacao->getData('vorDoi');
+            if($publication->getData('vorDoi'))
+                $publicationDoi = $publication->getData('vorDoi');
         }
 
-        return [$estadoPublicacao, $doiPublicacao];
+        return [$publicationStatus, $publicationDoi];
     }
 
-    private function obterAutores($autores) {
-        $dadosAutores = array();
-        foreach($autores as $autor) {
-            $nomeAutor = $autor->getLocalizedGivenName() . " " . $autor->getLocalizedFamilyName();
-            $paisAutor = $autor->getCountryLocalized();
-            $afiliacaoAutor = $autor->getLocalizedAffiliation();
+    private function getAuthors($authors) {
+        $authorsData = array();
+        foreach($authors as $author) {
+            $authorName = $author->getLocalizedGivenName() . " " . $author->getLocalizedFamilyName();
+            $authorCountry = $author->getCountryLocalized();
+            $authorAffiliation = $author->getLocalizedAffiliation();
 
-            $dadosAutores[] = implode(", ", [$nomeAutor, $paisAutor, $afiliacaoAutor]);
+            $authorsData[] = implode(", ", [$authorName, $authorCountry, $authorAffiliation]);
         }
 
-        return implode("; ", $dadosAutores);
+        return implode("; ", $authorsData);
     }
 
-    private function obterModeradores($submissionId) {
+    private function getModerators($submissionId) {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
-        $iteradorDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $palavrasChave = array("moderador de área","moderador");
-        $moderadorArea = array();
-        $moderadores =  array();
+        $designatedIterator = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $keywords = array("moderador de área","moderador");
+        $areaModerator = array();
+        $moderators =  array();
 
-        while($designado = $iteradorDesignados->next()){
-            $moderador = $userDao->getById($designado->getUserId());
-            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
-            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+        while($designated = $designatedIterator->next()){
+            $moderator = $userDao->getById($designated->getUserId());
+            $userGroup = $userGroupDao->getById($designated->getUserGroupId());
+            $currentGroupName = strtolower($userGroup->getLocalizedName());
 
-            if( strstr($nomeGrupoAtual,$palavrasChave[0]) )
-                array_push($moderadorArea,$moderador->getFullName());
-            if( $nomeGrupoAtual == $palavrasChave[1] )
-                array_push($moderadores,$moderador->getFullName());
+            if( strstr($currentGroupName,$keywords[0]) )
+                array_push($areaModerator,$moderator->getFullName());
+            if( $currentGroupName == $keywords[1] )
+                array_push($moderators,$moderator->getFullName());
         }
-        $usuariosModeradores = [implode(",", $moderadorArea),implode(",", $moderadores)];
+        $moderatorUsers = [implode(",", $areaModerator),implode(",", $moderators)];
 
-        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1])=== false))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), $usuariosModeradores[1]];
-        if((empty($usuariosModeradores[0]) === false) and (empty($usuariosModeradores[1]) === true))
-            return [$usuariosModeradores[0],__("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
-        if((empty($usuariosModeradores[0]) === true) and (empty($usuariosModeradores[1]) === true))
+        if((empty($moderatorUsers[0]) === true) and (empty($moderatorUsers[1])=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), $moderatorUsers[1]];
+        if((empty($moderatorUsers[0]) === false) and (empty($moderatorUsers[1]) === true))
+            return [$moderatorUsers[0],__("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
+        if((empty($moderatorUsers[0]) === true) and (empty($moderatorUsers[1]) === true))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
         
-        return $usuariosModeradores; 
+        return $moderatorUsers; 
     }
 
 
-    private function obterEditores($submissionId) {
+    private function getEditors($submissionId) {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
-        $iteradorEditoresDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $iteradorGerentesDesignados = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
-        $palavrasChave = array("editor da revista","editor de seção");
-        $editoresRevista =  array();
-        $editoresSecao = array();
+        $iteratorDesignatedEditors = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $iteratorDesignatedManagers = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER,5);
+        $keywords = array("editor da revista","editor de seção");
+        $journalEditors =  array();
+        $sectionEditors = array();
 
-        while($designado = $iteradorGerentesDesignados->next()){
-            $gerente = $userDao->getById($designado->getUserId());
-            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
-            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+        while($designated = $iteratorDesignatedManagers->next()){
+            $manager = $userDao->getById($designated->getUserId());
+            $userGroup = $userGroupDao->getById($designated->getUserGroupId());
+            $currentGroupName = strtolower($userGroup->getLocalizedName());
             
-            if(strstr($nomeGrupoAtual,$palavrasChave[0]))
-                array_push($editoresRevista,$gerente->getFullName());
+            if(strstr($currentGroupName,$keywords[0]))
+                array_push($journalEditors,$manager->getFullName());
         }
 
-        while($designado = $iteradorEditoresDesignados->next()){
-            $editor = $userDao->getById($designado->getUserId());
-            $userGroup = $userGroupDao->getById($designado->getUserGroupId());
-            $nomeGrupoAtual = strtolower($userGroup->getLocalizedName());
+        while($designated = $iteratorDesignatedEditors->next()){
+            $editor = $userDao->getById($designated->getUserId());
+            $userGroup = $userGroupDao->getById($designated->getUserGroupId());
+            $currentGroupName = strtolower($userGroup->getLocalizedName());
 
-            if(strstr($nomeGrupoAtual,$palavrasChave[1]))
-                array_push($editoresSecao,$editor->getFullName());
+            if(strstr($currentGroupName,$keywords[1]))
+                array_push($sectionEditors,$editor->getFullName());
 
         }
 
-        $usuarios = [implode(",", $editoresRevista),implode(",", $editoresSecao)];
+        $users = [implode(",", $journalEditors),implode(",", $sectionEditors)];
 
-        if((empty($editoresRevista) === true) and (empty($editoresSecao)=== false))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $usuarios[1]];
-        if((empty($editoresRevista) === false) and (empty($editoresSecao) === true))
-            return [$usuarios[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
-        if((empty($editoresRevista) === true) and (empty($editoresSecao) === true))
+        if((empty($journalEditors) === true) and (empty($sectionEditors)=== false))
+            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $users[1]];
+        if((empty($journalEditors) === false) and (empty($sectionEditors) === true))
+            return [$users[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        if((empty($journalEditors) === true) and (empty($sectionEditors) === true))
             return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), __("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
         
-        return $usuarios; 
+        return $users; 
     }
     
-    private function obterNotas($submissionId) {
+    private function getNotes($submissionId) {
         $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissionId}");
-        $notas = "";
+        $notes = "";
         if($resultNotes->NumRows() == 0) {
-            $notas = 'Sem Notas';
+            $notes = 'No notes';
         }
         else{
             while($note = $resultNotes->FetchRow()) {
                 $note = $note[0];
-                $notas .= "Nota: " . trim(preg_replace('/\s+/', ' ', $note));
+                $notes .= "Note: " . trim(preg_replace('/\s+/', ' ', $note));
             }
         }
-        return $notas;
+        return $notes;
     }
 
-    private function obterAvaliacoes($submissionId) {
+    private function getReviews($submissionId) {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $avaliacoesSubmissao = $reviewAssignmentDao->getBySubmissionId($submissionId);
-        $avaliacoesCompletas = false;
-        $avaliacoes = array();
+        $submissionReviews = $reviewAssignmentDao->getBySubmissionId($submissionId);
+        $completeReviews = false;
+        $reviews = array();
 
-        foreach($avaliacoesSubmissao as $avaliacao) {
-            if($avaliacao->getDateCompleted())
-                $avaliacoesCompletas = true;
-            $avaliacoes[] = $avaliacao->getLocalizedRecommendation();
+        foreach($submissionReviews as $review) {
+            if($review->getDateCompleted())
+                $completeReviews = true;
+            $reviews[] = $review->getLocalizedRecommendation();
         }
 
-        return [$avaliacoesCompletas, implode(", ", $avaliacoes)];
+        return [$completeReviews, implode(", ", $reviews)];
     }
 
-    public function obterSecoes($journalId) {
+    public function getSections($journalId) {
         import('classes.core.Services');
 		$sections = Services::get('section')
             ->getSectionList($journalId);
@@ -264,7 +263,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $newSections;
     }
 
-    public function obterOpcoesSecoes($journalId) {
+    public function getSectionsOptions($journalId) {
         import('classes.core.Services');
 		$sections = Services::get('section')
             ->getSectionList($journalId);

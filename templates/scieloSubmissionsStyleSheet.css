@@ -19,12 +19,12 @@
     margin-bottom: 16px;
 }
 
-#campoTipoFiltragem {
+#filterTypeField {
     display: flex;
     align-items: baseline;
 }
 
-#campoTipoFiltragem p {
+#filterTypeField p {
     margin-bottom: 24px;
     margin-right: 8px;
 }
@@ -35,15 +35,15 @@
     justify-content: space-between;
 }
 
-#camposFiltragemData {
+#dateFilterFields {
     display: flex;
     align-items: center;
 }
 
-#camposDataSubmissao {
+#dateSubmissionFields {
     margin-right: 64px;
 }
 
-#selectTipoFiltragemData {
+#selectFilterTypeDate {
     margin-bottom: 24px;
 }
