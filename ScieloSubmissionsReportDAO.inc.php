@@ -46,7 +46,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $submissionData = $this->getCommonSubmissionData($submission, $journalId, $statusChangeDays, $sections);
+        $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
         
         if(!$submissionData) return null;
 
@@ -67,7 +67,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $submissionData;
     }
 
-    private function getCommonSubmissionData($submission, $journalId, $statusChangeDays, $sections) {
+    private function getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections) {
         $locale = AppLocale::getLocale();
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION);
@@ -80,7 +80,7 @@ class ScieloSubmissionsReportDAO extends DAO
         $section = DAORegistry::getDAO('SectionDAO')->getById( $submission->getSectionId() );
         $sectionName = $section->getTitle($locale);
         $journalName = Application::getContextDAO()->getById($journalId)->getLocalizedName();
-        list($areaModerator_JournalEditor, $moderators_SectionEditor) = $this->controllerModeratorEditor($submission);
+        list($areaModerator_JournalEditor, $moderators_SectionEditor) = $this->controllerModeratorEditor($application, $submission);
         $submissionUser = $this->getSubmisssionUser($submission->getId());
         $authors = $this->getAuthors($submission->getAuthors());
 
@@ -90,13 +90,10 @@ class ScieloSubmissionsReportDAO extends DAO
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
-    private function controllerModeratorEditor($submission){
-        $applicationName = Application::getName();
-        $defaultApplicationName = strtolower($applicationName);
-        
-        if(strstr($defaultApplicationName,'ops'))
+    private function controllerModeratorEditor($application, $submission){
+        if($application == 'ops')
             return $this->getModerators($submission->getId());
-        if(strstr($defaultApplicationName,'ojs'))
+        else if($application == 'ojs')
             return $this->getEditors($submission->getId());
     }
 
@@ -160,21 +157,16 @@ class ScieloSubmissionsReportDAO extends DAO
         while($designated = $designatedIterator->next()){
             $moderator = $userDao->getById($designated->getUserId());
             $userGroup = $userGroupDao->getById($designated->getUserGroupId());
-            $currentGroupName = strtolower($userGroup->getLocalizedName());
+            $currentGroupName = strtolower($userGroup->getName('pt_BR'));
 
             if( strstr($currentGroupName,$keywords[0]) )
                 array_push($areaModerator,$moderator->getFullName());
             if( $currentGroupName == $keywords[1] )
                 array_push($moderators,$moderator->getFullName());
         }
-        $moderatorUsers = [implode(",", $areaModerator),implode(",", $moderators)];
-
-        if((empty($moderatorUsers[0]) === true) and (empty($moderatorUsers[1])=== false))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), $moderatorUsers[1]];
-        if((empty($moderatorUsers[0]) === false) and (empty($moderatorUsers[1]) === true))
-            return [$moderatorUsers[0],__("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
-        if((empty($moderatorUsers[0]) === true) and (empty($moderatorUsers[1]) === true))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noModerators"), __("plugins.reports.scieloSubmissionsReport.warning.noModerators")];
+        $moderatorUsers = array();
+        $moderatorUsers[] = (!empty($areaModerator)) ? (implode(",", $areaModerator)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
+        $moderatorUsers[] = (!empty($moderators)) ? (implode(",", $moderators)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
         
         return $moderatorUsers; 
     }
@@ -193,7 +185,7 @@ class ScieloSubmissionsReportDAO extends DAO
         while($designated = $iteratorDesignatedManagers->next()){
             $manager = $userDao->getById($designated->getUserId());
             $userGroup = $userGroupDao->getById($designated->getUserGroupId());
-            $currentGroupName = strtolower($userGroup->getLocalizedName());
+            $currentGroupName = strtolower($userGroup->getName('pt_BR'));
             
             if(strstr($currentGroupName,$keywords[0]))
                 array_push($journalEditors,$manager->getFullName());
@@ -202,23 +194,18 @@ class ScieloSubmissionsReportDAO extends DAO
         while($designated = $iteratorDesignatedEditors->next()){
             $editor = $userDao->getById($designated->getUserId());
             $userGroup = $userGroupDao->getById($designated->getUserGroupId());
-            $currentGroupName = strtolower($userGroup->getLocalizedName());
+            $currentGroupName = strtolower($userGroup->getName('pt_BR'));
 
             if(strstr($currentGroupName,$keywords[1]))
                 array_push($sectionEditors,$editor->getFullName());
 
         }
 
-        $users = [implode(",", $journalEditors),implode(",", $sectionEditors)];
-
-        if((empty($journalEditors) === true) and (empty($sectionEditors)=== false))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $users[1]];
-        if((empty($journalEditors) === false) and (empty($sectionEditors) === true))
-            return [$users[0],__("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
-        if((empty($journalEditors) === true) and (empty($sectionEditors) === true))
-            return [__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), __("plugins.reports.scieloSubmissionsReport.warning.noEditors")];
+        $editorUsers = array();
+        $editorUsers[] = (!empty($journalEditors)) ? (implode(",", $journalEditors)) : (__("plugins.reports.scieloSubmissionsReport.warning.noEditors"));
+        $editorUsers[] = (!empty($sectionEditors)) ? (implode(",", $sectionEditors)) : (__("plugins.reports.scieloSubmissionsReport.warning.noEditors"));
         
-        return $users; 
+        return $editorUsers; 
     }
     
     private function getNotes($submissionId) {
