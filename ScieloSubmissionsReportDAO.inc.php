@@ -76,7 +76,7 @@ class ScieloSubmissionsReportDAO extends DAO
         $title = $submission->getTitle($locale);
         $submissionDate = $submission->getDateSubmitted();
         $decisionDate = $submission->getDateStatusModified();
-        $locale = $submission->getLocale();
+        $submissionLocale = $submission->getLocale();
         $section = DAORegistry::getDAO('SectionDAO')->getById( $submission->getSectionId() );
         $sectionName = $section->getTitle($locale);
         $journalName = Application::getContextDAO()->getById($journalId)->getLocalizedName();
@@ -87,7 +87,7 @@ class ScieloSubmissionsReportDAO extends DAO
         if(!in_array($sectionName, $sections))
             return null;
         
-        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$locale,$authors];
+        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
     private function controllerModeratorEditor($submission){
