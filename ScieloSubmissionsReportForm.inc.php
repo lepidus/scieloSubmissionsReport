@@ -58,7 +58,7 @@ class ScieloSubmissionsReportForm extends Form {
 			__("submission.submissionTitle"),
 			__("submission.submitter"),
 			__("common.dateSubmitted"),
-			__("common.dateDecided"),
+			__("plugins.reports.scieloSubmissionsReport.header.LastDateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
 		];

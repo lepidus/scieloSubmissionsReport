@@ -48,5 +48,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Journal / Server</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Section</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.reviews">Reviews</message>
+
+    <message key="plugins.reports.scieloSubmissionsReport.header.LastDateDecided">Date of last decision</message>
 </locale>
 
