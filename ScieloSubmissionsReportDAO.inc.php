@@ -13,9 +13,9 @@
  */
 
 import('lib.pkp.classes.db.DBRowIterator');
+
 class ScieloSubmissionsReportDAO extends DAO
 {
-
     /**
      * Get the submission report data.
      * @param $journalId int
@@ -83,11 +83,33 @@ class ScieloSubmissionsReportDAO extends DAO
         list($areaModerator_JournalEditor, $moderators_SectionEditor) = $this->controllerModeratorEditor($application, $submission);
         $submissionUser = $this->getSubmisssionUser($submission->getId());
         $authors = $this->getAuthors($submission->getAuthors());
+        $finalDecision = $this->getFinalDecision($submission->getId());
 
         if(!in_array($sectionName, $sections))
             return null;
         
-        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
+        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$finalDecision,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
+    }
+
+    public function getFinalDecision($submissionId){
+        $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+        $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
+        $lastDecision = "";
+        $recusedDecisionId = "4";
+        $acceptedDecisionId = "1";
+
+        foreach($decisionsSubmission as $decisions){
+            $lastDecision = $decisions['decision'];
+        }
+
+        switch ($lastDecision) {
+            case $acceptedDecisionId:
+                return 'Aceito';
+            case $recusedDecisionId:
+                return 'Rejeitado';
+            default:
+                return '';
+        }
     }
 
     private function controllerModeratorEditor($application, $submission){
