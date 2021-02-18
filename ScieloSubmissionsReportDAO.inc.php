@@ -47,7 +47,8 @@ class ScieloSubmissionsReportDAO extends DAO
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
-        
+        $evaluationTime = $this->evaluationTime($submission);
+
         if(!$submissionData) return null;
 
         if($application == 'ops') {
@@ -65,7 +66,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
             $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision]);
         }
-
+        $submissionData = array_merge($submissionData,[$evaluationTime]);
         return $submissionData;
     }
 
@@ -90,6 +91,16 @@ class ScieloSubmissionsReportDAO extends DAO
             return null;
         
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
+    }
+
+    public function evaluationTime($submission){
+        $submissionDate = $submission->getDateSubmitted();
+        $decisionDate = $submission->getDateStatusModified();
+        $dateFinal = new DateTime(preg_split('/ /',$decisionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
+        $dateBegin = new DateTime(preg_split('/ /',$submissionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
+        $evaluationTime = $dateFinal->diff($dateBegin);
+
+        return $evaluationTime->format('%a');
     }
 
     public function getFinalDecision($submissionId){
