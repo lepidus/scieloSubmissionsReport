@@ -34,14 +34,45 @@ class ScieloSubmissionsReportDAO extends DAO
         $resultSubmissions = $this->retrieve($querySubmissions);
 
         $submissionsData = array();
+        $allSubmissions = array();
+
         while($rowSubmission = $resultSubmissions->FetchRow()) {
+            $allSubmissions[] = $rowSubmission;
             $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections);
 
             if($submissionData)
                 $submissionsData[] = $submissionData;
         }
 
+        // foreach ($allSubmissions as $value) {
+        //     error_log($value['submission_id']);
+        // }
+        $this->averageEvaluationTime($allSubmissions);
+
         return $submissionsData;
+    }
+
+    public function averageEvaluationTime($allSubmissions){
+        $totalDays = 0;
+        $totalSubmissions = array();
+        $reviews = array();
+        error_log('vasco ' . count($allSubmissions));
+        foreach ($allSubmissions as $submissions) {
+            $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissions['submission_id']);
+            $evaluatedSubmission = $this->getFinalDecision($submissions['submission_id']);
+            $reviews[] = $this->getReviews($submissions['submission_id']);
+            if($evaluatedSubmission != ''){
+                $totalSubmissions[] = $submissions['submission_id'];
+                $totalDays += $this->evaluationTime($submission);
+            }
+
+        }
+
+        $averageTime = $totalDays/ count($totalSubmissions);
+        error_log('Reviews ' . count($reviews));
+        error_log('SUBMISSÕES ' . count($totalSubmissions));
+        error_log('DIAS ' . $totalDays);
+        error_log('MEDIA ' . $averageTime);
     }
 
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
@@ -89,6 +120,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
         if(!in_array($sectionName, $sections))
             return null;
+        
         
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
