@@ -57,11 +57,12 @@ class ScieloSubmissionsReportDAO extends DAO
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
+            $finalDecision = $this->getFinalDecision($submissionId);
 
             if(!$completeReviews)
                 return null;
 
-            $submissionData = array_merge($submissionData, [$reviews]);
+            $submissionData = array_merge($submissionData, [$reviews], [$finalDecision]);
         }
 
         return $submissionData;
@@ -83,12 +84,11 @@ class ScieloSubmissionsReportDAO extends DAO
         list($areaModerator_JournalEditor, $moderators_SectionEditor) = $this->controllerModeratorEditor($application, $submission);
         $submissionUser = $this->getSubmisssionUser($submission->getId());
         $authors = $this->getAuthors($submission->getAuthors());
-        $finalDecision = $this->getFinalDecision($submission->getId());
 
         if(!in_array($sectionName, $sections))
             return null;
         
-        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$finalDecision,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
+        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
     public function getFinalDecision($submissionId){
@@ -97,16 +97,19 @@ class ScieloSubmissionsReportDAO extends DAO
         $lastDecision = "";
         $recusedDecisionId = "4";
         $acceptedDecisionId = "1";
+        $submissionAcceptedId = "7";
 
         foreach($decisionsSubmission as $decisions){
             $lastDecision = $decisions['decision'];
         }
-
+        error_log($lastDecision);
         switch ($lastDecision) {
             case $acceptedDecisionId:
-                return 'Aceito';
+                return __('common.accepted');
+            case $submissionAcceptedId:
+                return __('common.accepted');                
             case $recusedDecisionId:
-                return 'Rejeitado';
+                return __('common.declined');
             default:
                 return '';
         }

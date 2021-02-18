@@ -59,7 +59,6 @@ class ScieloSubmissionsReportForm extends Form {
 			__("submission.submitter"),
 			__("common.dateSubmitted"),
 			__("plugins.reports.scieloSubmissionsReport.header.LastDateDecided"),
-			__("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
 		];
@@ -84,6 +83,7 @@ class ScieloSubmissionsReportForm extends Form {
 				__("common.language"),
 				__("submission.authors"),
 				__("plugins.reports.scieloSubmissionsReport.header.reviews"),
+				__("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
 			]);
 		}
 
