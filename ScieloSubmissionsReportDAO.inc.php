@@ -57,12 +57,13 @@ class ScieloSubmissionsReportDAO extends DAO
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
+            $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
 
             if(!$completeReviews)
                 return null;
 
-            $submissionData = array_merge($submissionData, [$reviews], [$finalDecision]);
+            $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision]);
         }
 
         return $submissionData;
@@ -102,7 +103,7 @@ class ScieloSubmissionsReportDAO extends DAO
         foreach($decisionsSubmission as $decisions){
             $lastDecision = $decisions['decision'];
         }
-        error_log($lastDecision);
+
         switch ($lastDecision) {
             case $acceptedDecisionId:
                 return __('common.accepted');
@@ -113,6 +114,26 @@ class ScieloSubmissionsReportDAO extends DAO
             default:
                 return '';
         }
+    }
+
+    function newDataObject() {
+		return new ArticleReportPlugin();
+	}
+
+    public function getLastDecision($submissionId){
+        $report = $this->newDataObject();
+        $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+        $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
+        $lastDecision = "";
+
+        foreach($decisionsSubmission as $decisions){
+            $lastDecision = $decisions['decision'];
+        }
+
+        $decision = $report->getDecisionMessage($lastDecision); 
+
+        return $decision;
+
     }
 
     private function controllerModeratorEditor($application, $submission){

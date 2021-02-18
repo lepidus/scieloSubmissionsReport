@@ -50,6 +50,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.reviews">Reviews</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.LastDateDecided">Date of last decision</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.FinalDecision">Final decision</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.LastDecision">Last decision</message>
 
 
 </locale>

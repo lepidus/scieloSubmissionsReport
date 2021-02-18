@@ -83,6 +83,7 @@ class ScieloSubmissionsReportForm extends Form {
 				__("common.language"),
 				__("submission.authors"),
 				__("plugins.reports.scieloSubmissionsReport.header.reviews"),
+				__("plugins.reports.scieloSubmissionsReport.header.LastDecision"),
 				__("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
 			]);
 		}
