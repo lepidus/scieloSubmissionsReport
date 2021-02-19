@@ -42,7 +42,6 @@ class ScieloSubmissionsReportDAO extends DAO
                 $submissionsData[] = $submissionData;
                 $allSubmissions[] = $rowSubmission;
             }
-
         }
 
         if($application == 'ojs'){
@@ -52,6 +51,8 @@ class ScieloSubmissionsReportDAO extends DAO
             $submissionsData[$lastRowCSV][0] = " ";
             $submissionsData[$rowEmptyCSV][0] = __("plugins.reports.scieloSubmissionsReport.header.AverageEvaluationTime");
             $submissionsData[$rowEmptyCSV][1] = $this->averageEvaluationTime($allSubmissions);
+            $submissionsData[$rowEmptyCSV][2] = __("section.sections");
+            $submissionsData[$rowEmptyCSV][3] = implode(",", $sections);  
         }
 
         return $submissionsData;
