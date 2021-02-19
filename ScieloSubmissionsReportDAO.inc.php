@@ -32,47 +32,50 @@ class ScieloSubmissionsReportDAO extends DAO
         }
         
         $resultSubmissions = $this->retrieve($querySubmissions);
-
         $submissionsData = array();
         $allSubmissions = array();
 
         while($rowSubmission = $resultSubmissions->FetchRow()) {
-            $allSubmissions[] = $rowSubmission;
             $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections);
 
-            if($submissionData)
+            if($submissionData){
                 $submissionsData[] = $submissionData;
+                $allSubmissions[] = $rowSubmission;
+            }
+
         }
 
-        // foreach ($allSubmissions as $value) {
-        //     error_log($value['submission_id']);
-        // }
-        $this->averageEvaluationTime($allSubmissions);
+        if($application == 'ojs'){
+            $lastRowCSV = count($submissionsData);
+            $rowEmptyCSV = $lastRowCSV + 1;
+
+            $submissionsData[$lastRowCSV][0] = " ";
+            $submissionsData[$rowEmptyCSV][0] = __("plugins.reports.scieloSubmissionsReport.header.AverageEvaluationTime");
+            $submissionsData[$rowEmptyCSV][1] = $this->averageEvaluationTime($allSubmissions);
+        }
 
         return $submissionsData;
     }
 
     public function averageEvaluationTime($allSubmissions){
         $totalDays = 0;
-        $totalSubmissions = array();
-        $reviews = array();
-        error_log('vasco ' . count($allSubmissions));
+        $totalSubmissions = 0;
+
         foreach ($allSubmissions as $submissions) {
             $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissions['submission_id']);
             $evaluatedSubmission = $this->getFinalDecision($submissions['submission_id']);
-            $reviews[] = $this->getReviews($submissions['submission_id']);
+                
             if($evaluatedSubmission != ''){
-                $totalSubmissions[] = $submissions['submission_id'];
+                $totalSubmissions += 1;
                 $totalDays += $this->evaluationTime($submission);
             }
-
         }
+        if($totalDays == 0 || $totalSubmissions == 0)
+            return 0;
 
-        $averageTime = $totalDays/ count($totalSubmissions);
-        error_log('Reviews ' . count($reviews));
-        error_log('SUBMISSÕES ' . count($totalSubmissions));
-        error_log('DIAS ' . $totalDays);
-        error_log('MEDIA ' . $averageTime);
+        $averageTime = number_format($totalDays / $totalSubmissions,2);
+
+        return $averageTime;
     }
 
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {

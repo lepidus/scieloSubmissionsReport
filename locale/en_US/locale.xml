@@ -52,5 +52,6 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.FinalDecision">Final decision</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.LastDecision">Last decision</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.EvaluationTime">Evaluation time</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.AverageEvaluationTime">Average evaluation time</message>
 </locale>
 
