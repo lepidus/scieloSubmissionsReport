@@ -146,7 +146,6 @@ class ScieloSubmissionsReportDAO extends DAO
     public function getFinalDecision($submissionId){
         $editDecision = DAORegistry::getDAO('EditDecisionDAO');
         $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
-        $lastDecision = end($decisionsSubmission)['decision'];
 
         foreach($decisionsSubmission as $decision){
             if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
