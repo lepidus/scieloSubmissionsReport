@@ -49,8 +49,8 @@ class ScieloSubmissionsReportDAO extends DAO
             $rowEmptyCSV = $lastRowCSV + 1;
 
             $submissionsData[$lastRowCSV][0] = " ";
-            $submissionsData[$rowEmptyCSV][0] = __("plugins.reports.scieloSubmissionsReport.header.AverageEvaluationTime");
-            $submissionsData[$rowEmptyCSV][1] = $this->averageEvaluationTime($allSubmissions);
+            $submissionsData[$rowEmptyCSV][0] = __("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime");
+            $submissionsData[$rowEmptyCSV][1] = $this->averageReviewingTime($allSubmissions);
             $submissionsData[$rowEmptyCSV][2] = __("section.sections");
             $submissionsData[$rowEmptyCSV][3] = implode(",", $sections);  
         }
@@ -58,7 +58,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $submissionsData;
     }
 
-    public function averageEvaluationTime($allSubmissions){
+    public function averageReviewingTime($allSubmissions){
         $totalDays = 0;
         $totalSubmissions = 0;
 
@@ -68,7 +68,7 @@ class ScieloSubmissionsReportDAO extends DAO
                 
             if($evaluatedSubmission != ''){
                 $totalSubmissions += 1;
-                $totalDays += $this->evaluationTime($submission);
+                $totalDays += $this->reviewingTime($submission);
             }
         }
         if($totalDays == 0 || $totalSubmissions == 0)
@@ -82,7 +82,7 @@ class ScieloSubmissionsReportDAO extends DAO
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
-        $evaluationTime = $this->evaluationTime($submission);
+        $evaluationTime = $this->reviewingTime($submission);
 
         if(!$submissionData) return null;
 
@@ -129,14 +129,14 @@ class ScieloSubmissionsReportDAO extends DAO
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
-    public function evaluationTime($submission){
+    public function reviewingTime($submission){
         $submissionDate = $submission->getDateSubmitted();
         $decisionDate = $submission->getDateStatusModified();
         $dateFinal = new DateTime(preg_split('/ /',$decisionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $dateBegin = new DateTime(preg_split('/ /',$submissionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
-        $evaluationTime = $dateFinal->diff($dateBegin);
+        $reviewingTime = $dateFinal->diff($dateBegin);
 
-        return $evaluationTime->format('%a');
+        return $reviewingTime->format('%a');
     }
 
     public function getFinalDecision($submissionId){

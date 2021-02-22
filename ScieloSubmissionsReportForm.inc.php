@@ -87,8 +87,8 @@ class ScieloSubmissionsReportForm extends Form {
 				__("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
 			]);
 		}
-		$header = array_merge($header,[
-			__("plugins.reports.scieloSubmissionsReport.header.EvaluationTime"),
+		$header = array_merge($header,[ 
+			__("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
 		]);
 
 		fputcsv($fp, $header);
