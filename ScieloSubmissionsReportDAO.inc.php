@@ -142,33 +142,19 @@ class ScieloSubmissionsReportDAO extends DAO
     public function getFinalDecision($submissionId){
         $editDecision = DAORegistry::getDAO('EditDecisionDAO');
         $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
-        $lastDecision = "";
-        $recusedDecisionId = "4";
-        $acceptedDecisionId = "1";
-        $submissionAcceptedId = "7";
+        $lastDecision = end($decisionsSubmission)['decision'];
 
-        foreach($decisionsSubmission as $decisions){
-            $lastDecision = $decisions['decision'];
-        }
-
-        switch ($lastDecision) {
-            case $acceptedDecisionId:
-                return __('common.accepted');
-            case $submissionAcceptedId:
+        foreach($decisionsSubmission as $decision){
+            if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
                 return __('common.accepted');                
-            case $recusedDecisionId:
+            else if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE)
                 return __('common.declined');
-            default:
-                return '';
         }
+        return "";        
     }
 
-    function newDataObject() {
-		return new ArticleReportPlugin();
-	}
-
     public function getLastDecision($submissionId){
-        $report = $this->newDataObject();
+        $report = new ArticleReportPlugin();
         $editDecision = DAORegistry::getDAO('EditDecisionDAO');
         $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
         $lastDecision = "";
