@@ -86,27 +86,27 @@ class ScieloSubmissionsReportDAO extends DAO
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
-        $reviewingTime = $this->reviewingTime($submission);
 
         if(!$submissionData) return null;
 
         if($application == 'ops') {
             list($publicationStatus, $publicationDoi) = $this->getPublicationData($submission);
             $notes = $this->getNotes($submissionId);
-            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes]);
+            $firstPublicationDate = $this->getFirstPublicationDate($submissionId);
+            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$firstPublicationDate]);
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
             $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
             $firstEditDecisionDate = $this->getFirstEditDecisionDate($submissionId);
+            $reviewingTime = $this->reviewingTime($submission);
 
             if(!$completeReviews)
                 return null;
 
-            $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision],[$firstEditDecisionDate]);
+            $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision],[$firstEditDecisionDate],[$reviewingTime]);
         }
-        $submissionData = array_merge($submissionData,[$reviewingTime]);
         return $submissionData;
     }
 
@@ -128,6 +128,8 @@ class ScieloSubmissionsReportDAO extends DAO
 
         if(!in_array($sectionName, $sections))
             return null;
+        
+        $this->getFirstPublicationDate($submission->getId());
                 
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
@@ -153,6 +155,12 @@ class ScieloSubmissionsReportDAO extends DAO
                 return __('common.declined');
         }
         return "";        
+    }
+
+    public function getFirstPublicationDate($submissionId){
+        $publication = DAORegistry::getDAO('PublicationDAO')->getById($submissionId);
+        $firstPublicationDate = $publication->getData('datePublished');
+        return $firstPublicationDate;
     }
 
     public function getFirstEditDecisionDate($submissionId){
