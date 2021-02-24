@@ -134,7 +134,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
     public function reviewingTime($submission){
         $submissionDate = $submission->getDateSubmitted();
-        $decisionDate = $submission->getDateStatusModified();
+        $decisionDate = $this->getFirstEditDecisionDate($submission->getId());
         $dateFinal = new DateTime(preg_split('/ /',$decisionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $dateBegin = new DateTime(preg_split('/ /',$submissionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $reviewingTime = $dateFinal->diff($dateBegin);
