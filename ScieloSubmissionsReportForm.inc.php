@@ -58,7 +58,6 @@ class ScieloSubmissionsReportForm extends Form {
 			__("submission.submissionTitle"),
 			__("submission.submitter"),
 			__("common.dateSubmitted"),
-			__("plugins.reports.scieloSubmissionsReport.header.LastDateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
 			__("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
 		];
@@ -88,6 +87,7 @@ class ScieloSubmissionsReportForm extends Form {
 			]);
 		}
 		$header = array_merge($header,[ 
+			__("plugins.reports.scieloSubmissionsReport.header.LastDateDecided"),
 			__("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
 		]);
 

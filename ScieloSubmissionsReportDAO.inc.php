@@ -86,7 +86,8 @@ class ScieloSubmissionsReportDAO extends DAO
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
-        $evaluationTime = $this->reviewingTime($submission);
+        $reviewingTime = $this->reviewingTime($submission);
+        $decisionDate = $submission->getDateStatusModified();
 
         if(!$submissionData) return null;
 
@@ -105,7 +106,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
             $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision]);
         }
-        $submissionData = array_merge($submissionData,[$evaluationTime]);
+        $submissionData = array_merge($submissionData,[$decisionDate],[$reviewingTime]);
         return $submissionData;
     }
 
@@ -117,7 +118,6 @@ class ScieloSubmissionsReportDAO extends DAO
         $submissionStatus = __($submission->getStatusKey());
         $title = $submission->getTitle($locale);
         $submissionDate = $submission->getDateSubmitted();
-        $decisionDate = $submission->getDateStatusModified();
         $submissionLocale = $submission->getLocale();
         $section = DAORegistry::getDAO('SectionDAO')->getById( $submission->getSectionId() );
         $sectionName = $section->getTitle($locale);
@@ -130,7 +130,7 @@ class ScieloSubmissionsReportDAO extends DAO
             return null;
         
         
-        return [$submission->getId(),$title,$submissionUser,$submissionDate,$decisionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
+        return [$submission->getId(),$title,$submissionUser,$submissionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
     public function reviewingTime($submission){
