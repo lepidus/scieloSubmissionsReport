@@ -48,7 +48,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.context">Periódico / Servidor</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.section">Seção</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.reviews">Avaliações</message>
-    <message key="plugins.reports.scieloSubmissionsReport.header.LastDateDecided">Data da última decisão</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.LastDateDecided">Data da decisão final</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.FinalDecision">Decisão final</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.LastDecision">Última decisão</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.ReviewingTime">Tempo de avaliação</message>

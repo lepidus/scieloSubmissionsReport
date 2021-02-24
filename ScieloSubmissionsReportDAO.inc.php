@@ -87,7 +87,6 @@ class ScieloSubmissionsReportDAO extends DAO
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
         $reviewingTime = $this->reviewingTime($submission);
-        $decisionDate = $submission->getDateStatusModified();
 
         if(!$submissionData) return null;
 
@@ -100,13 +99,14 @@ class ScieloSubmissionsReportDAO extends DAO
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
             $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
+            $firstEditDecisionDate = $this->getFirstEditDecisionDate($submissionId);
 
             if(!$completeReviews)
                 return null;
 
-            $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision]);
+            $submissionData = array_merge($submissionData, [$reviews], [$lastDecision], [$finalDecision],[$firstEditDecisionDate]);
         }
-        $submissionData = array_merge($submissionData,[$decisionDate],[$reviewingTime]);
+        $submissionData = array_merge($submissionData,[$reviewingTime]);
         return $submissionData;
     }
 
@@ -128,8 +128,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
         if(!in_array($sectionName, $sections))
             return null;
-        
-        
+                
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
@@ -154,6 +153,19 @@ class ScieloSubmissionsReportDAO extends DAO
                 return __('common.declined');
         }
         return "";        
+    }
+
+    public function getFirstEditDecisionDate($submissionId){
+        $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+        $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
+        foreach($decisionsSubmission as $decision){
+            if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT || $decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE){
+                $firstEditDecisionDate = $decision['dateDecided'];
+                break;
+            }
+        } 
+
+        return $firstEditDecisionDate;
     }
 
     public function getLastDecision($submissionId){
