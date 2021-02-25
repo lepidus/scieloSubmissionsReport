@@ -92,7 +92,7 @@ class ScieloSubmissionsReportDAO extends DAO
         if($application == 'ops') {
             list($publicationStatus, $publicationDoi) = $this->getPublicationData($submission);
             $notes = $this->getNotes($submissionId);
-            $firstPublicationDate = $this->getFirstPublicationDate($submissionId);
+            $firstPublicationDate = $this->getFirstPublicationDate($submission);
             $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$firstPublicationDate]);
         }
         else if($application == 'ojs') {
@@ -128,8 +128,6 @@ class ScieloSubmissionsReportDAO extends DAO
 
         if(!in_array($sectionName, $sections))
             return null;
-        
-        $this->getFirstPublicationDate($submission->getId());
                 
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
@@ -157,10 +155,14 @@ class ScieloSubmissionsReportDAO extends DAO
         return "";        
     }
 
-    public function getFirstPublicationDate($submissionId){
-        $publication = DAORegistry::getDAO('PublicationDAO')->getById($submissionId);
-        $firstPublicationDate = $publication->getData('datePublished');
-        return $firstPublicationDate;
+    public function getFirstPublicationDate($submission){
+        $publication = $submission->getData('publications');
+        $firstPublicationDate = "";
+        if (empty($publication)) {
+            return $firstPublicationDate;
+		}else {
+            return $firstPublicationDate = $publication[0]->getData('datePublished');
+        }
     }
 
     public function getFirstEditDecisionDate($submissionId){
