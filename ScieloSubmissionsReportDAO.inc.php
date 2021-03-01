@@ -99,7 +99,7 @@ class ScieloSubmissionsReportDAO extends DAO
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
             $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
-            $firstEditDecisionDate = $this->getFirstEditDecisionDate($submissionId);
+            $firstEditDecisionDate = $this->getDateOfFirstEditorDecision($submissionId);
             $reviewingTime = $this->reviewingTime($submission);
 
             if(!$completeReviews)
@@ -134,7 +134,7 @@ class ScieloSubmissionsReportDAO extends DAO
 
     public function reviewingTime($submission){
         $submissionDate = $submission->getDateSubmitted();
-        $decisionDate = $this->getFirstEditDecisionDate($submission->getId());
+        $decisionDate = $this->getDateOfFirstEditorDecision($submission->getId());
         $dateFinal = new DateTime(preg_split('/ /',$decisionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $dateBegin = new DateTime(preg_split('/ /',$submissionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $reviewingTime = $dateFinal->diff($dateBegin);
@@ -165,7 +165,7 @@ class ScieloSubmissionsReportDAO extends DAO
         }
     }
 
-    public function getFirstEditDecisionDate($submissionId){
+    public function getDateOfFirstEditorDecision($submissionId){
         $editDecision = DAORegistry::getDAO('EditDecisionDAO');
         $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
         foreach($decisionsSubmission as $decision){
