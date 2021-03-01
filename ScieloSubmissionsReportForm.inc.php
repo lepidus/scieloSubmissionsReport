@@ -87,7 +87,7 @@ class ScieloSubmissionsReportForm extends Form {
 			]);
 		}
 		$header = array_merge($header,[ 
-			__("plugins.reports.scieloSubmissionsReport.header.LastDateDecided"),
+			__("plugins.reports.scieloSubmissionsReport.header.finalDecisionDate"),
 			__("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
 		]);
 
