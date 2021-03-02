@@ -93,14 +93,15 @@ class ScieloSubmissionsReportDAO extends DAO
             list($publicationStatus, $publicationDoi) = $this->getPublicationData($submission);
             $notes = $this->getNotes($submissionId);
             $firstPublicationDate = $this->getFirstPublicationDate($submission);
-            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$firstPublicationDate]);
+            $reviewingTime = $this->reviewingTime($submission, $application);
+            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$firstPublicationDate],[$reviewingTime]);
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
             $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
             $firstEditDecisionDate = $this->getDateOfFirstEditorDecision($submissionId);
-            $reviewingTime = $this->reviewingTime($submission);
+            $reviewingTime = $this->reviewingTime($submission, $application);
 
             if(!$completeReviews)
                 return null;
@@ -132,9 +133,13 @@ class ScieloSubmissionsReportDAO extends DAO
         return [$submission->getId(),$title,$submissionUser,$submissionDate,$statusChangeDays,$submissionStatus,$areaModerator_JournalEditor,$moderators_SectionEditor,$sectionName,$submissionLocale,$authors];
     }
 
-    public function reviewingTime($submission){
+    public function reviewingTime($submission, $application){
         $submissionDate = $submission->getDateSubmitted();
-        $decisionDate = $this->getDateOfFirstEditorDecision($submission->getId());
+        if ($application == 'ops') {
+            $decisionDate = $this->getFirstPublicationDate($submission);
+        }else if ($application == 'ojs') {
+            $decisionDate = $this->getDateOfFirstEditorDecision($submission->getId());
+        }
         $dateFinal = new DateTime(preg_split('/ /',$decisionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $dateBegin = new DateTime(preg_split('/ /',$submissionDate,-1,PREG_SPLIT_NO_EMPTY)[0]);
         $reviewingTime = $dateFinal->diff($dateBegin);
