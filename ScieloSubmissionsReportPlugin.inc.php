@@ -51,7 +51,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 	 * @return String name of plugin
 	 */
 	function getName() {
-		return 'SciELOSubmissionsReportPlugin';
+		return 'ScieloSubmissionsReportPlugin';
 	}
 
 	/**
