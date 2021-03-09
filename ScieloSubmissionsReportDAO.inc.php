@@ -125,7 +125,7 @@ class ScieloSubmissionsReportDAO extends DAO
         $submissionDate = $submission->getDateSubmitted();
         $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
         
-        $dateFinal = new DateTime(trim($decisionDate));
+        $dateFinal = new DateTime(trim($finalDecisionDate));
         $dateBegin = new DateTime(trim($submissionDate));
         
         $reviewingTime = $dateFinal->diff($dateBegin);
@@ -150,6 +150,16 @@ class ScieloSubmissionsReportDAO extends DAO
             $publication = $submission->getCurrentPublication();
             if ($publication->getData('datePublished')) {
                 return $publication->getData('datePublished');
+            }
+            else {
+                $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+                $decisionsSubmission = $editDecision->getEditorDecisions($submission->getId());
+                foreach($decisionsSubmission as $decision){
+                    if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $decision['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE){
+                        $finalDecisionDate = new DateTime($decision['dateDecided']);
+                        return $finalDecisionDate->format('Y-m-d');
+                    }
+                }
             }
         }
         else if($application == 'ojs') {
