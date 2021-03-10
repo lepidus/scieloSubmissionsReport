@@ -91,7 +91,7 @@ class ScieloSubmissionsReportDAO extends DAO
             
             $lastDecision = $this->getLastDecision($submissionId);
             $finalDecision = $this->getFinalDecision($submissionId);
-            $finalDecisionDate = $this->getFinalDecisionDate($submissionId, $application);
+            $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
             $reviewingTime = $this->getReviewingTime($submission, $application);
 
             $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime]);
