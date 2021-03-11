@@ -59,11 +59,16 @@ class ScieloSubmissionsReportDAO extends DAO
 
     public function averageReviewingTime($allSubmissions, $application){
         $totalDays = 0;
-        $totalSubmissions = count($allSubmissions);
+        $totalSubmissions = 0;
 
         foreach ($allSubmissions as $submissionRow) {
             $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionRow['submission_id']);
-            $totalDays += $this->getReviewingTime($submission, $application);
+            $finalDecision = $this->getFinalDecision($submissionRow['submission_id']);
+            list($completeReviews, $reviews) = $this->getReviews($submissionRow['submission_id']);
+            if ($finalDecision && $completeReviews) {
+                $totalDays += $this->getReviewingTime($submission, $application);
+                $totalSubmissions += 1;
+            }
         }
         if($totalDays == 0 || $totalSubmissions == 0)
             return 0;
