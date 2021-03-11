@@ -86,15 +86,18 @@ class ScieloSubmissionsReportDAO extends DAO
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
-            if(!$completeReviews)
-                return null;
-            
-            $lastDecision = $this->getLastDecision($submissionId);
-            $finalDecision = $this->getFinalDecision($submissionId);
-            $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
-            $reviewingTime = $this->getReviewingTime($submission, $application);
-
-            $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime]);
+           
+            if($completeReviews){
+                $lastDecision = $this->getLastDecision($submissionId);
+                $finalDecision = $this->getFinalDecision($submissionId);
+                $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
+                $reviewingTime = $this->getReviewingTime($submission, $application);
+                $submissionInterval = $this->getReviewingTime($submission, $application);
+            } else {
+                $lastDecision = $this->getLastDecision($submissionId);
+                $reviewingTime = $this->getReviewingTime($submission, $application);
+            }
+            $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime, $submissionInterval]);
         }
         return $submissionData;
     }
