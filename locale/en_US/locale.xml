@@ -53,6 +53,6 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.LastDecision">Last decision</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.ReviewingTime">Reviewing time</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime">Average reviewing time (in days) of approved and rejected manuscripts (disregarding rejected submissions on receipt)</message>
-    <message key="plugins.reports.scieloSubmissionsReport.header.AubmissionAndFinalDecisionDateInterval">Time between submission and final decision</message>
+    <message key="plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval">Time between submission and final decision</message>
 </locale>
 
