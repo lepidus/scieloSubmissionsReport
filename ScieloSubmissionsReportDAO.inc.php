@@ -68,15 +68,16 @@ class ScieloSubmissionsReportDAO extends DAO
 
         foreach ($allSubmissions as $submissionRow) {
             $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionRow['submission_id']);
-            $finalDecision = $this->getFinalDecision($submissionRow['submission_id']);
-            list($completeReviews, $reviews) = $this->getReviews($submissionRow['submission_id']);
-            if ($finalDecision && $completeReviews) {
-                if ($application == 'ojs'){
+
+            if ($application == 'ojs'){
+                $finalDecision = $this->getFinalDecision($submissionRow['submission_id']);
+                list($completeReviews, $reviews) = $this->getReviews($submissionRow['submission_id']);
+                if ($finalDecision && $completeReview) {
                     $totalDays += $this->getReviewingTime($submission, $application);
                     $totalSubmissions += 1;
-                } else{
-                    $totalDays += $this->getReviewingTime($submission, $application);
                 }
+            } else{
+                $totalDays += $this->getReviewingTime($submission, $application);
             }
         }
         if($totalDays == 0 || $totalSubmissions == 0)
