@@ -72,6 +72,7 @@ class ScieloSubmissionsReportForm extends Form {
 				__("plugins.reports.scieloSubmissionsReport.header.publicationStatus"),
 				__("plugins.reports.scieloSubmissionsReport.header.publicationDOI"),
 				__("submission.notes"),
+				__("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
 			]);
 		}
 		else if($this->_application == "ojs") {

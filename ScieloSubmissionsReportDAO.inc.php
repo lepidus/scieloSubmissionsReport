@@ -72,7 +72,7 @@ class ScieloSubmissionsReportDAO extends DAO
             if ($application == 'ojs'){
                 $finalDecision = $this->getFinalDecision($submissionRow['submission_id']);
                 list($completeReviews, $reviews) = $this->getReviews($submissionRow['submission_id']);
-                if ($finalDecision && $completeReview) {
+                if ($finalDecision && $completeReviews) {
                     $totalDays += $this->getReviewingTime($submission, $application);
                     $totalSubmissions += 1;
                 }
@@ -95,18 +95,21 @@ class ScieloSubmissionsReportDAO extends DAO
         if($application == 'ops') {
             list($publicationStatus, $publicationDoi) = $this->getPublicationData($submission);
             $notes = $this->getNotes($submissionId);
+            $finalDecision = $this->getFinalDecision($submission, $application);
             $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
             $reviewingTime = $this->getReviewingTime($submission, $application);
-            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$finalDecisionDate,$reviewingTime]);
+            $submissionInterval = ($finalDecision) ? ($this->getReviewingTime($submission, $application)) : ("");
+
+            $submissionData = array_merge($submissionData, [$publicationStatus,$publicationDoi,$notes,$finalDecision,$finalDecisionDate,$reviewingTime,$submissionInterval]);
         }
         else if($application == 'ojs') {
             list($completeReviews, $reviews) = $this->getReviews($submissionId);
             
             $lastDecision = $this->getLastDecision($submissionId);
-            $finalDecision = $this->getFinalDecision($submissionId);
+            $finalDecision = $this->getFinalDecision($submission, $application);
             $finalDecisionDate = $this->getFinalDecisionDate($submission, $application);
             $reviewingTime = $this->getReviewingTime($submission, $application);
-            $submissionInterval = $this->getReviewingTime($submission, $application);
+            $submissionInterval = ($finalDecision) ? ($this->getReviewingTime($submission, $application)) : ("");
 
             $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime,$submissionInterval]);
 
@@ -147,22 +150,40 @@ class ScieloSubmissionsReportDAO extends DAO
         return $reviewingTime->format('%a');
     }
 
-    public function getFinalDecision($submissionId){
-        $editDecision = DAORegistry::getDAO('EditDecisionDAO');
-        $decisionsSubmission = $editDecision->getEditorDecisions($submissionId); 
-
-        foreach($decisionsSubmission as $decision){
-            if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
-                return __('common.accepted');                
-            else if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE)
-                return __('common.declined');
+    public function getFinalDecision($submission, $application){
+        if($application == 'ops') {
+            $publication = $submission->getData('publications')[0];
+            if ($publication->getData('datePublished')) {
+                return __('common.accepted');
+            }
+            else {
+                $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+                $decisionsSubmission = $editDecision->getEditorDecisions($submission->getId());
+                foreach($decisionsSubmission as $decision){
+                    if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $decision['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE){
+                        return __('common.declined');
+                    }
+                }
+            }
         }
+        else if($application == 'ojs') {
+            $editDecision = DAORegistry::getDAO('EditDecisionDAO');
+            $decisionsSubmission = $editDecision->getEditorDecisions($submission->getId()); 
+
+            foreach($decisionsSubmission as $decision){
+                if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
+                    return __('common.accepted');                
+                else if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE)
+                    return __('common.declined');
+            }
+        }
+        
         return "";        
     }
 
     public function getFinalDecisionDate($submission, $application) {
         if($application == 'ops') {
-            $publication = $submission->getCurrentPublication();
+            $publication = $submission->getData('publications')[0];
             if ($publication->getData('datePublished')) {
                 return $publication->getData('datePublished');
             }
