@@ -70,7 +70,7 @@ class ScieloSubmissionsReportDAO extends DAO
             $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionRow['submission_id']);
 
             if ($application == 'ojs'){
-                $finalDecision = $this->getFinalDecision($submissionRow['submission_id']);
+                $finalDecision = $this->getFinalDecision($submission, $application);
                 list($completeReviews, $reviews) = $this->getReviews($submissionRow['submission_id']);
                 if ($finalDecision && $completeReviews) {
                     $totalDays += $this->getReviewingTime($submission, $application);
