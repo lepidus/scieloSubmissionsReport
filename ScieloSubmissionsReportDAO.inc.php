@@ -44,7 +44,7 @@ class ScieloSubmissionsReportDAO extends DAO
             }
         }
 
-        $submissionsData[] = [" "];
+        $submissionsData[] = ["", ""];
         $submissionsData[] = [
             __("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"),
             __("section.sections"),
@@ -83,7 +83,7 @@ class ScieloSubmissionsReportDAO extends DAO
         if($totalDays == 0 || $totalSubmissions == 0)
             return 0;
         
-        return number_format($totalDays / $totalSubmissions,2);
+        return round($totalDays / $totalSubmissions);
     }
 
     private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
