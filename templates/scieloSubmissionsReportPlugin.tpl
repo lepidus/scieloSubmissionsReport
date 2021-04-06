@@ -1,5 +1,10 @@
-{* Copyright (c) 2019 Lepidus Tecnologia
-Distributed under the GNU GPL v2. For full terms see the file docs/COPYING. *}
+{*
+  * Copyright (c) 2019-2021 Lepidus Tecnologia
+  * Copyright (c) 2020-2021 SciELO
+  * Distributed under the GNU GPL v3. For full terms see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt
+  *
+  *}
+
 {strip}
 {assign var="pageTitle" value= "plugins.reports.scieloSubmissionsReport.displayName"}
 {include file="common/header.tpl"}
