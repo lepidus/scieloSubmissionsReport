@@ -1,49 +1,61 @@
-# Submissions Report Plugin 
+# SciELO Submissions Report Plugin 
 
-This plugin generates a **CSV** spreadsheet with the following information:
-- Submission Id
+This plugin generates a **CSV** spreadsheet with information that is usually requested by SciELO, based on the website submissions. It allows the user to filter submissions within a date interval, using for this the submission date, last decision date or both. The user can also filter from which sections the submissions should be obtained.
+
+Since this plugin can be used in OJS and OPS, the informations change for each application.
+
+The common information obtained for OJS and OPS are:
+- Submission ID
 - Submission title
-- Submission user
-- Submission date
-- Decision date
-- Days until decision made
-- Submission status (review, approved, rejected)
-- Preprint publication status (not sent for publication in a journal, sent, sent and accepted)
+- Submitter
+- Date submitted
+- Days until status changing
+- Submission status (queued, published, declined or scheduled)
+- Submission section
+- Submission language
+- Authors (containing full name, country and affiliation to each one)
+- Final decision
+- Final decision date
+- Time in reviewing
+- Time between submission and final decision
+- Average time in reviewing
+- Sections chosen for filtering
+
+The information obtained only in OJS are:
+- Journal editors assigned
+- Section editor assigned
+- Reviewing recommendations
+- Last decision
+
+The information obtained only in OPS are:
+- Preprint publication status (not submitted for publication in journal, submitted or submitted and published)
 - Preprint publication DOI (if it has been published in a journal)
-- Submission area moderator
-- Submission moderators
-- Server name
-- Submission Section
-- Submission Locale
-- Authors (containing their names, countries and affiliation)
+- Section moderator assigned
+- Moderators assigned
 - Submission notes
 
-__Copyright (c) Lepidus Tecnologia__ 
+## Compatibility
 
-# First steps
+The latest release of this plugin is compatible with the following PKP applications:
 
-## Prerequisites
-
+* OJS 3.2.1
 * OPS 3.2.1
 
 
 ## Plugin Download
 
-To download the plugin, go to the Releases page [clicking here](https://gitlab.lepidus.com.br/plugins_ojs/relatorioscielo/-/releases), or go to `RelatorioScielo> Project Overview> Releases` and check the version you want to install.
+To download the plugin, go to the [Releases page](https://github.com/lepidus/scieloSubmissionsReport/releases) and download the tar.gz package of the latest release compatible with your website.
 
 ## Installation
 
-1. Enter the administration area of ​​your OPS website through the __Dashboard__.
+1. Enter the administration area of ​​your OJS/OPS website through the __Dashboard__.
 2. Navigate to `Settings`>` Website`> `Plugins`> `Upload a new plugin`.
-3. Under __Upload file__ select the file __SubmissionReportPlugin.tar.gz__.
-4. Click __Save__ and the plugin will be installed on your OPS.
+3. Under __Upload file__ select the file __ScieloSubmissionsReportPlugin.tar.gz__.
+4. Click __Save__ and the plugin will be installed on your website.
 
-# Technologies Used
-
-* CSS
-* PHP 7.2.24
-* Smarty 3.1.32
-* MariaDB 10.1.43
 
 # License
-__This plugin is licensed under the GNU General Public License v2__
+__This plugin is licensed under the GNU General Public License v3.0__
+
+__Copyright (c) 2019-2021 Lepidus Tecnologia__
+__Copyright (c) 2020-2021 SciELO__
