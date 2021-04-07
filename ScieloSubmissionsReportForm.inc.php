@@ -116,6 +116,10 @@ class ScieloSubmissionsReportForm extends Form {
 		
 		$submissionsData = $scieloSubmissionsReportDAO->getReportWithSections($this->_application, $journal->getId(),$initialSubmissionDate,$finalSubmissionDate,$initialDecisionDate,$finalDecisionDate,$sessions);
 		$fp = fopen('php://output', 'wt');
+
+		// Add BOM (byte order mark) to fix UTF-8 in Excel
+		fprintf($fp, chr(0xEF).chr(0xBB).chr(0xBF));
+
 		$this->printCsvHeader($fp);
 		foreach($submissionsData as $submissionLine){
 			fputcsv($fp, $submissionLine);
