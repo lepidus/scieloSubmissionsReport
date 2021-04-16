@@ -5,7 +5,7 @@ class ScieloSubmissionsReport {
     private $sections;
     private $submissions;
 
-    public function __construct(array $sections, array $submissions){
+    public function __construct(array $sections, array $submissions) {
         $this->sections = $sections;
         $this->submissions = $submissions;
     }

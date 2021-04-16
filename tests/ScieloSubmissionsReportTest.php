@@ -12,7 +12,7 @@ final class ScieloSubmissionsReportTest extends TestCase {
 
     public function testReportHasScieloSubmissions() : void {
         $sections = array();
-        $submissions = array(new ScieloSubmission(), new ScieloSubmission());
+        $submissions = (new ScieloSubmissionTest())->getTestSubmissions();
         $report = new ScieloSubmissionsReport($sections, $submissions);
         $this->assertEquals($submissions, $report->getSubmissions());
     }
