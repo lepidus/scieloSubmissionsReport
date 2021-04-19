@@ -85,4 +85,18 @@ class ScieloSubmission {
 
         return "";
     }
+
+    private function authorsAsRecord() : string {
+        $records = [];
+
+        foreach($this->authors as $author) {
+            $records[] = $author->asRecord();
+        }
+
+        return implode("; ", $records);
+    }
+
+    public function asRecord(): array {
+        return array($this->id, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+    }
 }

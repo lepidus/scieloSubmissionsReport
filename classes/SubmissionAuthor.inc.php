@@ -22,5 +22,9 @@ public function __construct(string $fullName, string $country, string $affiliati
     public function getAffiliation() : string {
         return $this->affiliation;
     }
+
+    public function asRecord() : string {
+        return implode(", ", [$this->fullName, $this->country, $this->affiliation]);
+    }
 }
     

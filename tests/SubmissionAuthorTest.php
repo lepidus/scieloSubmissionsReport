@@ -22,4 +22,8 @@ final class SubmissionAuthorTest extends TestCase {
     public function testHasAffiliation() : void {
         $this->assertEquals($this->affiliation, $this->author->getAffiliation());
     }
+
+    public function testAsRecord() : void {
+        $this->assertEquals("Atila Iamarino, Brasil, Universidade de São Paulo", $this->author->asRecord());
+    }
 }

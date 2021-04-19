@@ -15,6 +15,7 @@ final class ScieloSubmissionTest extends TestCase {
     private $language = "en_US";
     private $finalDecision = "Accepted";
     private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $expectedReviewingTime = 8;
 
     private function createScieloSubmission() {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
@@ -79,8 +80,7 @@ final class ScieloSubmissionTest extends TestCase {
     }
 
     public function testTimeUnderReviewWithFinalDecisionMade() : void {
-        $expectedReviewingTime = 8;
-        $this->assertEquals($expectedReviewingTime, $this->submission->getTimeUnderReview());
+        $this->assertEquals($this->expectedReviewingTime, $this->submission->getTimeUnderReview());
     }
 
     public function testTimeUnderReviewWithoutFinalDecisionMade() : void {
@@ -93,13 +93,17 @@ final class ScieloSubmissionTest extends TestCase {
     }
 
     public function testTimeBetweenSubmissionAndFinalDecisionWithFinalDecision() : void {
-        $expectedTimeBetweenSubmissionAndFinalDecision = 8;
-        $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $this->submission->getTimeBetweenSubmissionAndFinalDecision());
+        $this->assertEquals($this->expectedReviewingTime, $this->submission->getTimeBetweenSubmissionAndFinalDecision());
     }
 
     public function testTimeBetweenSubmissionAndFinalDecisionWithoutFinalDecision() : void {
         $submission = $this->createSubmissionWithoutFinalDecision();
         $expectedTimeBetweenSubmissionAndFinalDecision = "";
         $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $submission->getTimeBetweenSubmissionAndFinalDecision());
+    }
+
+    public function testGetRecord() : void {
+        $expectedRecord = ['1233',"Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
+        $this->assertEquals($expectedRecord, $this->submission->asRecord());
     }
 }
