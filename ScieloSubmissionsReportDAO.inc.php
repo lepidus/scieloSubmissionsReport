@@ -24,18 +24,18 @@ class ScieloSubmissionsReportDAO extends DAO
      */
     public function getReportWithSections($application, $journalId, $initialSubmissionDate, $finalSubmissionDate, $initialDecisionDate, $finalDecisionDate, $sections) {
         $querySubmissions = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS status_change_days FROM submissions WHERE context_id = ? AND date_submitted IS NOT NULL";
-        $params = [$journalId];
+        $paramsForQuery = [$journalId];
         if($initialSubmissionDate){
             $querySubmissions .= " AND date_submitted >= ? AND date_submitted <= ?";
-            $params = array_merge($params, [$initialSubmissionDate.' 00:00:00', $finalSubmissionDate.' 23:59:59']);
+            $paramsForQuery = array_merge($paramsForQuery, [$initialSubmissionDate.' 00:00:00', $finalSubmissionDate.' 23:59:59']);
         }
         
         if($initialDecisionDate){
             $querySubmissions .= " AND date_last_activity >= ? AND date_last_activity <= ?";
-            $params = array_merge($params, [$initialDecisionDate.' 00:00:00', $finalDecisionDate.' 23:59:59']);
+            $paramsForQuery = array_merge($paramsForQuery, [$initialDecisionDate.' 00:00:00', $finalDecisionDate.' 23:59:59']);
         }
         
-        $resultSubmissions = $this->retrieve($querySubmissions, $params);
+        $resultSubmissions = $this->retrieve($querySubmissions, $paramsForQuery);
         $submissionsData = array();
         $allSubmissions = array();
 
