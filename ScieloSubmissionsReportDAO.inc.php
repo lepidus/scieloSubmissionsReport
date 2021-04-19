@@ -23,16 +23,19 @@ class ScieloSubmissionsReportDAO extends DAO
      * @return array
      */
     public function getReportWithSections($application, $journalId, $initialSubmissionDate, $finalSubmissionDate, $initialDecisionDate, $finalDecisionDate, $sections) {
-        $querySubmissions = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS status_change_days FROM submissions WHERE context_id = {$journalId} AND date_submitted IS NOT NULL";
+        $querySubmissions = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS status_change_days FROM submissions WHERE context_id = ? AND date_submitted IS NOT NULL";
+        $params = [$journalId];
         if($initialSubmissionDate){
-            $querySubmissions .= " AND date_submitted >= '{$initialSubmissionDate} 23:59:59' AND date_submitted <= '{$finalSubmissionDate} 23:59:59'";
+            $querySubmissions .= " AND date_submitted >= ? AND date_submitted <= ?";
+            $params = array_merge($params, [$initialSubmissionDate.' 00:00:00', $finalSubmissionDate.' 23:59:59']);
         }
         
         if($initialDecisionDate){
-            $querySubmissions .= " AND date_last_activity >= '{$initialDecisionDate}  23:59:59' AND date_last_activity <= '{$finalDecisionDate} 23:59:59'";
+            $querySubmissions .= " AND date_last_activity >= ? AND date_last_activity <= ?";
+            $params = array_merge($params, [$initialDecisionDate.' 00:00:00', $finalDecisionDate.' 23:59:59']);
         }
         
-        $resultSubmissions = $this->retrieve($querySubmissions);
+        $resultSubmissions = $this->retrieve($querySubmissions, $params);
         $submissionsData = array();
         $allSubmissions = array();
 
@@ -347,7 +350,7 @@ class ScieloSubmissionsReportDAO extends DAO
     }
     
     private function getNotes($submissionId) {
-        $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = {$submissionId}");
+        $resultNotes = $this->retrieve("SELECT contents FROM notes WHERE assoc_type = 1048585 AND assoc_id = ?", [$submissionId]);
         $notes = "";
         if($resultNotes->NumRows() == 0) {
             $notes = 'No notes';
