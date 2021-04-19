@@ -11,15 +11,15 @@ public function __construct(string $fullName, string $country, string $affiliati
         $this->affiliation = $affiliation;
     }
 
-    public function getFullName() {
+    public function getFullName() : string {
         return $this->fullName;
     }
     
-    public function getCountry() {
+    public function getCountry() : string {
         return $this->country;
     }
 
-    public function getAffiliation() {
+    public function getAffiliation() : string {
         return $this->affiliation;
     }
 }

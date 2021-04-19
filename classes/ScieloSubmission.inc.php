@@ -1,55 +1,88 @@
 <?php
 
 class ScieloSubmission {
+
     private $id;
     private $title;
     private $submitter;
     private $dateSubmitted;
+    private $daysUntilStatusChange;
     private $status;
     private $authors;
+    private $section;
     private $language;
     private $finalDecision;
+    private $finalDecisionDate;
 
-    public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, string $status, array $authors, string $language, string $finalDecision) {
+    public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate) {
         $this->id = $id;
         $this->title = $title;
         $this->submitter = $submitter;
         $this->dateSubmitted = $dateSubmitted;
+        $this->daysUntilStatusChange = $daysUntilStatusChange;
         $this->status = $status;
         $this->authors = $authors;
+        $this->section = $section;
         $this->language = $language;
         $this->finalDecision = $finalDecision;
+        $this->finalDecisionDate = $finalDecisionDate;
     }
 
-    public function getId() {
+    public function getId() : int {
         return $this->id;
     }
 
-    public function getTitle() {
+    public function getTitle() : string {
         return $this->title;
     }
 
-    public function getSubmitter() {
+    public function getSubmitter() : string {
         return $this->submitter;
     }
 
-    public function getDateSubmitted() {
+    public function getDateSubmitted() : string {
         return $this->dateSubmitted;
     }
 
-    public function getStatus() {
+    public function getStatus() : string {
         return $this->status;
     }
 
-    public function getAuthors() {
+    public function getAuthors() : array {
         return $this->authors;
     }
 
-    public function getLanguage() {
+    public function getSection() : string {
+        return $this->section;
+    }
+
+    public function getLanguage() : string {
         return $this->language;
     }
 
-    public function getFinalDecision() {
+    public function getFinalDecision() : string {
         return $this->finalDecision;
+    }
+
+    public function getDaysUntilStatusChange() : int {
+        return $this->daysUntilStatusChange;
+    }
+
+    public function getFinalDecisionDate() : string {
+        return $this->finalDecisionDate;
+    }
+
+    public function getTimeUnderReview() : int {
+        $dateFinal = new DateTime(trim($this->finalDecisionDate));
+        $dateBegin = new DateTime(trim($this->dateSubmitted));
+        $reviewingTime = $dateFinal->diff($dateBegin);
+        return $reviewingTime->format('%a');
+    }
+    
+    public function getTimeBetweenSubmissionAndFinalDecision() : string {
+        if(!empty($this->finalDecisionDate))
+            return $this->getTimeUnderReview();
+
+        return "";
     }
 }

@@ -10,11 +10,11 @@ class ScieloSubmissionsReport {
         $this->submissions = $submissions;
     }
 
-    public function getSections() {
+    public function getSections() : array {
         return $this->sections;
     }
 
-    public function getSubmissions() {
+    public function getSubmissions() : array {
         return $this->submissions;
     }
 }

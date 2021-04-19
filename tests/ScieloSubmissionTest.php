@@ -2,23 +2,28 @@
 use PHPUnit\Framework\TestCase;
 
 final class ScieloSubmissionTest extends TestCase {
-    //properties to test:
-    //id, titulo, usuário submissor (nome), data de submissão, estado da submissão, autores, lingua
-    //decisão final, data da decisão final, tempo em avaliação, tempo entre submissão e a decisão final
-
+    
     private $submission;
     private $submissionId = 1233;
     private $title = "Rethinking linguistic relativity";
     private $submitter = "Atila Iamarino";
     private $dateSubmitted = "2013-09-06 19:07:02";
+    private $daysUntilStatusChange = 3;
     private $status = "Published";
     private $authors;
+    private $section = "Biological Sciences";
     private $language = "en_US";
     private $finalDecision = "Accepted";
+    private $finalDecisionDate = "2013-09-14 22:00:00";
 
     private function createScieloSubmission() {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
-        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->status, $this->authors, $this->language, $this->finalDecision);
+        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
+    }
+
+    private function createSubmissionWithoutFinalDecision() {
+        $emptyFinalDecisionDate = "";
+        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
     }
     
     public function getTestSubmissions() {
@@ -53,11 +58,48 @@ final class ScieloSubmissionTest extends TestCase {
         $this->assertEquals($this->authors, $this->submission->getAuthors());
     }
 
+    public function testHasSection() : void {
+        $this->assertEquals($this->section, $this->submission->getSection());
+    }
+
     public function testHasLanguage() : void {
         $this->assertEquals($this->language, $this->submission->getLanguage());
     }
 
     public function testFinalDecision() : void {
         $this->assertEquals($this->finalDecision, $this->submission->getFinalDecision());
+    }
+
+    public function testDaysUntilStatusChange() : void {
+        $this->assertEquals($this->daysUntilStatusChange, $this->submission->getDaysUntilStatusChange());
+    }
+    
+    public function testFinalDecisionDate() : void {
+        $this->assertEquals($this->finalDecisionDate, $this->submission->getFinalDecisionDate());
+    }
+
+    public function testTimeUnderReviewWithFinalDecisionMade() : void {
+        $expectedReviewingTime = 8;
+        $this->assertEquals($expectedReviewingTime, $this->submission->getTimeUnderReview());
+    }
+
+    public function testTimeUnderReviewWithoutFinalDecisionMade() : void {
+        $submission = $this->createSubmissionWithoutFinalDecision();
+        
+        $expectedReviewingTime = date_diff(new DateTime(trim($this->dateSubmitted)), new DateTime());
+        $expectedReviewingTime = $expectedReviewingTime->format('%a');
+
+        $this->assertEquals($expectedReviewingTime, $submission->getTimeUnderReview());
+    }
+
+    public function testTimeBetweenSubmissionAndFinalDecisionWithFinalDecision() : void {
+        $expectedTimeBetweenSubmissionAndFinalDecision = 8;
+        $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $this->submission->getTimeBetweenSubmissionAndFinalDecision());
+    }
+
+    public function testTimeBetweenSubmissionAndFinalDecisionWithoutFinalDecision() : void {
+        $submission = $this->createSubmissionWithoutFinalDecision();
+        $expectedTimeBetweenSubmissionAndFinalDecision = "";
+        $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $submission->getTimeBetweenSubmissionAndFinalDecision());
     }
 }
