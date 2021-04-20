@@ -7,6 +7,7 @@ spl_autoload_register(
         static $classes = null;
         if ($classes === null) {
             $classes = array(
+                'scielopreprint' => '/ScieloPreprint.inc.php',
                 'scielosubmission' => '/ScieloSubmission.inc.php',
                 'scielosubmissionsojsreport' => '/ScieloSubmissionsOJSReport.inc.php',
                 'scielosubmissionsopsreport' => '/ScieloSubmissionsOPSReport.inc.php',
