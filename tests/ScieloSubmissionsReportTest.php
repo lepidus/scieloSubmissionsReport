@@ -1,13 +1,13 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-final class ScieloSubmissionsReportTest extends TestCase {
+class ScieloSubmissionsReportTest extends TestCase {
     
     private $report;
-    private $sections = array("Biological Sciences", "Math", "Human Sciences");
-    private $submissions;
-    private $UTF8Bytes;
-    private $filePath = "/tmp/test.csv";
+    protected $sections = array("Biological Sciences", "Math", "Human Sciences");
+    protected $submissions;
+    protected $UTF8Bytes;
+    protected $filePath = "/tmp/test.csv";
 
     public function setUp() : void {
         $this->UTF8Bytes = chr(0xEF).chr(0xBB).chr(0xBF);
@@ -19,15 +19,19 @@ final class ScieloSubmissionsReportTest extends TestCase {
             unlink($this->filePath);
     }
 
-    private function createScieloSubmissionReport() {
+    protected function createScieloSubmissionReport() {
         $this->submissions = (new ScieloSubmissionTest())->getTestSubmissions();
         return new ScieloSubmissionsReport($this->sections, $this->submissions);
     }
 
-    private function createCSVReport() : void {
+    protected function createCSVReport() : void {
         $csvFile = fopen($this->filePath, 'wt');
         $this->report->buildCSV($csvFile);
         fclose($csvFile);
+    }
+
+    protected function readUTF8Bytes($csvFile) {
+        return fread($csvFile, strlen($this->UTF8Bytes));
     }
 
     public function testReportHasSections() : void {
@@ -38,10 +42,11 @@ final class ScieloSubmissionsReportTest extends TestCase {
         $this->assertEquals($this->submissions, $this->report->getSubmissions());
     }
 
-    public function testGeneratedCSVHasSubmissionsData() : void {
+    public function testGeneratedCSVHasCommonSubmissionsData() : void {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
-        fread($csvFile, 3);
+        $this->readUTF8Bytes($csvFile);
+        $line = fgetcsv($csvFile);
         while (($line = fgetcsv($csvFile)) !== FALSE) {
             $expectedLine = ["1233","Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
             $this->assertEquals($expectedLine, $line);
@@ -52,10 +57,9 @@ final class ScieloSubmissionsReportTest extends TestCase {
     public function testGeneratedCSVHasUTF8Bytes() : void {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
-        $byteRead = fread($csvFile, 3);
+        $byteRead = $this->readUTF8Bytes($csvFile);
         fclose($csvFile);
         
         $this->assertEquals($this->UTF8Bytes, $byteRead);
     }
-    //testGeneratedCSVHasCommonHeaders
 }

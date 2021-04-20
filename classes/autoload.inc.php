@@ -8,6 +8,8 @@ spl_autoload_register(
         if ($classes === null) {
             $classes = array(
                 'scielosubmission' => '/ScieloSubmission.inc.php',
+                'scielosubmissionsojsreport' => '/ScieloSubmissionsOJSReport.inc.php',
+                'scielosubmissionsopsreport' => '/ScieloSubmissionsOPSReport.inc.php',
                 'scielosubmissionsreport' => '/ScieloSubmissionsReport.inc.php',
                 'submissionauthor' => '/SubmissionAuthor.inc.php'
             );
