@@ -1,6 +1,0 @@
-* Seções - ok
-* Submissões - ok
-* Cada propriedade da submissão scielo - ok
-* impressão do CSV - parcial
-* nome do autor quando não tem autor
-* Tempo médio de avaliação (em dias) dos manuscritos aprovados e rejeitados (desconsiderando as submissões rejeitadas no recebimento)
