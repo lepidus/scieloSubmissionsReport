@@ -1,6 +1,6 @@
 <?php
 
-require "ScieloSubmissionTest.php";
+require_once "ScieloSubmissionTest.php";
 
 class ScieloPreprintTest extends ScieloSubmissionTest {
     
@@ -32,7 +32,7 @@ class ScieloPreprintTest extends ScieloSubmissionTest {
         $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, "", $this->publicationStatus, $this->publicationDOI, $this->notes);
         $this->assertEquals("No moderators", $preprint->getSectionModerator());
     }
-    
+
     public function testHasPublicationStatus() : void {
         $this->assertEquals($this->publicationStatus, $this->submission->getPublicationStatus());
     }

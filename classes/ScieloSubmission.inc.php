@@ -35,6 +35,13 @@ class ScieloSubmission {
         return $field;
     }
 
+    protected function implodeEmptyFields($field, $messageIfEmpty) : string {
+        if(empty($field))
+            return $messageIfEmpty;
+
+        return implode(",", $field);
+    }
+
     public function getId() : int {
         return $this->id;
     }

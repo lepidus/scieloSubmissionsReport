@@ -18,10 +18,7 @@ class ScieloPreprint extends ScieloSubmission {
     }
 
     public function getModerators() : string {
-        if (empty($this->moderators))
-            return "No moderators";
-        
-        return implode(",", $this->moderators);
+        return $this->implodeEmptyFields($this->moderators, "No moderators");
     }
 
     public function getSectionModerator() : string {
