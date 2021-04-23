@@ -47,5 +47,7 @@ class ScieloSubmissionsReport {
         foreach($this->submissions as $submission){
             fputcsv($fileDescriptor, $submission->asRecord());
         }
+
+        fputcsv($fileDescriptor, [implode(",", $this->getSections())]);
     }
 }

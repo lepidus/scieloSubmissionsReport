@@ -46,11 +46,12 @@ class ScieloSubmissionsReportTest extends TestCase {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
         $this->readUTF8Bytes($csvFile);
-        $line = fgetcsv($csvFile);
-        while (($line = fgetcsv($csvFile)) !== FALSE) {
-            $expectedLine = ["1233","Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
-            $this->assertEquals($expectedLine, $line);
-        }
+        fgetcsv($csvFile);
+        $firstLine = fgetcsv($csvFile);
+        $secondLine = fgetcsv($csvFile);
+        $expectedLine = ["1233","Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
+        $this->assertEquals($expectedLine, $firstLine);
+        $this->assertEquals($expectedLine, $secondLine);
         fclose($csvFile);
     }
 
@@ -62,4 +63,19 @@ class ScieloSubmissionsReportTest extends TestCase {
         
         $this->assertEquals($this->UTF8Bytes, $byteRead);
     }
+
+    public function testGeneratedCSVHasSections() : void {
+        $this->createCSVReport();
+        $csvRows = array_map('str_getcsv', file($this->filePath));
+
+        $expectedSections = implode(",", $this->sections);
+        $lastRow = $csvRows[sizeof($csvRows)-1];
+        $lastCellFromLastRow = $lastRow[sizeof($lastRow)-1];
+
+        $this->assertEquals($expectedSections, $lastCellFromLastRow);
+    }
+
 }
+
+/*"Tempo médio","Seções"
+"3","Biologicas,Humanas"*/
