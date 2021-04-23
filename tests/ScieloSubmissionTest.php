@@ -47,6 +47,11 @@ class ScieloSubmissionTest extends TestCase {
         $this->assertEquals($this->submitter, $this->submission->getSubmitter());
     }
 
+    public function testWhenEmptySubmitter() : void {
+        $submission = new ScieloSubmission($this->submissionId, $this->title, "", $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
+        $this->assertEquals("The submitting author was not found", $submission->getSubmitter());
+    }
+
     public function testHasDateSubmitted() : void {
         $this->assertEquals($this->dateSubmitted, $this->submission->getDateSubmitted());
     }

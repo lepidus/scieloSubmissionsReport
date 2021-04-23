@@ -17,13 +17,6 @@ class ScieloPreprint extends ScieloSubmission {
         $this->notes = $notes;
     }
 
-    private function fillEmptyFields($field, $messageIfEmpty) {
-        if (empty($field))
-            return $messageIfEmpty;
-
-        return $field;
-    }
-
     public function getModerators() : string {
         if (empty($this->moderators))
             return "No moderators";

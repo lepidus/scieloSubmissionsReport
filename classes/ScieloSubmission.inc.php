@@ -28,6 +28,13 @@ class ScieloSubmission {
         $this->finalDecisionDate = $finalDecisionDate;
     }
 
+    protected function fillEmptyFields($field, $messageIfEmpty) {
+        if (empty($field))
+            return $messageIfEmpty;
+
+        return $field;
+    }
+
     public function getId() : int {
         return $this->id;
     }
@@ -37,7 +44,7 @@ class ScieloSubmission {
     }
 
     public function getSubmitter() : string {
-        return $this->submitter;
+        return $this->fillEmptyFields($this->submitter, "The submitting author was not found");
     }
 
     public function getDateSubmitted() : string {
