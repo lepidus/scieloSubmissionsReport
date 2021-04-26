@@ -56,4 +56,15 @@ class ScieloSubmissionsOPSReportTest extends ScieloSubmissionsReportTest {
         $expectedReviewingTime = 0;
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
+
+    public function testGeneratedCSVHasAverageReviewingTime() : void {
+        $this->createCSVReport();
+        $csvRows = array_map('str_getcsv', file($this->filePath));
+        
+        $lastRow = $csvRows[sizeof($csvRows)-1];
+        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
+        $expectedAverageReviewingTime = 8;
+
+        $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
+    }
 }

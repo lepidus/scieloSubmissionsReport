@@ -20,6 +20,10 @@ class ScieloSubmissionsReport {
         return $this->submissions;
     }
 
+    public function getAverageReviewingTime() : int {
+        return 0;
+    }
+
     protected function getHeaders() : array {
         return [
             "ID da submissão",
@@ -50,6 +54,7 @@ class ScieloSubmissionsReport {
             fputcsv($fileDescriptor, $submission->asRecord());
         }
 
-        fputcsv($fileDescriptor, [implode(",", $this->getSections())]);
+        $sections = implode(",", $this->getSections());
+        fputcsv($fileDescriptor, [$this->getAverageReviewingTime(), $sections]);
     }
 }
