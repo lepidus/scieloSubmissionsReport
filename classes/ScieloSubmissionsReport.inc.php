@@ -4,10 +4,12 @@ class ScieloSubmissionsReport {
 
     private $sections;
     private $submissions;
+    private $UTF8_BOM;
 
     public function __construct(array $sections, array $submissions) {
         $this->sections = $sections;
         $this->submissions = $submissions;
+        $this->UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
     }
 
     public function getSections() : array {
@@ -41,7 +43,7 @@ class ScieloSubmissionsReport {
     }
 
     public function buildCSV($fileDescriptor) : void {
-        fprintf($fileDescriptor, chr(0xEF).chr(0xBB).chr(0xBF));
+        fprintf($fileDescriptor, $this->UTF8_BOM);
         fputcsv($fileDescriptor, $this->getHeaders());
 
         foreach($this->submissions as $submission){

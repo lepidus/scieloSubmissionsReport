@@ -6,11 +6,11 @@ class ScieloSubmissionsReportTest extends TestCase {
     private $report;
     protected $sections = array("Biological Sciences", "Math", "Human Sciences");
     protected $submissions;
-    protected $UTF8Bytes;
+    protected $expected_UTF8_BOM;
     protected $filePath = "/tmp/test.csv";
 
     public function setUp() : void {
-        $this->UTF8Bytes = chr(0xEF).chr(0xBB).chr(0xBF);
+        $this->expected_UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
         $this->report = $this->createScieloSubmissionReport();
     }
 
@@ -31,7 +31,7 @@ class ScieloSubmissionsReportTest extends TestCase {
     }
 
     protected function readUTF8Bytes($csvFile) {
-        return fread($csvFile, strlen($this->UTF8Bytes));
+        return fread($csvFile, strlen($this->expected_UTF8_BOM));
     }
 
     public function testReportHasSections() : void {
@@ -61,7 +61,7 @@ class ScieloSubmissionsReportTest extends TestCase {
         $byteRead = $this->readUTF8Bytes($csvFile);
         fclose($csvFile);
         
-        $this->assertEquals($this->UTF8Bytes, $byteRead);
+        $this->assertEquals($this->expected_UTF8_BOM, $byteRead);
     }
 
     public function testGeneratedCSVHasSections() : void {
@@ -76,6 +76,3 @@ class ScieloSubmissionsReportTest extends TestCase {
     }
 
 }
-
-/*"Tempo médio","Seções"
-"3","Biologicas,Humanas"*/
