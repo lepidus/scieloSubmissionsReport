@@ -10,7 +10,7 @@ class ScieloPreprintTest extends ScieloSubmissionTest {
     private $publicationDOI = "https://doi.org/10.1590/0100-3984.2020.53.2e1";
     private $notes = array("The author forgot to cite relevant work on this preprint", "This work is wonderful! Congrats!");
 
-    protected function createScieloSubmission() {
+    protected function createScieloSubmission() : ScieloPreprint {
         parent::createScieloSubmission();
         return new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $this->notes);
     }

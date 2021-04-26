@@ -19,7 +19,7 @@ class ScieloSubmissionsReportTest extends TestCase {
             unlink($this->filePath);
     }
 
-    protected function createScieloSubmissionReport() {
+    protected function createScieloSubmissionReport() : ScieloSubmissionsReport {
         $this->submissions = (new ScieloSubmissionTest())->getTestSubmissions();
         return new ScieloSubmissionsReport($this->sections, $this->submissions);
     }
@@ -30,7 +30,7 @@ class ScieloSubmissionsReportTest extends TestCase {
         fclose($csvFile);
     }
 
-    protected function readUTF8Bytes($csvFile) {
+    protected function readUTF8Bytes($csvFile) : string {
         return fread($csvFile, strlen($this->expected_UTF8_BOM));
     }
 

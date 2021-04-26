@@ -9,7 +9,7 @@ class ScieloArticleTest extends ScieloSubmissionTest {
     private $reviews = array("Aceitar", "Ver comentários");
     private $lastDecision = "Enviar para avaliação";
 
-    protected function createScieloSubmission() {
+    protected function createScieloSubmission() : ScieloArticle {
         parent::createScieloSubmission();
         return new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, $this->lastDecision);
     }

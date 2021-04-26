@@ -17,17 +17,17 @@ class ScieloSubmissionTest extends TestCase {
     protected $finalDecisionDate = "2013-09-14 22:00:00";
     protected $expectedReviewingTime = 8;
 
-    protected function createScieloSubmission() {
+    protected function createScieloSubmission() : ScieloSubmission {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
     }
 
-    private function createSubmissionWithoutFinalDecision() {
+    private function createSubmissionWithoutFinalDecision() : ScieloSubmission {
         $emptyFinalDecisionDate = "";
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
     }
     
-    public function getTestSubmissions() {
+    public function getTestSubmissions() : array {
         return array($this->createScieloSubmission(), $this->createScieloSubmission());
     }
 
