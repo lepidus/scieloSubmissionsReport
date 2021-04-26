@@ -3,7 +3,7 @@
 class ScieloSubmissionsReport {
 
     private $sections;
-    private $submissions;
+    protected $submissions;
     private $UTF8_BOM;
 
     public function __construct(array $sections, array $submissions) {
