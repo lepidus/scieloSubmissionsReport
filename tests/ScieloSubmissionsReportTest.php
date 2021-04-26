@@ -75,4 +75,13 @@ class ScieloSubmissionsReportTest extends TestCase {
         $this->assertEquals($expectedSections, $lastCellFromLastRow);
     }
 
+    public function testGeneratedCSVHasSecondHeaders() : void {
+        $this->createCSVReport();
+        $csvRows = array_map('str_getcsv', file($this->filePath));
+
+        $penultimateRow = $csvRows[sizeof($csvRows)-2];
+        $expectedPenultimateRow = ["Tempo médio em avaliação", "Seções"];
+
+        $this->assertEquals($expectedPenultimateRow, $penultimateRow);
+    }
 }

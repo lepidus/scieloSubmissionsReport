@@ -46,6 +46,13 @@ class ScieloSubmissionsReport {
         ];
     }
 
+    private function getSecondHeaders() : array {
+        return [
+            "Tempo médio em avaliação",
+            "Seções"
+        ];
+    }
+
     public function buildCSV($fileDescriptor) : void {
         fprintf($fileDescriptor, $this->UTF8_BOM);
         fputcsv($fileDescriptor, $this->getHeaders());
@@ -54,6 +61,9 @@ class ScieloSubmissionsReport {
             fputcsv($fileDescriptor, $submission->asRecord());
         }
 
+        $blankLine = ["", "", ""];
+        fputcsv($fileDescriptor, $blankLine);
+        fputcsv($fileDescriptor, $this->getSecondHeaders());
         $sections = implode(",", $this->getSections());
         fputcsv($fileDescriptor, [$this->getAverageReviewingTime(), $sections]);
     }
