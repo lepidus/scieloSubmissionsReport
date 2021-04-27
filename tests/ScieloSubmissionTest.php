@@ -106,9 +106,4 @@ class ScieloSubmissionTest extends TestCase {
         $expectedTimeBetweenSubmissionAndFinalDecision = "";
         $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $submission->getTimeBetweenSubmissionAndFinalDecision());
     }
-
-    public function testGetRecord() : void {
-        $expectedRecord = ['1233',"Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
-        $this->assertEquals($expectedRecord, $this->submission->asRecord());
-    }
 }

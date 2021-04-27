@@ -20,8 +20,21 @@ class ScieloSubmissionsReport {
         return $this->submissions;
     }
 
+    protected function filterWithAverageReviewingTimeOnly() {
+        return $this->submissions;
+    }
+
     public function getAverageReviewingTime() : int {
-        return 0;
+        $submissionsToUse = $this->filterWithAverageReviewingTimeOnly();
+        if (empty($submissionsToUse)) return 0;
+        
+        $totalReviewingTime = 0;
+
+        foreach ($submissionsToUse as $submission) {
+            $totalReviewingTime += $submission->getTimeUnderReview();
+        }
+
+        return round($totalReviewingTime / count($submissionsToUse));
     }
 
     protected function getHeaders() : array {

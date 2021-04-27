@@ -2,17 +2,17 @@
 
 class ScieloSubmission {
 
-    private $id;
-    private $title;
-    private $submitter;
-    private $dateSubmitted;
-    private $daysUntilStatusChange;
-    private $status;
-    private $authors;
-    private $section;
-    private $language;
-    private $finalDecision;
-    private $finalDecisionDate;
+    protected $id;
+    protected $title;
+    protected $submitter;
+    protected $dateSubmitted;
+    protected $daysUntilStatusChange;
+    protected $status;
+    protected $authors;
+    protected $section;
+    protected $language;
+    protected $finalDecision;
+    protected $finalDecisionDate;
 
     public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate) {
         $this->id = $id;
@@ -100,7 +100,7 @@ class ScieloSubmission {
         return "";
     }
 
-    private function authorsAsRecord() : string {
+    protected function authorsAsRecord() : string {
         $records = [];
 
         foreach($this->authors as $author) {

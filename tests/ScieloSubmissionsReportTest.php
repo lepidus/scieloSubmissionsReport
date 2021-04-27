@@ -42,19 +42,6 @@ class ScieloSubmissionsReportTest extends TestCase {
         $this->assertEquals($this->submissions, $this->report->getSubmissions());
     }
 
-    public function testGeneratedCSVHasCommonSubmissionsData() : void {
-        $this->createCSVReport();
-        $csvFile = fopen($this->filePath, 'r');
-        $this->readUTF8Bytes($csvFile);
-        fgetcsv($csvFile);
-        $firstLine = fgetcsv($csvFile);
-        $secondLine = fgetcsv($csvFile);
-        $expectedLine = ["1233","Rethinking linguistic relativity", "Atila Iamarino", "2013-09-06 19:07:02", '3', "Published", "Atila, Brasil, USP", "Biological Sciences", "en_US", "Accepted", "2013-09-14 22:00:00", '8', '8'];
-        $this->assertEquals($expectedLine, $firstLine);
-        $this->assertEquals($expectedLine, $secondLine);
-        fclose($csvFile);
-    }
-
     public function testGeneratedCSVHasUTF8Bytes() : void {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');

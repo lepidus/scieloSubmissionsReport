@@ -16,6 +16,10 @@ class ScieloArticle extends ScieloSubmission {
         $this->lastDecision = $lastDecision;
     }
     
+    public function asRecord(): array {
+        return array($this->id, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getJournalEditors(), $this->getSectionEditor(), $this->authorsAsRecord(), $this->section, $this->language, $this->getReviews(), $this->lastDecision, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+    }
+
     public function getJournalEditors() : string {
         return $this->implodeEmptyFields($this->editors, self::noEditors);
     }
@@ -26,6 +30,15 @@ class ScieloArticle extends ScieloSubmission {
     
     public function getReviews() : string {
        return $this->implodeEmptyFields($this->reviews, "");
+    }
+
+    public function hasReviews() : bool {
+        foreach($this->reviews as $review){
+            if(!empty($review))
+                return true;
+        }
+
+        return false;
     }
 
     public function getLastDecision() : string {
