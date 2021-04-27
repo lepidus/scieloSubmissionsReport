@@ -17,6 +17,10 @@ class ScieloPreprint extends ScieloSubmission {
         $this->notes = $notes;
     }
 
+    public function asRecord(): array {
+        return array($this->id, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerator(), $this->getModerators(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+    }
+
     public function getModerators() : string {
         return $this->implodeEmptyFields($this->moderators, "No moderators");
     }

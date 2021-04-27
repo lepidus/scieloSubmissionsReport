@@ -68,4 +68,11 @@ class ScieloPreprintTest extends ScieloSubmissionTest {
 
         $this->assertEquals("No notes", $preprint->getNotes());
     }
+
+    public function testGetRecord() : void {
+        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "", [""]);
+        
+        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No publication's DOI", "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $this->assertEquals($expectedRecord, $preprint->asRecord());
+    }
 }
