@@ -1,18 +1,30 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-require_once "ScieloSubmissionTest.php";
-
-class ScieloPreprintTest extends ScieloSubmissionTest {
+class ScieloPreprintTest extends TestCase {
     
+    private $submission;
+    private $submissionId = 1233;
+    private $title = "Rethinking linguistic relativity";
+    private $submitter = "Atila Iamarino";
+    private $dateSubmitted = "2013-09-06 19:07:02";
+    private $daysUntilStatusChange = 3;
+    private $status = "Published";
+    private $authors;
+    private $section = "Biological Sciences";
+    private $language = "en_US";
+    private $finalDecision = "Accepted";
+    private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $expectedReviewingTime = 8;
     private $moderators = array("Albert Einstein", "Richard Feynman");
     private $sectionModerator = "Clarice Lispector";
     private $publicationStatus = "Preprint has been published in a journal as an article";
     private $publicationDOI = "https://doi.org/10.1590/0100-3984.2020.53.2e1";
     private $notes = array("The author forgot to cite relevant work on this preprint", "This work is wonderful! Congrats!");
 
-    protected function createScieloSubmission() : ScieloPreprint {
-        parent::createScieloSubmission();
-        return new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $this->notes);
+    public function setUp() : void {
+        $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
+        $this->submission = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $this->notes);
     }
 
     public function testHasModerators() : void {

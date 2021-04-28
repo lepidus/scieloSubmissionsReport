@@ -1,17 +1,29 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-require_once "ScieloSubmissionTest.php";
+class ScieloArticleTest extends TestCase {
 
-class ScieloArticleTest extends ScieloSubmissionTest {
-
+    private $submission;
+    private $submissionId = 1233;
+    private $title = "Rethinking linguistic relativity";
+    private $submitter = "Atila Iamarino";
+    private $dateSubmitted = "2013-09-06 19:07:02";
+    private $daysUntilStatusChange = 3;
+    private $status = "Published";
+    private $authors;
+    private $section = "Biological Sciences";
+    private $language = "en_US";
+    private $finalDecision = "Accepted";
+    private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $expectedReviewingTime = 8;
     private $editors = array("Albert Einstein", "Richard Feynman");
     private $sectionEditor = "Carl Sagan";
     private $reviews = array("Aceitar", "Ver comentários");
     private $lastDecision = "Enviar para avaliação";
 
-    protected function createScieloSubmission() : ScieloArticle {
-        parent::createScieloSubmission();
-        return new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, $this->lastDecision);
+    public function setUp() : void {
+        $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
+        $this->submission = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, $this->lastDecision);
     }
 
     public function testJournalEditors() : void {

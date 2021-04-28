@@ -3,21 +3,21 @@ use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionTest extends TestCase {
     
-    protected $submission;
-    protected $submissionId = 1233;
-    protected $title = "Rethinking linguistic relativity";
-    protected $submitter = "Atila Iamarino";
-    protected $dateSubmitted = "2013-09-06 19:07:02";
-    protected $daysUntilStatusChange = 3;
-    protected $status = "Published";
-    protected $authors;
-    protected $section = "Biological Sciences";
-    protected $language = "en_US";
-    protected $finalDecision = "Accepted";
-    protected $finalDecisionDate = "2013-09-14 22:00:00";
-    protected $expectedReviewingTime = 8;
+    private $submission;
+    private $submissionId = 1233;
+    private $title = "Rethinking linguistic relativity";
+    private $submitter = "Atila Iamarino";
+    private $dateSubmitted = "2013-09-06 19:07:02";
+    private $daysUntilStatusChange = 3;
+    private $status = "Published";
+    private $authors;
+    private $section = "Biological Sciences";
+    private $language = "en_US";
+    private $finalDecision = "Accepted";
+    private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $expectedReviewingTime = 8;
 
-    protected function createScieloSubmission() : ScieloSubmission {
+    private function createScieloSubmission() : ScieloSubmission {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
     }
