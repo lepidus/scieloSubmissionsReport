@@ -4,24 +4,16 @@ use PHPUnit\Framework\TestCase;
 class ScieloSubmissionsReportTest extends TestCase {
     
     private $report;
-    protected $sections = array("Biological Sciences", "Math", "Human Sciences");
-    protected $submissions;
-    protected $expected_UTF8_BOM;
-    protected $filePath = "/tmp/test.csv";
+    private $sections = array("Biological Sciences", "Math", "Human Sciences");
+    private $filePath = "/tmp/test.csv";
 
     public function setUp() : void {
-        $this->expected_UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
-        $this->report = $this->createScieloSubmissionReport();
+        $this->report = new ScieloSubmissionsReport($this->sections, []);
     }
 
     public function tearDown() : void {
         if (file_exists(($this->filePath))) 
             unlink($this->filePath);
-    }
-
-    protected function createScieloSubmissionReport() : ScieloSubmissionsReport {
-        $this->submissions = (new ScieloSubmissionTest())->getTestSubmissions();
-        return new ScieloSubmissionsReport($this->sections, $this->submissions);
     }
 
     protected function createCSVReport() : void {
@@ -30,25 +22,18 @@ class ScieloSubmissionsReportTest extends TestCase {
         fclose($csvFile);
     }
 
-    protected function readUTF8Bytes($csvFile) : string {
-        return fread($csvFile, strlen($this->expected_UTF8_BOM));
-    }
-
     public function testReportHasSections() : void {
         $this->assertEquals($this->sections, $this->report->getSections());
-    }
-
-    public function testReportHasScieloSubmissions() : void {
-        $this->assertEquals($this->submissions, $this->report->getSubmissions());
     }
 
     public function testGeneratedCSVHasUTF8Bytes() : void {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
-        $byteRead = $this->readUTF8Bytes($csvFile);
+        $csvFileUtils = new CSVFileUtils();
+        $byteRead = $csvFileUtils->readUTF8Bytes($csvFile);
         fclose($csvFile);
         
-        $this->assertEquals($this->expected_UTF8_BOM, $byteRead);
+        $this->assertEquals($csvFileUtils->getExpectedUTF8BOM(), $byteRead);
     }
 
     public function testGeneratedCSVHasSections() : void {

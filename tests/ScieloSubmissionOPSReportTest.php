@@ -1,12 +1,28 @@
 <?php
+use PHPUnit\Framework\TestCase;
+require "CSVFileUtils.php";
 
-require_once "ScieloSubmissionsReportTest.php";
+class ScieloSubmissionsOPSReportTest extends TestCase {
 
-class ScieloSubmissionsOPSReportTest extends ScieloSubmissionsReportTest {
+    private $report;
+    private $sections = array("Biological Sciences", "Math", "Human Sciences");
+    private $submissions;
+    private $filePath = "/tmp/test.csv";
 
-    protected function createScieloSubmissionReport() : ScieloSubmissionsOPSReport {
-        parent::createScieloSubmissionReport();
-        return new ScieloSubmissionsOPSReport($this->sections, $this->submissions);
+    public function setUp() : void {
+        $this->submissions = $this->createTestPreprints();
+        $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions);
+    }
+
+    public function tearDown() : void {
+        if (file_exists(($this->filePath))) 
+            unlink($this->filePath);
+    }
+
+    private function generateCSV() : void {
+        $csvFile = fopen($this->filePath, 'wt');
+        $this->report->buildCSV($csvFile);
+        fclose($csvFile);
     }
 
     private function createTestPreprints() : array {
@@ -25,9 +41,10 @@ class ScieloSubmissionsOPSReportTest extends ScieloSubmissionsReportTest {
     }
     
     public function testGeneratedCSVHeadersFromOPSSubmissions() : void {
-        $this->createCSVReport();
+        $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
-        $this->readUTF8Bytes($csvFile);
+        $csvFileUtils = new CSVFileUtils();
+        $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
         $expectedLine = ["ID da submissão","Título da Submissão","Submetido por","Data de submissão","Dias até mudança de status","Estado da submissão","Moderador de área","Moderadores","Autores","Seção","Idioma","Estado de publicação","DOI da publicação","Notas","Decisão final","Data da decisão final","Tempo em avaliação","Tempo entre submissão e decisão final"];
@@ -60,12 +77,12 @@ class ScieloSubmissionsOPSReportTest extends ScieloSubmissionsReportTest {
     }
 
     public function testGeneratedCSVHasAverageReviewingTime() : void {
-        $this->createCSVReport();
+        $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
         
         $lastRow = $csvRows[sizeof($csvRows)-1];
         $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
-        $expectedAverageReviewingTime = 8;
+        $expectedAverageReviewingTime = 4;
 
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
     }

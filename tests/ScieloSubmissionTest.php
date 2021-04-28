@@ -27,7 +27,7 @@ class ScieloSubmissionTest extends TestCase {
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
     }
     
-    public function getTestSubmissions() : array {
+    private function getTestSubmissions() : array {
         return array($this->createScieloSubmission(), $this->createScieloSubmission());
     }
 

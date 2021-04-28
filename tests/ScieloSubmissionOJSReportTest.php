@@ -6,27 +6,22 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
     private $report;
     private $sections = array("Biological Sciences", "Math", "Human Sciences");
     private $submissions;
-    private $expected_UTF8_BOM;
     private $filePath = "/tmp/test.csv";
 
     public function setUp() : void {
-        $this->expected_UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
-        $this->report = $this->createScieloSubmissionReport();
-    }
-
-    private function createScieloSubmissionReport() : ScieloSubmissionsOJSReport {
         $this->submissions = $this->createTestArticles();
-        return new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
+        $this->report = new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
     }
 
-    private function createCSVReport() : void {
+    public function tearDown() : void {
+        if (file_exists(($this->filePath))) 
+            unlink($this->filePath);
+    }
+
+    private function generateCSV() : void {
         $csvFile = fopen($this->filePath, 'wt');
         $this->report->buildCSV($csvFile);
         fclose($csvFile);
-    }
-
-    private function readUTF8Bytes($csvFile) : string {
-        return fread($csvFile, strlen($this->expected_UTF8_BOM));
     }
 
     private function createTestArticles() : array {
@@ -44,9 +39,10 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
     }
     
     public function testGeneratedCSVHeadersFromOJSSubmissions() {
-        $this->createCSVReport();
+        $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
-        $this->readUTF8Bytes($csvFile);
+        $csvFileUtils = new CSVFileUtils();
+        $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
         $expectedLine = ["ID da submissão","Título da Submissão","Submetido por","Data de submissão","Dias até mudança de status","Estado da submissão","Editores da Revista","Editor de Seção","Autores","Seção","Idioma","Avaliações","Última decisão", "Decisão final","Data da decisão final","Tempo em avaliação","Tempo entre submissão e decisão final"];
@@ -99,9 +95,11 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
 
     public function testGeneratedCSVHasArticlesData() : void {
         $this->submissions = ($this->createTestArticles())[0];
-        $this->createCSVReport();
+        $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
-        $this->readUTF8Bytes($csvFile);
+        $csvFileUtils = new CSVFileUtils();
+
+        $csvFileUtils->readUTF8Bytes($csvFile);
         fgetcsv($csvFile);
         $firstLine = fgetcsv($csvFile);
         fclose($csvFile);
