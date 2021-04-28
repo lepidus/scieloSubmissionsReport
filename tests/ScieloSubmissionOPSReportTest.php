@@ -1,5 +1,7 @@
 <?php
 
+require_once "ScieloSubmissionsReportTest.php";
+
 class ScieloSubmissionsOPSReportTest extends ScieloSubmissionsReportTest {
 
     protected function createScieloSubmissionReport() : ScieloSubmissionsOPSReport {

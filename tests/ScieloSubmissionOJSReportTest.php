@@ -1,13 +1,32 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-require "ScieloSubmissionsReportTest.php";
-
-class ScieloSubmissionsOJSReportTest extends ScieloSubmissionsReportTest {
+class ScieloSubmissionsOJSReportTest extends TestCase {
     
-    protected function createScieloSubmissionReport() : ScieloSubmissionsOJSReport {
-        parent::createScieloSubmissionReport();
+    private $report;
+    private $sections = array("Biological Sciences", "Math", "Human Sciences");
+    private $submissions;
+    private $expected_UTF8_BOM;
+    private $filePath = "/tmp/test.csv";
+
+    public function setUp() : void {
+        $this->expected_UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
+        $this->report = $this->createScieloSubmissionReport();
+    }
+
+    private function createScieloSubmissionReport() : ScieloSubmissionsOJSReport {
         $this->submissions = $this->createTestArticles();
         return new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
+    }
+
+    private function createCSVReport() : void {
+        $csvFile = fopen($this->filePath, 'wt');
+        $this->report->buildCSV($csvFile);
+        fclose($csvFile);
+    }
+
+    private function readUTF8Bytes($csvFile) : string {
+        return fread($csvFile, strlen($this->expected_UTF8_BOM));
     }
 
     private function createTestArticles() : array {
@@ -24,7 +43,6 @@ class ScieloSubmissionsOJSReportTest extends ScieloSubmissionsReportTest {
         return [$article1, $article2, $article3, $article4, $article5];
     }
     
-
     public function testGeneratedCSVHeadersFromOJSSubmissions() {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
