@@ -86,4 +86,19 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
 
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
     }
+
+    public function testGeneratedCSVHasPreprintData() : void {
+        $this->submissions = ($this->createTestPreprints())[0];
+        $this->generateCSV();
+        $csvFile = fopen($this->filePath, 'r');
+        $csvFileUtils = new CSVFileUtils();
+
+        $csvFileUtils->readUTF8Bytes($csvFile);
+        fgetcsv($csvFile);
+        $firstLine = fgetcsv($csvFile);
+        fclose($csvFile);
+
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $this->assertEquals($expectedLine, $firstLine);
+    }
 }

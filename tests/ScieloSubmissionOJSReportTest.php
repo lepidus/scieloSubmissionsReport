@@ -107,4 +107,15 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
         $expectedLine = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedLine, $firstLine);
     }
+
+    public function testGeneratedCSVHasAverageReviewingTime() : void {
+        $this->generateCSV();
+        $csvRows = array_map('str_getcsv', file($this->filePath));
+        
+        $lastRow = $csvRows[sizeof($csvRows)-1];
+        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
+        $expectedAverageReviewingTime = 4;
+
+        $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
+    }
 }
