@@ -1,5 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
+import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
 
 final class SubmissionAuthorTest extends TestCase {
     private $author;

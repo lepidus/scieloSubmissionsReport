@@ -1,5 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
+import ('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
 
 class ScieloSubmissionsReportTest extends TestCase {
     
