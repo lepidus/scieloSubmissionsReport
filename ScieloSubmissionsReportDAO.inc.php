@@ -30,17 +30,12 @@ class ScieloSubmissionsReportDAO extends DAO
             $paramsForQuery = array_merge($paramsForQuery, [$initialSubmissionDate.' 00:00:00', $finalSubmissionDate.' 23:59:59']);
         }
         
-        if($initialDecisionDate){
-            $querySubmissions .= " AND date_last_activity >= ? AND date_last_activity <= ?";
-            $paramsForQuery = array_merge($paramsForQuery, [$initialDecisionDate.' 00:00:00', $finalDecisionDate.' 23:59:59']);
-        }
-        
         $resultSubmissions = $this->retrieve($querySubmissions, $paramsForQuery);
         $submissionsData = array();
         $allSubmissions = array();
 
         while($rowSubmission = $resultSubmissions->FetchRow()) {
-            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections);
+            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections,[$initialDecisionDate, $finalDecisionDate]);
 
             if($submissionData){
                 $submissionsData[] = $submissionData;
@@ -90,7 +85,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return round($totalDays / $totalSubmissions);
     }
 
-    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections) {
+    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $decisionsDate) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
 
@@ -118,6 +113,11 @@ class ScieloSubmissionsReportDAO extends DAO
             $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime,$submissionInterval]);
 
         }
+
+        if ($finalDecisionDate == '') return null;
+
+        if ((strtotime($decisionsDate[0]) > strtotime($finalDecisionDate)) ||  (strtotime($finalDecisionDate) > strtotime($decisionsDate[1]))) return null;
+
         return $submissionData;
     }
 
