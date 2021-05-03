@@ -2,6 +2,8 @@
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.reports.ScieloSubmissionsReportPlugin.ScieloSubmissionsReportDAO');
+
+
 class ScieloSubmissionsReportDAOTest extends PKPTestCase {
 
 	private $application;
@@ -11,14 +13,41 @@ class ScieloSubmissionsReportDAOTest extends PKPTestCase {
 	private $sessions;
 
 	protected function setUp() : void {
+
 		$this->application = "ops";
 		$this->journalId = 1;
 		$this->initialDecisionDate = "2020-07-01";
 		$this->finalDecisionDate = "2020-07-31";
 		$this->sessions = ["Health Sciences"];
+		
+		$submission = new Submission();
+		$submission->setContextId($this->journalId);
+		$submission->setStatus(STATUS_DECLINED);
+		//$submission->setSubmissionProgress(1);
+		$submission->stampStatusModified();
+		$submission->setStageId(WORKFLOW_STAGE_ID_SUBMISSION);
+		//$submission->setData('seriesId', $seriesId = current(array_keys($seriesOptions)));
+		//$submission->setLocale($this->getDefaultFormLocale());
+
+		$user = new User();
+		
+		$editorDecision = array(
+			'editDecisionId' => null,
+			'editorId' => $user->getId(),
+			'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
+			'dateDecided' => date(Core::getCurrentDate())
+		);
 
 		$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
 		DAORegistry::registerDAO('ScieloSubmissionsReportDAO', $scieloSubmissionsReportDAO);
+
+
+		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); 
+		$submissionId = $submissionDao->insertObject($submission);
+
+		$editDecisionDAO = DAORegistry::getDAO('EditDecisionDAO');
+		$editDecisionDAO->updateEditorDecision($submissionId, $editorDecision);
+
 
 		parent::setUp();
 	}
