@@ -85,7 +85,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return round($totalDays / $totalSubmissions);
     }
 
-    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $decisionsDate) {
+    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $finalDecisionInterval) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
 
@@ -114,9 +114,13 @@ class ScieloSubmissionsReportDAO extends DAO
 
         }
 
-        if ($finalDecisionDate == '') return null;
+        if (!is_null($finalDecisionInterval)) {
+            $initialDate = strtotime($finalDecisionInterval[0]);
+            $finalDate = strtotime($finalDecisionInterval[1]);
 
-        if ((strtotime($decisionsDate[0]) > strtotime($finalDecisionDate)) ||  (strtotime($finalDecisionDate) > strtotime($decisionsDate[1]))) return null;
+            if ($finalDecisionDate == '') return null;
+            if (($initialDate > strtotime($finalDecisionDate)) ||  (strtotime($finalDecisionDate) > $finalDate)) return null;
+        }
 
         return $submissionData;
     }
