@@ -6,8 +6,6 @@ import('classes.submission.Submission');
 import('classes.publication.Publication');
 import('lib.pkp.classes.user.User');
 
-
-
 class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 
 	private $application;
@@ -15,8 +13,6 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 	private $initialDecisionDate;
 	private $finalDecisionDate;
 	private $sessions;
-
-	private $submissionId;
 
 	
 	protected function setUp() : void {
@@ -45,8 +41,8 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		
 		// Insert Submission
 		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); 
-		$this->submissionId = $submissionDao->insertObject($submission);
-		$newSubmission = $submissionDao->getById($this->submissionId);
+		$submissionId = $submissionDao->insertObject($submission);
+		$newSubmission = $submissionDao->getById($submissionId);
 		
 		//Create Publication
 		$publication = new Publication();
@@ -63,9 +59,11 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		$newSubmission->_data = array_merge($newSubmission->_data, ['currentPublicationId' => $newPublication->getId()]);
 		$submissionDao->updateObject($newSubmission);
 
-		self::assertTrue(is_integer($this->submissionId));
+		self::assertTrue(is_integer($submissionId));
 		self::assertTrue(is_integer($publicationId));
-		self::assertTrue(is_integer(($submissionDao->getById($this->submissionId))->getSectionId()));
+		self::assertTrue(is_integer(($submissionDao->getById($submissionId))->getSectionId()));
+
+		return $submissionId;
 	}
 
 	function setPublicationData($publication, $submission) {
@@ -75,7 +73,10 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		$publication->setData('language', PKPString::substr($locale, 0, 2));
 	}
 
-	public function testEditorDecisionSettings(){
+	/**
+     * @depends testCreateSubmission
+     */
+	public function testEditorDecisionSettings(int $submissionId) {
 		$user = new User();
 		
 		$editorDecision = array(
@@ -86,9 +87,9 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 			);
 			
 		$editDecisionDAO = DAORegistry::getDAO('EditDecisionDAO');
-		$editDecisionDAO->updateEditorDecision($this->submissionId, $editorDecision);
+		$editDecisionDAO->updateEditorDecision($submissionId, $editorDecision);
 
-		$decisionsSubmission = $editDecisionDAO->getEditorDecisions($this->submissionId);
+		$decisionsSubmission = $editDecisionDAO->getEditorDecisions($submissionId);
 		self::assertTrue(is_string($decisionsSubmission[0]['decision']));
 	}
 
@@ -106,7 +107,7 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 
 		self::assertTrue(true);
 	}
-
+	
 	protected function getAffectedTables() {
 		return array('submissions','edit_decisions','publications');
 	}
