@@ -3,7 +3,9 @@
 import('lib.pkp.tests.DatabaseTestCase');
 import('plugins.reports.ScieloSubmissionsReportPlugin.ScieloSubmissionsReportDAO');
 import('classes.submission.Submission');
+import('classes.publication.Publication');
 import('lib.pkp.classes.user.User');
+
 
 
 class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
@@ -21,8 +23,8 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		
 		$this->application = "ops";
 		$this->journalId = 1;
-		$this->initialDecisionDate = "2020-07-01";
-		$this->finalDecisionDate = "2020-07-31";
+		$this->initialDecisionDate = "2021-03-01";
+		$this->finalDecisionDate = "2021-05-31";
 		$this->sessions = ["Health Sciences"];
 		
 		$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
@@ -30,24 +32,47 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		
 		parent::setUp();
 	}
-		
-	protected function getAffectedTables() {
-		return array('submissions','edit_decisions');
-	}
 	
 	public function testCreateSubmission(){
+		// Create Submission
 		$submission = new Submission();
 		$submission->setContextId($this->journalId);
 		$submission->setStatus(STATUS_DECLINED);
 		$submission->setSubmissionProgress(1);
 		$submission->stampStatusModified();
 		$submission->setStageId(STATUS_DECLINED);
-		//$submission->setData('seriesId', $seriesId = current(array_keys($seriesOptions)));
-		//$submission->setLocale($this->getDefaultFormLocale());
+		$submission->setData('dateSubmitted', date('2021-03-15 16:00:00'));
 		
+		// Insert Submission
 		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); 
+		$this->submissionId = $submissionDao->insertObject($submission);
+		$newSubmission = $submissionDao->getById($this->submissionId);
 		
-		self::assertTrue(is_integer($this->submissionId = $submissionDao->insertObject($submission)));
+		//Create Publication
+		$publication = new Publication();
+		$this->setPublicationData($publication, $newSubmission);
+		$publication->setData('status', STATUS_QUEUED);
+		$publication->setData('version', 1);
+		$publication->setData('sectionId', 3);
+
+		// Insert publication
+		$publicationDao = DAORegistry::getDAO('PublicationDAO');
+		$publicationId = $publicationDao->insertObject($publication);
+		$newPublication = $publicationDao->getById($publicationId);
+
+		$newSubmission->_data = array_merge($newSubmission->_data, ['currentPublicationId' => $newPublication->getId()]);
+		$submissionDao->updateObject($newSubmission);
+
+		self::assertTrue(is_integer($this->submissionId));
+		self::assertTrue(is_integer($publicationId));
+		self::assertTrue(is_integer(($submissionDao->getById($this->submissionId))->getSectionId()));
+	}
+
+	function setPublicationData($publication, $submission) {
+		$locale = $publication->getData('locale');
+		$publication->setData('submissionId', $submission->getId());
+		$publication->setData('locale', $locale);
+		$publication->setData('language', PKPString::substr($locale, 0, 2));
 	}
 
 	public function testEditorDecisionSettings(){
@@ -64,7 +89,7 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		$editDecisionDAO->updateEditorDecision($this->submissionId, $editorDecision);
 
 		$decisionsSubmission = $editDecisionDAO->getEditorDecisions($this->submissionId);
-		self::assertTrue(is_integer($decisionsSubmission[0]['decision']));
+		self::assertTrue(is_string($decisionsSubmission[0]['decision']));
 	}
 
     public function testFilterByFinalDecisionDate(){
@@ -82,8 +107,8 @@ class ScieloSubmissionsReportDAOTest extends DatabaseTestCase {
 		self::assertTrue(true);
 	}
 
-
-
-
+	protected function getAffectedTables() {
+		return array('submissions','edit_decisions','publications');
+	}
 
 }
