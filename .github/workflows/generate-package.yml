@@ -17,12 +17,9 @@ jobs:
       - name: Create the tar.gz package
         run: |
           mkdir $PLUGIN_NAME
-          ls -la
           shopt -s extglob
-          cp -r !($PLUGIN_NAME|.git*|.|..) $PLUGIN_NAME
-          ls -la
+          cp -r !($PLUGIN_NAME|.git*|.|..|tests) $PLUGIN_NAME
           tar -zcvf $PLUGIN_NAME.tar.gz $PLUGIN_NAME
-          ls -la
         shell: bash
       - name: Create the release
         id: create_release
