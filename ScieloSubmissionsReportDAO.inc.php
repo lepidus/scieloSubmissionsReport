@@ -34,8 +34,9 @@ class ScieloSubmissionsReportDAO extends DAO
         $submissionsData = array();
         $allSubmissions = array();
 
+        
         while($rowSubmission = $resultSubmissions->FetchRow()) {
-            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections,[$initialDecisionDate, $finalDecisionDate]);
+            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections, $initialDecisionDate, $finalDecisionDate);
 
             if($submissionData){
                 $submissionsData[] = $submissionData;
@@ -85,7 +86,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return round($totalDays / $totalSubmissions);
     }
 
-    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $finalDecisionInterval) {
+    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $initialDecisionDate, $finalDecisionDate) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
 
@@ -114,14 +115,14 @@ class ScieloSubmissionsReportDAO extends DAO
 
         }
 
-        if (!is_null($finalDecisionInterval)) {
-            $initialDate = strtotime($finalDecisionInterval[0]);
-            $finalDate = strtotime($finalDecisionInterval[1]);
+        if (!empty($initialDecisionDate) && !empty($finalDecisionDate)) {
+            $initialDate = strtotime($initialDecisionDate);
+            $finalDate = strtotime($finalDecisionDate);
 
             if ($finalDecisionDate == '') return null;
             if (($initialDate > strtotime($finalDecisionDate)) ||  (strtotime($finalDecisionDate) > $finalDate)) return null;
         }
-
+        
         return $submissionData;
     }
 
