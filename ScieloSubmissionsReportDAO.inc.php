@@ -34,6 +34,8 @@ class ScieloSubmissionsReportDAO extends DAO
         $submissionsData = array();
         $allSubmissions = array();
 
+        $initialDecisionDate = (!empty($initialDecisionDate) ? new DateTime($initialDecisionDate) : null);
+        $finalDecisionDate = (!empty($finalDecisionDate) ? new DateTime($finalDecisionDate) : null);
         
         while($rowSubmission = $resultSubmissions->FetchRow()) {
             $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections, $initialDecisionDate, $finalDecisionDate);
@@ -115,12 +117,8 @@ class ScieloSubmissionsReportDAO extends DAO
 
         }
 
-        if (!empty($initialDecisionDate) && !empty($finalDecisionDate)) {
-            $initialDate = strtotime($initialDecisionDate);
-            $finalDate = strtotime($finalDecisionDate);
-
-            if ($finalDecisionDate == '') return null;
-            if (($initialDate > strtotime($finalDecisionDate)) ||  (strtotime($finalDecisionDate) > $finalDate)) return null;
+        if (!is_null($initialDecisionDate) && !is_null($finalDecisionDate)) {
+            if ($initialDecisionDate > $finalDecisionDate) return null;
         }
         
         return $submissionData;
