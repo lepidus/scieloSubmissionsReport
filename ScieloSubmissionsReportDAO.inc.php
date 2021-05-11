@@ -34,8 +34,8 @@ class ScieloSubmissionsReportDAO extends DAO
         $submissionsData = array();
         $allSubmissions = array();
 
-        $startDecisionDateInterval = (!empty($startDecisionDateInterval) ? new DateTime($startDecisionDateInterval) : null);
-        $endDecisionDateInterval = (!empty($endDecisionDateInterval) ? new DateTime($endDecisionDateInterval) : null);
+        $startDecisionDateInterval = (!empty($startDecisionDateInterval) ? new DateTime($startDecisionDateInterval .' 00:00:00') : null);
+        $endDecisionDateInterval = (!empty($endDecisionDateInterval) ? new DateTime($endDecisionDateInterval .' 23:59:59') : null);
         
         while($rowSubmission = $resultSubmissions->FetchRow()) {
             $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections, $startDecisionDateInterval, $endDecisionDateInterval);
@@ -116,9 +116,10 @@ class ScieloSubmissionsReportDAO extends DAO
             $submissionData = array_merge($submissionData, [$reviews,$lastDecision,$finalDecision,$finalDecisionDate,$reviewingTime,$submissionInterval]);
 
         }
-
+        
         if (!is_null($startDecisionDateInterval) && !is_null($endDecisionDateInterval)) {
-            if(empty($finalDecisionDate)) return null;
+            
+            if (empty($finalDecisionDate)) return null;
             
             $finalDecisionDate = new DateTime($finalDecisionDate);
             if ($finalDecisionDate < $startDecisionDateInterval || $finalDecisionDate > $endDecisionDateInterval) return null;
