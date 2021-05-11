@@ -22,23 +22,23 @@ class ScieloSubmissionsReportDAO extends DAO
      * @param $journalId int
      * @return array
      */
-    public function getReportWithSections($application, $journalId, $initialSubmissionDate, $finalSubmissionDate, $initialDecisionDate, $finalDecisionDate, $sections) {
+    public function getReportWithSections($application, $journalId, $startSubmissionDateInterval, $endSubmissionDateInterval, $startDecisionDateInterval, $endDecisionDateInterval, $sections) {
         $querySubmissions = "SELECT submission_id, DATEDIFF(date_last_activity,date_submitted) AS status_change_days FROM submissions WHERE context_id = ? AND date_submitted IS NOT NULL";
         $paramsForQuery = [$journalId];
-        if($initialSubmissionDate){
+        if($startSubmissionDateInterval && $endSubmissionDateInterval){
             $querySubmissions .= " AND date_submitted >= ? AND date_submitted <= ?";
-            $paramsForQuery = array_merge($paramsForQuery, [$initialSubmissionDate.' 00:00:00', $finalSubmissionDate.' 23:59:59']);
+            $paramsForQuery = array_merge($paramsForQuery, [$startSubmissionDateInterval.' 00:00:00', $endSubmissionDateInterval.' 23:59:59']);
         }
         
         $resultSubmissions = $this->retrieve($querySubmissions, $paramsForQuery);
         $submissionsData = array();
         $allSubmissions = array();
 
-        $initialDecisionDate = (!empty($initialDecisionDate) ? new DateTime($initialDecisionDate) : null);
-        $finalDecisionDate = (!empty($finalDecisionDate) ? new DateTime($finalDecisionDate) : null);
+        $startDecisionDateInterval = (!empty($startDecisionDateInterval) ? new DateTime($startDecisionDateInterval) : null);
+        $endDecisionDateInterval = (!empty($endDecisionDateInterval) ? new DateTime($endDecisionDateInterval) : null);
         
         while($rowSubmission = $resultSubmissions->FetchRow()) {
-            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections, $initialDecisionDate, $finalDecisionDate);
+            $submissionData = $this->getSubmissionData($application, $journalId, $rowSubmission['submission_id'], $rowSubmission['status_change_days'], $sections, $startDecisionDateInterval, $endDecisionDateInterval);
 
             if($submissionData){
                 $submissionsData[] = $submissionData;
@@ -88,7 +88,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return round($totalDays / $totalSubmissions);
     }
 
-    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $initialDecisionDate, $finalDecisionDate) {
+    private function getSubmissionData($application, $journalId, $submissionId, $statusChangeDays, $sections, $startDecisionDateInterval, $endDecisionDateInterval) {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $submissionData = $this->getCommonSubmissionData($application, $submission, $journalId, $statusChangeDays, $sections);
 
@@ -117,8 +117,11 @@ class ScieloSubmissionsReportDAO extends DAO
 
         }
 
-        if (!is_null($initialDecisionDate) && !is_null($finalDecisionDate)) {
-            if ($initialDecisionDate > $finalDecisionDate) return null;
+        if (!is_null($startDecisionDateInterval) && !is_null($endDecisionDateInterval)) {
+            if(empty($finalDecisionDate)) return null;
+            
+            $finalDecisionDate = new DateTime($finalDecisionDate);
+            if ($finalDecisionDate < $startDecisionDateInterval || $finalDecisionDate > $endDecisionDateInterval) return null;
         }
         
         return $submissionData;
