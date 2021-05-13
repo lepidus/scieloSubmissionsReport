@@ -184,7 +184,7 @@ class ScieloSubmissionsReportDAO extends DAO
             foreach($decisionsSubmission as $decision){
                 if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
                     return __('common.accepted');                
-                else if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE)
+                else if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $decision['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE)
                     return __('common.declined');
             }
         }
@@ -213,7 +213,7 @@ class ScieloSubmissionsReportDAO extends DAO
             $editDecision = DAORegistry::getDAO('EditDecisionDAO');
             $decisionsSubmission = $editDecision->getEditorDecisions($submission->getId()); 
             foreach($decisionsSubmission as $decision){
-                if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT || $decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE){
+                if ($decision['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT || $decision['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $decision['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE){
                     return $decision['dateDecided'];
                 }
             } 
