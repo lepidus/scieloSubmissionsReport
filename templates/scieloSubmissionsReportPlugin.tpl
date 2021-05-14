@@ -27,29 +27,47 @@
 		</div>
 
 		<div id="dateFilterFields">
-			<!-- Submission -->
-			<div id="dateSubmissionFields">
-				<div id="fieldDateSubmittedStart">	
-					<label for="dateSubmittedStart">{translate key="plugins.reports.scieloSubmissionsReport.dateSubmittedStart"}</label> 
-					<input type="date" id='dateSubmittedStart' name='initialSubmissionDate' from=$dateSubmittedStart defaultValue=$dateSubmittedStart value="{$years[0]}"/>
+			<!-- Submitted Date -->
+			<fieldset id="submittedDateFields" class="search_advanced">
+				<legend>
+					{translate key="plugins.reports.scieloSubmissionsReport.dateSubmittedInterval"}
+				</legend>
+				<div class="date_range">
+					<div class="from">
+						<label class="label">
+							{translate key="common.from"}
+						</label>
+						<input type="date" id='startSubmittedDate' name='initialSubmissionDate' from=$startSubmittedDate defaultValue=$startSubmittedDate value="{$years[0]}"/>		
+					</div>
+					<div class="to">
+						<label class="label">
+							{translate key="common.until"}
+						</label>
+						<input type="date" id='endSubmittedDate' name='finalSubmissionDate' from=$endSubmittedDate defaultValue=$endSubmittedDate value="{$years[1]}"/>		
+					</div>
 				</div>
-				<div id="fieldDateSubmittedEnd">
-					<label for="dateSubmittedEnd">{translate key="plugins.reports.scieloSubmissionsReport.dateSubmittedEnd"}</label>
-					<input type="date" id='dateSubmittedEnd' name='finalSubmissionDate' from=$dateSubmittedEnd defaultValue=$dateSubmittedEnd value="{$years[1]}"/>
-				</div>
-			</div>
+			</fieldset>
 			
-			<!-- Decision -->
-			<div id="decisionDateFields" hidden="true">
-				<div id="fieldDateDecisionStart">
-					<label for="dateDecisionStart">{translate key="plugins.reports.scieloSubmissionsReport.dateDecisionStart"}</label> 
-					<input type="date" id='dateDecisionStart' name='initialDecisionDate' from=$dateDecisionStart defaultValue=$dateDecisionStart value="{$years[0]}"/>
+			<!-- Final Decision Date-->
+			<fieldset id="finalDecisionDateFields" class="search_advanced" hidden="true">
+				<legend>
+					{translate key="plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"}
+				</legend>
+				<div class="date_range">
+					<div class="from">
+						<label class="label">
+							{translate key="common.from"}
+						</label>
+						<input type="date" id='startFinalDecisionDate' name='initialDecisionDate' from=$startFinalDecisionDate defaultValue=$startFinalDecisionDate value="{$years[0]}"/>
+					</div>
+					<div class="to">
+						<label class="label">
+							{translate key="common.until"}
+						</label>
+						<input type="date" id='endFinalDecisionDate' name='finalDecisionDate' from=$endFinalDecisionDate defaultValue=$endFinalDecisionDate value="{$years[1]}"/>
+					</div>
 				</div>
-				<div id="fieldDateDecisionEnd">
-					<label for="dateDecisionEnd">{translate key="plugins.reports.scieloSubmissionsReport.dateDecisionEnd"}</label>
-					<input type="date" id='dateDecisionEnd' name='finalDecisionDate' from=$dateDecisionEnd defaultValue=$dateDecisionEnd value="{$years[1]}"/>
-				</div>
-			</div>
+			</fieldset>
 		</div>
 	</div>
 
@@ -77,8 +95,8 @@
 
 <script>
 	var filterTypeSelection = document.getElementById('selectFilterTypeDate');
-	var submissionDiv = document.getElementById('dateSubmissionFields');
-	var decisionDiv = document.getElementById('decisionDateFields');
+	var submissionDiv = document.getElementById('submittedDateFields');
+	var decisionDiv = document.getElementById('finalDecisionDateFields');
 
 	filterTypeSelection.addEventListener("change", function(){ldelim}
 		var selectedValue = filterTypeSelection.value;
