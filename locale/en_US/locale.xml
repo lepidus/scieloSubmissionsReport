@@ -16,10 +16,10 @@
     <message key="plugins.reports.scieloSubmissionsReport.description">This plugin implements a .csv format sheet report that contains information that Scielo usually request. Developed by Lepidus Tecnologia.</message>        
     
     <message key="plugins.reports.scieloSubmissionsReport.filterMessage">Select the desired filtering type:</message>
-    <message key="plugins.reports.scieloSubmissionsReport.filterSubmission">Filter by submission's date</message>
-    <message key="plugins.reports.scieloSubmissionsReport.filterDecision">Filter by final decision's date</message>
-    <message key="plugins.reports.scieloSubmissionsReport.filterBoth">Filter by submission's date and final decision</message>
-    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedInterval">Submission date range</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterSubmission">Filter by submitted date</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterDecision">Filter by final decision date</message>
+    <message key="plugins.reports.scieloSubmissionsReport.filterBoth">Filter by submitted date and final decision</message>
+    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedInterval">Submitted date range</message>
     <message key="plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval">Final decision date range</message>
 
     <message key="plugins.reports.scieloSubmissionsReport.type">Report Type</message>

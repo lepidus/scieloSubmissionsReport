@@ -19,8 +19,8 @@
     <message key="plugins.reports.scieloSubmissionsReport.filterSubmission">Filtrar por data de submissão</message>
     <message key="plugins.reports.scieloSubmissionsReport.filterDecision">Filtrar por data de decisão final</message>
     <message key="plugins.reports.scieloSubmissionsReport.filterBoth">Filtrar por data de submissão e decisão final</message>
-    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedInterval">Intervalo de data de submissão</message>
-    <message key="plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval">Intervalo de data de decisão final</message>
+    <message key="plugins.reports.scieloSubmissionsReport.dateSubmittedInterval">Intervalo da data de submissão</message>
+    <message key="plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval">Intervalo da data de decisão final</message>
     
     <message key="plugins.reports.scieloSubmissionsReport.generate">Gerar Relatório</message>
     <message key="plugins.reports.scieloSubmissionsReport.type">Tipo de Relatório</message>
