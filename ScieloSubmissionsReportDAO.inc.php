@@ -378,11 +378,10 @@ class ScieloSubmissionsReportDAO extends DAO
         $reviews = array();
 
         foreach($submissionReviews as $review) {
-            if($review->getDateCompleted())
+            if($review->getDateCompleted()){
                 $completeReviews = true;
-
-            if($review->getRecommendation() != "")
                 $reviews[] = $review->getLocalizedRecommendation();
+            }
         }
 
         return [$completeReviews, implode(", ", $reviews)];
