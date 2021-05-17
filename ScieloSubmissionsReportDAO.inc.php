@@ -134,7 +134,7 @@ class ScieloSubmissionsReportDAO extends DAO
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION);
 
         $submissionStatus = __($submission->getStatusKey());
-        $title = $this->removeBreakLines($submission->getTitle($locale));
+        $title = $this->removeLineBreaks($submission->getTitle($locale));
         $submissionDate = $submission->getDateSubmitted();
         $submissionLocale = $submission->getLocale();
         $section = DAORegistry::getDAO('SectionDAO')->getById( $submission->getSectionId() );
@@ -285,7 +285,7 @@ class ScieloSubmissionsReportDAO extends DAO
         foreach($authors as $author) {
             $authorName = $author->getLocalizedGivenName() . " " . $author->getLocalizedFamilyName();
             $authorCountry = $author->getCountryLocalized();
-            $authorAffiliation = $this->removeBreakLines($author->getLocalizedAffiliation());
+            $authorAffiliation = $this->removeLineBreaks($author->getLocalizedAffiliation());
 
             $authorsData[] = implode(", ", [$authorName, $authorCountry, $authorAffiliation]);
         }
@@ -365,7 +365,7 @@ class ScieloSubmissionsReportDAO extends DAO
         else{
             while($note = $resultNotes->FetchRow()) {
                 $note = $note[0];
-                $notes .= "Note: " . trim($this->removeBreakLines($note));
+                $notes .= "Note: " . trim($this->removeLineBreaks($note));
             }
         }
         return $notes;
@@ -418,7 +418,7 @@ class ScieloSubmissionsReportDAO extends DAO
         return $newSectionsOptions;
     }
 
-    private function removeBreakLines($text) {
+    private function removeLineBreaks($text) {
         return preg_replace('/\s+/', ' ', $text);
     }
 }
