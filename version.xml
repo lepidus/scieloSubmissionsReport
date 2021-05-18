@@ -12,8 +12,8 @@
 <version>
 	<application>scieloSubmissionsReport</application>
 	<type>plugins.reports</type>
-	<release>1.4.13.0</release>
-	<date>2021-05-11</date>
-  <class>ScieloSubmissionsReportPlugin</class>
+	<release>1.4.14.0</release>
+	<date>2021-05-18</date>
+	<class>ScieloSubmissionsReportPlugin</class>
 </version>
 
