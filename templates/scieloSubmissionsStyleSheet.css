@@ -38,11 +38,46 @@
 
 #dateFilterFields {
     display: flex;
-    align-items: center;
 }
 
-#dateSubmissionFields {
-    margin-right: 64px;
+#submittedDateFields, #finalDecisionDateFields {
+    margin-bottom: 12px;
+    border: 1px solid rgba(0,0,0,0.84);
+    border-radius: 10px;
+    padding: 0 20px 20px;
+    width: 45%;
+}
+
+#submittedDateFields {
+    margin-right: 5%;
+}
+
+.search_advanced legend {
+    padding: 10px 20px;
+    margin: 0;
+    color: rgba(0,0,0,0.84);
+    line-height: 20px;
+}
+
+.date_range .from {
+    margin-bottom: 10px;
+}
+
+.date_range .from .label, .date_range .to .label {
+    padding: 0 2px;
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.date_range .from input, .date_range .to input {
+    padding: 0 .5em;
+    height: 35px;
+    border: 1px solid #DDD;
+    border-radius: 3px;
+    font-size: 16px;
+    line-height: 28px;
 }
 
 #selectFilterTypeDate {
