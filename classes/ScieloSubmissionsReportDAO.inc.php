@@ -16,9 +16,12 @@ use Illuminate\Support\Collection;
 
 class ScieloSubmissionsReportDAO extends DAO {  
 
-    public function getSubmissions($contextId) {
+    public function getSubmissions($contextId, $sectionsIds) {
 		$result = Capsule::table('submissions')
-		->where('context_id', $contextId)
+		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
+		->where('submissions.context_id', $contextId)
+		->whereIn('publications.section_id', $sectionsIds)
+		->select('submissions.submission_id')
 		->get();
 		
 		$submissions = array();

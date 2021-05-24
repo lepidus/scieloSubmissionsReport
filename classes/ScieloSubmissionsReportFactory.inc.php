@@ -14,7 +14,7 @@ class ScieloSubmissionsReportFactory {
         }
         
         $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($contextId);
+        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($contextId, $sectionIds);
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }
