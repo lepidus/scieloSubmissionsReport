@@ -16,14 +16,20 @@ use Illuminate\Support\Collection;
 
 class ScieloSubmissionsReportDAO extends DAO {  
 
-    public function getSubmissions($contextId, $sectionsIds) {
-		$result = Capsule::table('submissions')
+    public function getSubmissions($contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval) {
+		$query = Capsule::table('submissions')
 		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
 		->where('submissions.context_id', $contextId)
 		->whereIn('publications.section_id', $sectionsIds)
-		->select('submissions.submission_id')
-		->get();
+		->select('submissions.submission_id');
 		
+		if(!empty($startSubmissionDateInterval) && !empty($endSubmissionDateInterval)){
+			$query = $query->where('submissions.date_submitted', '>=', $startSubmissionDateInterval)
+			->where('submissions.date_submitted', '<=', $endSubmissionDateInterval);
+		}
+
+		$result = $query->get();
+
 		$submissions = array();
 		foreach($result->toArray() as $row) {
 			$submissions[] = $this->_submissionFromRow(get_object_vars($row));

@@ -12,10 +12,18 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     private $locale = 'en_US';
     private $contextId = 1;
     private $reportFactory;
+    private $sectionsIds;
+    private $submissionsIds;
+    private $publicationsIds;
+    private $startSubmissionDateInterval = '';
+    private $endSubmissionDateInterval = '';
 
     public function setUp() : void {
         parent::setUp();
         $this->reportFactory = new ScieloSubmissionsReportFactory();
+        $this->sectionsIds = $this->createTestSections();
+        $this->submissionsIds = $this->createTestSubmissions();
+        $this->publicationsIds = $this->createTestPublications($this->submissionsIds, $this->sectionsIds);
     }
 
     protected function getAffectedTables() {
@@ -38,64 +46,86 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         
 		$firstSubmission = new Submission();
-        $secondSubmission = new Submission();
         $firstSubmission->setData('contextId', $this->contextId);
+        $firstSubmission->setData('dateSubmitted', '2021-05-21 11:56:37');
+        
+        $secondSubmission = new Submission();
         $secondSubmission->setData('contextId', $this->contextId);
+        $secondSubmission->setData('dateSubmitted', '2021-05-29 12:58:29');
+        
+        $thirdSubmission = new Submission();
+        $thirdSubmission->setData('contextId', $this->contextId);
+        $thirdSubmission->setData('dateSubmitted', '2021-06-14 04:30:08');
+        
+        $fourthSubmission = new Submission();
+        $fourthSubmission->setData('contextId', $this->contextId);
+        $fourthSubmission->setData('dateSubmitted', '2021-07-08 18:37:12');
+
         
         $firstSubmissionId = $submissionDao->insertObject($firstSubmission);
         $secondSubmissionId = $submissionDao->insertObject($secondSubmission);
+        $thirdSubmissionId = $submissionDao->insertObject($thirdSubmission);
+        $fourthSubmissionId = $submissionDao->insertObject($fourthSubmission);
 
-        return [$firstSubmissionId, $secondSubmissionId];
+        return [$firstSubmissionId, $secondSubmissionId, $thirdSubmissionId, $fourthSubmissionId];
     }
 
-	private function createTestPublications($submissionsIds, $sectionsIds) {
+	private function createTestPublications($submissionsIds, $sectionsIds) : array {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
 
         $firstPublication = new Publication();
         $firstPublication->setData('submissionId', $submissionsIds[0]);
         $firstPublication->setData('sectionId', $sectionsIds[0]);
+
         $secondPublication = new Publication();
         $secondPublication->setData('submissionId', $submissionsIds[1]);
         $secondPublication->setData('sectionId', $sectionsIds[1]);
 
+        $thirdPublication = new Publication();
+        $thirdPublication->setData('submissionId', $submissionsIds[2]);
+        $thirdPublication->setData('sectionId', $sectionsIds[1]);
+
+        $fourthPublication = new Publication();
+        $fourthPublication->setData('submissionId', $submissionsIds[3]);
+        $fourthPublication->setData('sectionId', $sectionsIds[1]);
+
         $firstPublicationId = $publicationDao->insertObject($firstPublication);
         $secondPublicationId = $publicationDao->insertObject($secondPublication);
+        $thirdPublicationId = $publicationDao->insertObject($thirdPublication);
+        $fourthPublicationId = $publicationDao->insertObject($fourthPublication);
 
-		return [$firstPublicationId, $secondPublicationId];
+		return [$firstPublicationId, $secondPublicationId, $thirdPublicationId, $fourthPublicationId];
 	}
 
     public function testReportHasSections() : void {
-        $testSections = $this->createTestSections();
+        $sectionsIds = $this->createTestSections();
         
-        $report = $this->reportFactory->createReport($this->contextId, $testSections, $this->locale);
+        $report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->locale);
 
-        $expectedSections = [$testSections[0] => "Biological Sciences", $testSections[1] => "Math"];
+        $expectedSections = [$this->sectionsIds[0] => "Biological Sciences", $this->sectionsIds[1] => "Math"];
         $this->assertEquals($expectedSections, $report->getSections());
     }
     
     public function testReportHasSubmissions() {
-		$testSections = $this->createTestSections();
-        $submissionsIds = $this->createTestSubmissions();
-        $publicationsIds = $this->createTestPublications($submissionsIds, $testSections);
+		$report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->locale);
 
-        $report = $this->reportFactory->createReport($this->contextId, $testSections, $this->locale);
-
-        $this->assertEquals($submissionsIds, $report->getSubmissions());
+        $this->assertEquals($this->submissionsIds, $report->getSubmissions());
     }
 
     public function testReportFilterBySections() {
-        $testSections = $this->createTestSections();
-        $submissionsIds = $this->createTestSubmissions();
-        $publicationsIds = $this->createTestPublications($submissionsIds, $testSections);
-        
-		$report = $this->reportFactory->createReport($this->contextId, [$testSections[0]], $this->locale);
+        $report = $this->reportFactory->createReport($this->contextId, [$this->sectionsIds[0]], $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->locale);
 
-		$expectedSubmissions = [$submissionsIds[0]];
+		$expectedSubmissions = [$this->submissionsIds[0]];
         $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
     
     public function testReportFilterBySubmissionDate() {
-        return true;
+		$this->startSubmissionDateInterval = '2021-05-23';
+        $this->endSubmissionDateInterval = '2021-07-01';
+        $report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->locale);
+        
+        $expectedSubmissions = [$this->submissionsIds[1], $this->submissionsIds[2]];
+        $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
     
     public function testReportFilterByFinalDecisionDate() {
