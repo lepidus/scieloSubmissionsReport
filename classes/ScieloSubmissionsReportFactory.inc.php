@@ -5,7 +5,7 @@ import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory {
 
-    public function createReport(int $contextId, array $sectionIds, string $startSubmissionDateInterval, string $endSubmissionDateInterval, string $locale) : ScieloSubmissionsReport {
+    public function createReport(int $contextId, array $sectionIds, string $startSubmissionDateInterval, string $endSubmissionDateInterval, string $startFinalDecisionDateInterval, string $endFinalDecisionDateInterval, string $locale) : ScieloSubmissionsReport {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sections = [];
 
