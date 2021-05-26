@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 
 class ScieloSubmissionsReportDAO extends DAO {  
 
-    public function getSubmissions($contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval) {
+    public function getSubmissions($contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval) {
 		$query = Capsule::table('submissions')
 		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
 		->where('submissions.context_id', $contextId)
@@ -32,14 +32,42 @@ class ScieloSubmissionsReportDAO extends DAO {
 
 		$submissions = array();
 		foreach($result->toArray() as $row) {
-			$submissions[] = $this->_submissionFromRow(get_object_vars($row));
+			$submissionId = $this->_submissionFromRow(get_object_vars($row));
+
+			if(!is_null($startFinalDecisionDateInterval) && !is_null($endFinalDecisionDateInterval)){
+				$finalDecisionDate = new DateTime($this->getFinalDecisionWithDate($submissionId)['date_decided']);
+				if($finalDecisionDate >= $startFinalDecisionDateInterval && $finalDecisionDate <= $endFinalDecisionDateInterval){
+					$submissions[] = $submissionId;
+				}
+			}
+			else {
+				$submissions[] = $submissionId;
+			}
 		}
 
         return $submissions;
 	}
 
+	public function getFinalDecisionWithDate($submissionId) {
+		$possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+
+		$result = Capsule::table('edit_decisions')
+		->where('submission_id', $submissionId)
+		->whereIn('decision', $possibleFinalDecisions)
+		->orderBy('date_decided', 'asc')
+		->first();
+
+		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result));
+
+		return $finalDecisionWithDate;
+	}
+
 	private function _submissionFromRow($row){
 		return $row['submission_id'];
+	}
+
+	private function _finalDecisionFromRow($row){
+		return ['decision' => "Aceitar", 'date_decided' => $row['date_decided']];
 	}
 
 }

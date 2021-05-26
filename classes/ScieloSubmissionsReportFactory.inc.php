@@ -18,8 +18,11 @@ class ScieloSubmissionsReportFactory {
             $endSubmissionDateInterval .= " 23:59:59";
         }
 
+        $startFinalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new DateTime($startFinalDecisionDateInterval .' 00:00:00') : null);
+        $endFinalDecisionDateInterval = (!empty($endFinalDecisionDateInterval) ? new DateTime($endFinalDecisionDateInterval .' 23:59:59') : null);
+
         $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($contextId, $sectionIds, $startSubmissionDateInterval, $endSubmissionDateInterval);
+        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($contextId, $sectionIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }
