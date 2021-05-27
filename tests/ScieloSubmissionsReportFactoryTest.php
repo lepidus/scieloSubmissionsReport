@@ -121,6 +121,24 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->assertEquals($this->submissionsIds, $report->getSubmissions());
     }
 
+    public function testReportExcludesNonSubmittedSubmissions() {
+        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+
+		$nonSubmittedSubmission = new Submission();
+        $nonSubmittedSubmission->setData('contextId', $this->contextId);
+        $nonSubmittedId = $submissionDao->insertObject($nonSubmittedSubmission);
+        
+        $nonSubmittedPublication = new Publication();
+        $nonSubmittedPublication->setData('submissionId', $nonSubmittedId);
+        $nonSubmittedPublication->setData('sectionId', $this->sectionsIds[0]);
+        $publicationDao->insertObject($nonSubmittedPublication);
+
+        $report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+
+        $this->assertEquals($this->submissionsIds, $report->getSubmissions());
+    }
+
     public function testReportFilterBySections() : void {
         $report = $this->reportFactory->createReport($this->contextId, [$this->sectionsIds[0]], $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
 

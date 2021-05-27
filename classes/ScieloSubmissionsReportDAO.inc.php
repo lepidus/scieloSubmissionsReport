@@ -20,6 +20,7 @@ class ScieloSubmissionsReportDAO extends DAO {
 		$query = Capsule::table('submissions')
 		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
 		->where('submissions.context_id', $contextId)
+		->whereNotNull('submissions.date_submitted')
 		->whereIn('publications.section_id', $sectionsIds)
 		->select('submissions.submission_id');
 		
