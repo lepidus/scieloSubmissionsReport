@@ -26,7 +26,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->reportFactory = new ScieloSubmissionsReportFactory();
         $this->sectionsIds = $this->createTestSections();
         $this->submissionsIds = $this->createTestSubmissions();
-        $this->publicationsIds = $this->createTestPublications($this->submissionsIds, $this->sectionsIds);
+        $this->publicationsIds = $this->createTestPublications();
     }
 
     protected function getAffectedTables() {
@@ -45,34 +45,25 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         return [$firstSectionId, $secondSectionId];
     }
 
-    private function createTestSubmissions() : array {
+    private function createSubmission($dateSubmitted = null, $dateFinalDecision = null) : int {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-
-		$firstSubmission = new Submission();
-        $firstSubmission->setData('contextId', $this->contextId);
-        $firstSubmission->setData('dateSubmitted', '2021-05-21 11:56:37');
         
-        $secondSubmission = new Submission();
-        $secondSubmission->setData('contextId', $this->contextId);
-        $secondSubmission->setData('dateSubmitted', '2021-05-29 12:58:29');
-        
-        $thirdSubmission = new Submission();
-        $thirdSubmission->setData('contextId', $this->contextId);
-        $thirdSubmission->setData('dateSubmitted', '2021-06-14 04:30:08');
-        
-        $fourthSubmission = new Submission();
-        $fourthSubmission->setData('contextId', $this->contextId);
-        $fourthSubmission->setData('dateSubmitted', '2021-07-08 18:37:12');
+        $submission = new Submission();
+        $submission->setData('contextId', $this->contextId);
 
-        $firstSubmissionId = $submissionDao->insertObject($firstSubmission);
-        $secondSubmissionId = $submissionDao->insertObject($secondSubmission);
-        $thirdSubmissionId = $submissionDao->insertObject($thirdSubmission);
-        $fourthSubmissionId = $submissionDao->insertObject($fourthSubmission);
+        if(!is_null($dateSubmitted)) $submission->setData('dateSubmitted', $dateSubmitted);
+        $submissionId = $submissionDao->insertObject($submission);
 
-        $this->addFinalDecision($firstSubmissionId, '2021-05-24 13:00:00');
-        $this->addFinalDecision($secondSubmissionId, '2021-06-01 23:41:09');
-        $this->addFinalDecision($thirdSubmissionId, '2021-06-17 12:00:00');
-        $this->addFinalDecision($fourthSubmissionId, '2021-07-10 15:49:00');
+        if(!is_null($dateFinalDecision)) $this->addFinalDecision($submissionId, $dateFinalDecision);
+
+        return $submissionId;
+    }
+
+    private function createTestSubmissions() : array {
+        $firstSubmissionId = $this->createSubmission('2021-05-21 11:56:37', '2021-05-24 13:00:00');
+        $secondSubmissionId = $this->createSubmission('2021-05-29 12:58:29', '2021-06-01 23:41:09');
+        $thirdSubmissionId = $this->createSubmission('2021-06-14 04:30:08','2021-06-17 12:00:00');
+        $fourthSubmissionId = $this->createSubmission('2021-07-08 18:37:12', '2021-07-10 15:49:00');
 
         return [$firstSubmissionId, $secondSubmissionId, $thirdSubmissionId, $fourthSubmissionId];
     }
@@ -82,29 +73,22 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => $dateDecided, 'editorId' => 1]);
     }
 
-	private function createTestPublications($submissionsIds, $sectionsIds) : array {
+    private function createPublication($submissionId, $sectionId, $datePublished = null) {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
+        
+        $publication = new Publication();
+        $publication->setData('submissionId', $submissionId);
+        $publication->setData('sectionId', $sectionId);
+        if(!is_null($datePublished)) $publication->setData('datePublished', $datePublished);
 
-        $firstPublication = new Publication();
-        $firstPublication->setData('submissionId', $submissionsIds[0]);
-        $firstPublication->setData('sectionId', $sectionsIds[0]);
+        return $publicationDao->insertObject($publication);
+    }
 
-        $secondPublication = new Publication();
-        $secondPublication->setData('submissionId', $submissionsIds[1]);
-        $secondPublication->setData('sectionId', $sectionsIds[1]);
-
-        $thirdPublication = new Publication();
-        $thirdPublication->setData('submissionId', $submissionsIds[2]);
-        $thirdPublication->setData('sectionId', $sectionsIds[1]);
-
-        $fourthPublication = new Publication();
-        $fourthPublication->setData('submissionId', $submissionsIds[3]);
-        $fourthPublication->setData('sectionId', $sectionsIds[1]);
-
-        $firstPublicationId = $publicationDao->insertObject($firstPublication);
-        $secondPublicationId = $publicationDao->insertObject($secondPublication);
-        $thirdPublicationId = $publicationDao->insertObject($thirdPublication);
-        $fourthPublicationId = $publicationDao->insertObject($fourthPublication);
+	private function createTestPublications() : array {
+        $firstPublicationId = $this->createPublication($this->submissionsIds[0], $this->sectionsIds[0]);
+        $secondPublicationId = $this->createPublication($this->submissionsIds[1], $this->sectionsIds[1]);
+        $thirdPublicationId = $this->createPublication($this->submissionsIds[2], $this->sectionsIds[1]);
+        $fourthPublicationId = $this->createPublication($this->submissionsIds[3], $this->sectionsIds[1]);
 
 		return [$firstPublicationId, $secondPublicationId, $thirdPublicationId, $fourthPublicationId];
 	}
@@ -123,17 +107,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     }
 
     public function testReportExcludesNonSubmittedSubmissions() {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-
-		$nonSubmittedSubmission = new Submission();
-        $nonSubmittedSubmission->setData('contextId', $this->contextId);
-        $nonSubmittedId = $submissionDao->insertObject($nonSubmittedSubmission);
-        
-        $nonSubmittedPublication = new Publication();
-        $nonSubmittedPublication->setData('submissionId', $nonSubmittedId);
-        $nonSubmittedPublication->setData('sectionId', $this->sectionsIds[0]);
-        $publicationDao->insertObject($nonSubmittedPublication);
+        $nonSubmittedId = $this->createSubmission();
+        $this->createPublication($nonSubmittedId, $this->sectionsIds[0]);
 
         $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
 
@@ -166,18 +141,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     }
 
     public function testReportFilterByFinalDecisionDateExcludesSubmissionsWithoutFinalDecision() : void {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-
-		$submissionWithoutFinalDecision = new Submission();
-        $submissionWithoutFinalDecision->setData('contextId', $this->contextId);
-        $submissionWithoutFinalDecision->setData('dateSubmitted', '2021-06-14 04:30:08');
-        $submissionWithoutFinalDecisionId = $submissionDao->insertObject($submissionWithoutFinalDecision);
-        
-        $publicationWithoutFinalDecision = new Publication();
-        $publicationWithoutFinalDecision->setData('submissionId', $submissionWithoutFinalDecisionId);
-        $publicationWithoutFinalDecision->setData('sectionId', $this->sectionsIds[0]);
-        $publicationDao->insertObject($publicationWithoutFinalDecision);
+        $submissionWithoutFinalDecisionId = $this->createSubmission('2021-06-14 04:30:08');
+        $this->createPublication($submissionWithoutFinalDecisionId, $this->sectionsIds[0]);
         
         $this->startFinalDecisionDateInterval = '2021-05-20';
         $this->endFinalDecisionDateInterval = '2021-07-12';
@@ -197,19 +162,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     }
 
     public function testReportFilterByFinalDecisionDateInOPSGetsPostedSubmissions() : void {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-
-		$postedSubmission = new Submission();
-        $postedSubmission->setData('contextId', $this->contextId);
-        $postedSubmission->setData('dateSubmitted', '2021-06-14 04:30:08');
-        $postedSubmissionId = $submissionDao->insertObject($postedSubmission);
-        
-        $postedPublication = new Publication();
-        $postedPublication->setData('submissionId', $postedSubmissionId);
-        $postedPublication->setData('sectionId', $this->sectionsIds[0]);
-        $postedPublication->setData('datePublished', '2021-06-21 14:13:20');
-        $publicationDao->insertObject($postedPublication);
+		$postedSubmissionId = $this->createSubmission('2021-06-14 04:30:08');
+        $this->createPublication($postedSubmissionId, $this->sectionsIds[0], '2021-06-21 14:13:20');
         
         $this->startFinalDecisionDateInterval = '2021-05-20';
         $this->endFinalDecisionDateInterval = '2021-07-12';
