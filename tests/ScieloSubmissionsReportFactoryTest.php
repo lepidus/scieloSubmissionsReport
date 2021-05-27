@@ -46,7 +46,6 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
 
     private function createTestSubmissions() : array {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
 
 		$firstSubmission = new Submission();
         $firstSubmission->setData('contextId', $this->contextId);
@@ -64,18 +63,22 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $fourthSubmission->setData('contextId', $this->contextId);
         $fourthSubmission->setData('dateSubmitted', '2021-07-08 18:37:12');
 
-        
         $firstSubmissionId = $submissionDao->insertObject($firstSubmission);
         $secondSubmissionId = $submissionDao->insertObject($secondSubmission);
         $thirdSubmissionId = $submissionDao->insertObject($thirdSubmission);
         $fourthSubmissionId = $submissionDao->insertObject($fourthSubmission);
 
-        $editDecisionDao->updateEditorDecision($firstSubmissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => '2021-05-24 13:00:00', 'editorId' => 1]);
-        $editDecisionDao->updateEditorDecision($secondSubmissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => '2021-06-01 23:41:09', 'editorId' => 1]);
-        $editDecisionDao->updateEditorDecision($thirdSubmissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => '2021-06-17 12:00:00', 'editorId' => 1]);
-        $editDecisionDao->updateEditorDecision($fourthSubmissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => '2021-07-10 15:49:00', 'editorId' => 1]);
+        $this->addFinalDecision($firstSubmissionId, '2021-05-24 13:00:00');
+        $this->addFinalDecision($secondSubmissionId, '2021-06-01 23:41:09');
+        $this->addFinalDecision($thirdSubmissionId, '2021-06-17 12:00:00');
+        $this->addFinalDecision($fourthSubmissionId, '2021-07-10 15:49:00');
 
         return [$firstSubmissionId, $secondSubmissionId, $thirdSubmissionId, $fourthSubmissionId];
+    }
+
+    private function addFinalDecision($submissionId, $dateDecided) {
+        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
+        $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => $dateDecided, 'editorId' => 1]);
     }
 
 	private function createTestPublications($submissionsIds, $sectionsIds) : array {
@@ -144,7 +147,13 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     }
 
     public function testReportFilterBySubmissionDateAndFinalDecisionDate() : void {
-        return true;
+        $this->startSubmissionDateInterval = '2021-05-23';
+        $this->endSubmissionDateInterval = '2021-07-01';
+        $this->startFinalDecisionDateInterval = '2021-06-15';
+        $this->endFinalDecisionDateInterval = '2021-07-12';
+        $report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $this->assertEquals([$this->submissionsIds[2]], $report->getSubmissions());
     }
 }
 
