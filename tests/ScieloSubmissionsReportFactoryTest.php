@@ -164,6 +164,27 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
 
+    public function testReportFilterByFinalDecisionDateExcludesSubmissionsWithoutFinalDecision() : void {
+        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+
+		$submissionWithoutFinalDecision = new Submission();
+        $submissionWithoutFinalDecision->setData('contextId', $this->contextId);
+        $submissionWithoutFinalDecision->setData('dateSubmitted', '2021-06-14 04:30:08');
+        $submissionWithoutFinalDecisionId = $submissionDao->insertObject($submissionWithoutFinalDecision);
+        
+        $publicationWithoutFinalDecision = new Publication();
+        $publicationWithoutFinalDecision->setData('submissionId', $submissionWithoutFinalDecisionId);
+        $publicationWithoutFinalDecision->setData('sectionId', $this->sectionsIds[0]);
+        $publicationDao->insertObject($publicationWithoutFinalDecision);
+        
+        $this->startFinalDecisionDateInterval = '2021-05-20';
+        $this->endFinalDecisionDateInterval = '2021-07-12';
+        $report = $this->reportFactory->createReport($this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $this->assertEquals($this->submissionsIds, $report->getSubmissions());
+    }
+
     public function testReportFilterBySubmissionDateAndFinalDecisionDate() : void {
         $this->startSubmissionDateInterval = '2021-05-23';
         $this->endSubmissionDateInterval = '2021-07-01';

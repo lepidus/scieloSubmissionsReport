@@ -36,9 +36,13 @@ class ScieloSubmissionsReportDAO extends DAO {
 			$submissionId = $this->_submissionFromRow(get_object_vars($row));
 
 			if(!is_null($startFinalDecisionDateInterval) && !is_null($endFinalDecisionDateInterval)){
-				$finalDecisionDate = new DateTime($this->getFinalDecisionWithDate($submissionId)['date_decided']);
-				if($finalDecisionDate >= $startFinalDecisionDateInterval && $finalDecisionDate <= $endFinalDecisionDateInterval){
-					$submissions[] = $submissionId;
+				$finalDecisionWithDate = $this->getFinalDecisionWithDate($submissionId);
+
+				if(!is_null($finalDecisionWithDate)){
+					$finalDecisionDate = new DateTime($finalDecisionWithDate['date_decided']);
+					if($finalDecisionDate >= $startFinalDecisionDateInterval && $finalDecisionDate <= $endFinalDecisionDateInterval){
+						$submissions[] = $submissionId;
+					}
 				}
 			}
 			else {
@@ -57,6 +61,8 @@ class ScieloSubmissionsReportDAO extends DAO {
 		->whereIn('decision', $possibleFinalDecisions)
 		->orderBy('date_decided', 'asc')
 		->first();
+
+		if(is_null($result)) return null;
 
 		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result));
 
