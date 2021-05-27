@@ -5,7 +5,7 @@ import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory {
 
-    public function createReport(int $contextId, array $sectionIds, string $startSubmissionDateInterval, string $endSubmissionDateInterval, string $startFinalDecisionDateInterval, string $endFinalDecisionDateInterval, string $locale) : ScieloSubmissionsReport {
+    public function createReport(string $application, int $contextId, array $sectionIds, string $startSubmissionDateInterval, string $endSubmissionDateInterval, string $startFinalDecisionDateInterval, string $endFinalDecisionDateInterval, string $locale) : ScieloSubmissionsReport {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sections = [];
 
@@ -22,7 +22,7 @@ class ScieloSubmissionsReportFactory {
         $endFinalDecisionDateInterval = (!empty($endFinalDecisionDateInterval) ? new DateTime($endFinalDecisionDateInterval .' 23:59:59') : null);
 
         $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($contextId, $sectionIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
+        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($application, $contextId, $sectionIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }
