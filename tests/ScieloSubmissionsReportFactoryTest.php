@@ -122,6 +122,13 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
     
+    public function testReportFilterByNoSectionsSelected() : void {
+        $emptySections = [];
+        $report = $this->reportFactory->createReport($this->application, $this->contextId, $emptySections, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+
+        $this->assertEmpty($report->getSubmissions());
+    }
+
     public function testReportFilterBySubmissionDate() : void {
 		$this->startSubmissionDateInterval = '2021-05-23';
         $this->endSubmissionDateInterval = '2021-07-01';
@@ -131,12 +138,48 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
     
+    public function testReportFilterBySubmissionDateSubmissionAtIntervalStart() : void {
+        $this->startSubmissionDateInterval = '2021-05-29';
+        $this->endSubmissionDateInterval = '2021-06-02';
+        $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $expectedSubmissions = [$this->submissionsIds[1]];
+        $this->assertEquals($expectedSubmissions, $report->getSubmissions());
+    }
+
+    public function testReportFilterBySubmissionDateSubmissionAtIntervalEnd() : void {
+        $this->startSubmissionDateInterval = '2021-05-26';
+        $this->endSubmissionDateInterval = '2021-05-29';
+        $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $expectedSubmissions = [$this->submissionsIds[1]];
+        $this->assertEquals($expectedSubmissions, $report->getSubmissions());
+    }
+
     public function testReportFilterByFinalDecisionDate() : void {
         $this->startFinalDecisionDateInterval = '2021-06-15';
         $this->endFinalDecisionDateInterval = '2021-07-12';
         $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
         
         $expectedSubmissions = [$this->submissionsIds[2], $this->submissionsIds[3]];
+        $this->assertEquals($expectedSubmissions, $report->getSubmissions());
+    }
+
+    public function testReportFilterByFinalDecisionDateSubmissionAtIntervalStart() : void {
+        $this->startFinalDecisionDateInterval = '2021-07-10';
+        $this->endFinalDecisionDateInterval = '2021-07-12';
+        $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $expectedSubmissions = [$this->submissionsIds[3]];
+        $this->assertEquals($expectedSubmissions, $report->getSubmissions());
+    }
+
+    public function testReportFilterByFinalDecisionDateSubmissionAtIntervalEnd() : void {
+        $this->startFinalDecisionDateInterval = '2021-07-05';
+        $this->endFinalDecisionDateInterval = '2021-07-10';
+        $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
+        
+        $expectedSubmissions = [$this->submissionsIds[3]];
         $this->assertEquals($expectedSubmissions, $report->getSubmissions());
     }
 
