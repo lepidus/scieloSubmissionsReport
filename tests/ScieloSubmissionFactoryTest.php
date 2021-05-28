@@ -11,6 +11,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     private $submissionId;
     private $publicationId;
     private $title = "eXtreme Programming: A practical guide";
+    private $submitter = "Don Vito Corleone";
 
     public function setUp() : void {
         parent::setUp();
@@ -20,7 +21,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     }
     
     protected function getAffectedTables() {
-        return ['submissions', 'submission_settings', 'publications', 'publication_settings'];
+        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log'];
     }
 
     private function createSubmission() : int {
@@ -52,6 +53,31 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->title, $scieloSubmission->getTitle());
+    }
+
+    public function testSubmissionGetsSubmitter() : void {
+        $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+
+        $userSubmitter = new User();
+        $userSubmitter->setUsername('the_godfather');
+        $userSubmitter->setEmail('donvito@corleone.com');
+        $userSubmitter->setPassword('miaumiau');
+        $userSubmitter->setGivenName("Don", $this->locale);
+        $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
+        $userSubmitterId = $userDao->insertObject($userSubmitter);
+
+        $submissionEvent = $submissionEventLogDao->newDataObject();
+        $submissionEvent->setSubmissionId($this->submissionId);
+        $submissionEvent->setEventType(SUBMISSION_LOG_SUBMISSION_SUBMIT);
+        $submissionEvent->setUserId($userSubmitterId);
+        $submissionEvent->setDateLogged('2021-05-28 15:19:24');
+        $submissionEventLogDao->insertObject($submissionEvent);
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->submitter, $scieloSubmission->getSubmitter());
     }
 }
 

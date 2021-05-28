@@ -10,6 +10,7 @@
  */
 
 import('lib.pkp.classes.db.DAO');
+import('classes.log.SubmissionEventLogEntry');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -75,6 +76,21 @@ class ScieloSubmissionsReportDAO extends DAO {
 		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result));
 
 		return $finalDecisionWithDate;
+	}
+
+	public function getIdSubmitterUser($submissionId) {
+		$result = Capsule::table('event_log')
+        ->where('event_type', SUBMISSION_LOG_SUBMISSION_SUBMIT)
+        ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+        ->where('assoc_id', $submissionId)
+        ->select('user_id')
+		->get();
+		$result = $result->toArray();
+
+		if(empty($result)) return null;
+
+		$userId = get_object_vars($result[0])['user_id'];
+		return $userId;
 	}
 
 	private function _submissionFromRow($row){
