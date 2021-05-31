@@ -12,11 +12,15 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     private $publicationId;
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
+    private $dateSubmitted = '2021-05-31 15:38:24';
+    private $statusCode = STATUS_PUBLISHED;
+    private $statusMessage;
 
     public function setUp() : void {
         parent::setUp();
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication();
+        $this->statusMessage = __('submission.status.published', [], 'en_US');
         $this->addCurrentPublicationToSubmission();
     }
     
@@ -28,6 +32,8 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = new Submission();
         $submission->setData('contextId', $this->contextId);
+        $submission->setData('dateSubmitted', $this->dateSubmitted);
+        $submission->setData('status', $this->statusCode);
          
         return $submissionDao->insertObject($submission);
     }
@@ -78,6 +84,20 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->submitter, $scieloSubmission->getSubmitter());
+    }
+
+    public function testSubmissionGetsDateSubmitted() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->dateSubmitted, $scieloSubmission->getDateSubmitted());
+    }
+
+    public function testSubmissionGetsStatus() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->statusMessage, $scieloSubmission->getStatus());
     }
 }
 

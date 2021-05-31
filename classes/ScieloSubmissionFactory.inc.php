@@ -11,8 +11,10 @@ class ScieloSubmissionFactory {
 
         $submissionTitle = $publication->getData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
+        $dateSubmitted = $submission->getData('dateSubmitted');
+        $status = __($submission->getStatusKey());
 
-        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, "", 0, "", [], "", "", "", "");
+        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, 0, $status, [], "", "", "", "");
 
         return $scieloSubmission;
     }
