@@ -2,6 +2,7 @@
 import('lib.pkp.tests.DatabaseTestCase');
 import('classes.submission.Submission');
 import('classes.publication.Publication');
+import('classes.journal.Section');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 
 class ScieloSubmissionFactoryTest extends DatabaseTestCase {
@@ -15,11 +16,13 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     private $dateSubmitted = '2021-05-31 15:38:24';
     private $statusCode = STATUS_PUBLISHED;
     private $statusMessage;
+    private $sectionName = "Biological Sciences";
 
     public function setUp() : void {
         parent::setUp();
+        $sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication();
+        $this->publicationId = $this->createPublication($sectionId);
         $this->statusMessage = __('submission.status.published', [], 'en_US');
         $this->addCurrentPublicationToSubmission();
     }
@@ -34,17 +37,28 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submission->setData('contextId', $this->contextId);
         $submission->setData('dateSubmitted', $this->dateSubmitted);
         $submission->setData('status', $this->statusCode);
+        $submission->setData('locale', $this->locale);
          
         return $submissionDao->insertObject($submission);
     }
 
-    private function createPublication() : int {
+    private function createPublication($sectionId) : int {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = new Publication();
         $publication->setData('submissionId', $this->submissionId);
         $publication->setData('title', $this->title, $this->locale);
+        $publication->setData('sectionId', $sectionId);
         
         return $publicationDao->insertObject($publication);
+    }
+
+    private function createSection() : int {
+        $sectionDao = DAORegistry::getDAO('SectionDAO');
+        $section = new Section();
+        $section->setTitle($this->sectionName, $this->locale);
+        $sectionId = $sectionDao->insertObject($section);
+
+        return $sectionId;
     }
 
     private function addCurrentPublicationToSubmission() : void {
@@ -98,6 +112,20 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->statusMessage, $scieloSubmission->getStatus());
+    }
+
+    public function testSubmissionGetsSectionName() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->sectionName, $scieloSubmission->getSection());
+    }
+
+    public function testSubmissionGetsLanguage() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->locale, $scieloSubmission->getLanguage());
     }
 }
 

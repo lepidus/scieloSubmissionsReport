@@ -13,8 +13,12 @@ class ScieloSubmissionFactory {
         $submitter = $this->retrieveSubmitter($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $status = __($submission->getStatusKey());
+        $sectionId = $publication->getData('sectionId');
+        $section = DAORegistry::getDAO('SectionDAO')->getById($sectionId);
+        $sectionName = $section->getTitle($locale);
+        $language = $submission->getData('locale');
 
-        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, 0, $status, [], "", "", "", "");
+        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, 0, $status, [], $sectionName, $language, "", "");
 
         return $scieloSubmission;
     }
