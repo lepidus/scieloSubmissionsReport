@@ -17,8 +17,10 @@ class ScieloSubmissionFactory {
         $section = DAORegistry::getDAO('SectionDAO')->getById($sectionId);
         $sectionName = $section->getTitle($locale);
         $language = $submission->getData('locale');
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
+        $authors = $this->retrieveAuthors($publication, $locale);
 
-        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, 0, $status, [], $sectionName, $language, "", "");
+        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, "", "");
 
         return $scieloSubmission;
     }
@@ -33,6 +35,28 @@ class ScieloSubmissionFactory {
         $submitter = $userDao->getById($userId);
         
         return $submitter->getFullName();
+    }
+
+    private function calculateDaysUntilStatusChange($submission) {
+        $dateSubmitted = new DateTime($submission->getData('dateSubmitted'));
+        $dateLastActivity = new DateTime($submission->getData('dateLastActivity'));
+        $daysUntilStatusChange = $dateLastActivity->diff($dateSubmitted)->format('%a');
+
+        return $daysUntilStatusChange;
+    }
+
+    private function retrieveAuthors($publication, $locale){
+        $authors =  $publication->getData('authors');
+        $submissionAuthors = [];
+
+        foreach ($authors as $author){
+            $fullName = $author->getFullName($locale);
+            $country = $author->getCountryLocalized();
+            $affiliation = $author->getAffiliation($locale);
+            $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
+        }
+    
+        return $submissionAuthors;
     }
 
 }

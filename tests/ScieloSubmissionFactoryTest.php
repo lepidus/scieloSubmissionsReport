@@ -3,6 +3,7 @@ import('lib.pkp.tests.DatabaseTestCase');
 import('classes.submission.Submission');
 import('classes.publication.Publication');
 import('classes.journal.Section');
+import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 
 class ScieloSubmissionFactoryTest extends DatabaseTestCase {
@@ -17,18 +18,21 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     private $statusCode = STATUS_PUBLISHED;
     private $statusMessage;
     private $sectionName = "Biological Sciences";
+    private $dateLastActivity = '2021-06-03 16:00:00';
+    private $submissionAuthors;
 
     public function setUp() : void {
         parent::setUp();
         $sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication($sectionId);
+        $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en_US');
         $this->addCurrentPublicationToSubmission();
     }
     
     protected function getAffectedTables() {
-        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log'];
+        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings'];
     }
 
     private function createSubmission() : int {
@@ -38,6 +42,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submission->setData('dateSubmitted', $this->dateSubmitted);
         $submission->setData('status', $this->statusCode);
         $submission->setData('locale', $this->locale);
+        $submission->setData('dateLastActivity', $this->dateLastActivity);
          
         return $submissionDao->insertObject($submission);
     }
@@ -59,6 +64,29 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $sectionId = $sectionDao->insertObject($section);
 
         return $sectionId;
+    }
+
+    private function createAuthors() : array {
+        $authorDao = DAORegistry::getDAO('AuthorDAO');
+        $author1 = new Author();
+        $author2 = new Author();
+        $author1->setData('publicationId', $this->publicationId);
+        $author2->setData('publicationId', $this->publicationId);
+        $author1->setData('email', "anaalice@harvard.com");
+        $author2->setData('email', "seizi.tagima@ufam.edu.br");
+        $author1->setGivenName('Ana Alice', $this->locale);
+        $author1->setFamilyName('Caldas Novas', $this->locale);
+        $author2->setGivenName('Seizi', $this->locale);
+        $author2->setFamilyName('Tagima', $this->locale);
+        $author1->setAffiliation("Harvard University", $this->locale);
+        $author2->setAffiliation("Amazonas Federal University", $this->locale);
+        $author1->setData('country', 'US');
+        $author2->setData('country', 'BR');
+
+        $authorDao->insertObject($author1);
+        $authorDao->insertObject($author2);
+
+        return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
     private function addCurrentPublicationToSubmission() : void {
@@ -126,6 +154,24 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->locale, $scieloSubmission->getLanguage());
+    }
+
+    public function testSubmissionsGetsDaysUntilStatusChange() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $dateSubmitted = new DateTime($this->dateSubmitted);
+        $dateLastActivity = new DateTime($this->dateLastActivity);
+        $daysUntilStatusChange = $dateLastActivity->diff($dateSubmitted)->format('%a');
+
+        $this->assertEquals($daysUntilStatusChange, $scieloSubmission->getDaysUntilStatusChange());
+    }
+
+    public function testSubmissionGetsSubmissionAuthors() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->submissionAuthors, $scieloSubmission->getAuthors());
     }
 }
 
