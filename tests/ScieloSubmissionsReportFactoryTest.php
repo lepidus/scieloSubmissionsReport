@@ -13,6 +13,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     private $locale = 'en_US';
     private $contextId = 1;
     private $reportFactory;
+    private $firstSectionName = "Biological Sciences";
+    private $secondSectionName = "Math";
     private $sectionsIds;
     private $submissionsIds;
     private $publicationsIds;
@@ -37,8 +39,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $section1 = new Section();
         $section2 = new Section();
-        $section1->setTitle("Biological Sciences", $this->locale);
-        $section2->setTitle("Math", $this->locale);
+        $section1->setTitle($this->firstSectionName, $this->locale);
+        $section2->setTitle($this->secondSectionName, $this->locale);
         $firstSectionId = $sectionDao->insertObject($section1);
         $secondSectionId = $sectionDao->insertObject($section2);
 
@@ -96,7 +98,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
     public function testReportHasSections() : void {
         $report = $this->reportFactory->createReport($this->application, $this->contextId, $this->sectionsIds, $this->startSubmissionDateInterval, $this->endSubmissionDateInterval, $this->startFinalDecisionDateInterval, $this->endFinalDecisionDateInterval, $this->locale);
 
-        $expectedSections = [$this->sectionsIds[0] => "Biological Sciences", $this->sectionsIds[1] => "Math"];
+        $expectedSections = [$this->sectionsIds[0] => $this->firstSectionName, $this->sectionsIds[1] => $this->secondSectionName];
         $this->assertEquals($expectedSections, $report->getSections());
     }
     
