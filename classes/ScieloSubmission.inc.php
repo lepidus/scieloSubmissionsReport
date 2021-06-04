@@ -51,7 +51,8 @@ class ScieloSubmission {
     }
 
     public function getSubmitter() : string {
-        return $this->fillEmptyFields($this->submitter, "The submitting author was not found");
+        $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+        return $this->fillEmptyFields($this->submitter, $messageNoSubmitter);
     }
 
     public function getDateSubmitted() : string {

@@ -29,6 +29,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.period">Período</message>
     <message key="plugins.reports.scieloSubmissionsReport.sections">Secciones</message>
 
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noNotes">Sin notas</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">Sin moderadores designados</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">No se encontró al autor que envió el envío</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus">Sin estado de publicación</message>

@@ -35,7 +35,8 @@ class ScieloArticleTest extends TestCase {
 
     public function testWhenJournalEditorsIsEmpty() : void {
         $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, [], $this->sectionEditor, $this->reviews, $this->lastDecision);
-        $this->assertEquals("No editors", $article->getJournalEditors());
+        $messageNoEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $this->assertEquals($messageNoEditors, $article->getJournalEditors());
     }
     
     public function testHasSectionEditor() : void {
@@ -44,7 +45,8 @@ class ScieloArticleTest extends TestCase {
 
     public function testWhenSectionEditorIsEmpty() : void {
         $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, "", $this->reviews ,$this->lastDecision);
-        $this->assertEquals("No editors", $article->getSectionEditor());
+        $messageNoEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $this->assertEquals($messageNoEditors, $article->getSectionEditor());
     }
 
     public function testHasReviews() : void {

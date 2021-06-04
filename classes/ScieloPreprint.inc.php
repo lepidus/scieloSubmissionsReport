@@ -22,24 +22,28 @@ class ScieloPreprint extends ScieloSubmission {
     }
 
     public function getModerators() : string {
-        return $this->implodeEmptyFields($this->moderators, "No moderators");
+        $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
+        return $this->implodeEmptyFields($this->moderators, $messageNoModerators);
     }
 
     public function getSectionModerator() : string {
-        return $this->fillEmptyFields($this->sectionModerator, "No moderators");
+        $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
+        return $this->fillEmptyFields($this->sectionModerator, $messageNoModerators);
     }
 
     public function getPublicationStatus() : string {
-        return $this->fillEmptyFields($this->publicationStatus, "No publication's status");
+        $messageNoPublicationStatus = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
+        return $this->fillEmptyFields($this->publicationStatus, $messageNoPublicationStatus);
     }
 
     public function getPublicationDOI() : string {
-        return $this->fillEmptyFields($this->publicationDOI, "No publication's DOI");
+        $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+        return $this->fillEmptyFields($this->publicationDOI, $messageNoPublicationDOI);
     }
 
     public function getNotes() : string {
         if(empty($this->notes))
-            return "No notes";
+            return __("plugins.reports.scieloSubmissionsReport.warning.noNotes");
         
         return trim(preg_replace('/\s+/', ' ', "Note: " . implode(". Note: ", $this->notes)));
     }

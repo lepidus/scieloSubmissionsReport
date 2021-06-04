@@ -29,6 +29,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.period">Period</message>
     <message key="plugins.reports.scieloSubmissionsReport.sections">Sections</message>
 
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noNotes">No notes</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">No moderators assigned</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noEditors">No editors assigned</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">The submitting author was not found</message>

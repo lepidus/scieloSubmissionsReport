@@ -6,7 +6,7 @@ class ScieloArticle extends ScieloSubmission {
     private $sectionEditor;
     private $reviews;
     private $lastDecision;
-    private const noEditors = "No editors";
+    private $noEditors;
 
     public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $editors, string $sectionEditor, array $reviews, string $lastDecision) {
         parent::__construct($id, $title, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
@@ -14,6 +14,7 @@ class ScieloArticle extends ScieloSubmission {
         $this->sectionEditor = $sectionEditor;
         $this->reviews = $reviews;
         $this->lastDecision = $lastDecision;
+        $this->noEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
     }
     
     public function asRecord(): array {
@@ -21,11 +22,11 @@ class ScieloArticle extends ScieloSubmission {
     }
 
     public function getJournalEditors() : string {
-        return $this->implodeEmptyFields($this->editors, self::noEditors);
+        return $this->implodeEmptyFields($this->editors, $this->noEditors);
     }
 
     public function getSectionEditor() : string {
-        return $this->fillEmptyFields($this->sectionEditor, self::noEditors);
+        return $this->fillEmptyFields($this->sectionEditor, $this->noEditors);
     }
     
     public function getReviews() : string {

@@ -51,7 +51,8 @@ class ScieloSubmissionTest extends TestCase {
 
     public function testWhenEmptySubmitter() : void {
         $submission = new ScieloSubmission($this->submissionId, $this->title, "", $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
-        $this->assertEquals("The submitting author was not found", $submission->getSubmitter());
+        $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+        $this->assertEquals($messageNoSubmitter, $submission->getSubmitter());
     }
 
     public function testHasDateSubmitted() : void {
