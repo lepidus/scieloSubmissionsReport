@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
 
 class ScieloSubmissionsReportDAO extends DAO {  
 
-    public function getSubmissions($application, $contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval) {
+    public function getSubmissions($application, $locale, $contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval) {
 		$query = Capsule::table('submissions')
 		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
 		->where('submissions.context_id', $contextId)
@@ -37,10 +37,10 @@ class ScieloSubmissionsReportDAO extends DAO {
 			$submissionId = $this->_submissionFromRow(get_object_vars($row));
 
 			if(!is_null($startFinalDecisionDateInterval) && !is_null($endFinalDecisionDateInterval)){
-				$finalDecisionWithDate = $this->getFinalDecisionWithDate($application, $submissionId);
+				$finalDecisionWithDate = $this->getFinalDecisionWithDate($application, $submissionId, $locale);
 
-				if(!is_null($finalDecisionWithDate)){
-					$finalDecisionDate = new DateTime($finalDecisionWithDate['date_decided']);
+				if(!empty($finalDecisionWithDate[0]) && !empty($finalDecisionWithDate[1])){
+					$finalDecisionDate = new DateTime($finalDecisionWithDate[1]);
 					if($finalDecisionDate >= $startFinalDecisionDateInterval && $finalDecisionDate <= $endFinalDecisionDateInterval){
 						$submissions[] = $submissionId;
 					}
@@ -54,12 +54,12 @@ class ScieloSubmissionsReportDAO extends DAO {
         return $submissions;
 	}
 
-	public function getFinalDecisionWithDate($application, $submissionId) {
+	public function getFinalDecisionWithDate($application, $submissionId, $locale) {
 		if($application == 'ops') {
 			$submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
             $publication = $submission->getData('publications')[0];
             if ($publication->getData('datePublished')) {
-                return ['decision' => "Aceitar", 'date_decided' => $publication->getData('datePublished')];
+                return [__('common.accepted', [], $locale), $publication->getData('datePublished')];
             }
 		}
 
@@ -71,9 +71,9 @@ class ScieloSubmissionsReportDAO extends DAO {
 		->orderBy('date_decided', 'asc')
 		->first();
 
-		if(is_null($result)) return null;
+		if(is_null($result)) return ["", ""];
 
-		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result));
+		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result), $locale);
 
 		return $finalDecisionWithDate;
 	}
@@ -97,8 +97,16 @@ class ScieloSubmissionsReportDAO extends DAO {
 		return $row['submission_id'];
 	}
 
-	private function _finalDecisionFromRow($row){
-		return ['decision' => "Aceitar", 'date_decided' => $row['date_decided']];
+	private function _finalDecisionFromRow($row, $locale){
+		$dateDecided = $row['date_decided'];
+		$decision = "";
+		
+		if($row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT)
+			$decision = __('common.accepted', [], $locale);
+		else if($row['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE)
+			$decision = __('common.declined', [], $locale);
+		
+		return [$decision, $dateDecided];
 	}
 
 }

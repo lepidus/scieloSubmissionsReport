@@ -1,10 +1,11 @@
 <?php
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportDAO');
 import('classes.log.SubmissionEventLogEntry');
 
 class ScieloSubmissionFactory {
     
-    public function createSubmission(int $submissionId, string $locale) : ScieloSubmission {
+    public function createSubmission(string $application, int $submissionId, string $locale) : ScieloSubmission {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = $submissionDao->getById($submissionId);
         $publication = $submission->getCurrentPublication();
@@ -20,7 +21,10 @@ class ScieloSubmissionFactory {
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
         $authors = $this->retrieveAuthors($publication, $locale);
 
-        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, "", "");
+        $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
+        list($finalDecision, $finalDecisionDate) = $scieloSubmissionsReportDao->getFinalDecisionWithDate($application, $submissionId, $locale);
+
+        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, $finalDecision, $finalDecisionDate);
 
         return $scieloSubmission;
     }

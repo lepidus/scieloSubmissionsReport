@@ -5,9 +5,11 @@ import('classes.publication.Publication');
 import('classes.journal.Section');
 import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
+import('classes.workflow.EditorDecisionActionsManager');
 
 class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     
+    private $application = 'ojs';
     private $locale = 'en_US';
     private $contextId = 1;
     private $submissionId;
@@ -32,7 +34,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     }
     
     protected function getAffectedTables() {
-        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings'];
+        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions'];
     }
 
     private function createSubmission() : int {
@@ -89,6 +91,11 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
+    public function createFinalDecision($submissionId, $decision, $dateDecided) : void {
+        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
+        $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => $decision, 'dateDecided' => $dateDecided, 'editorId' => 1]);
+    }
+
     private function addCurrentPublicationToSubmission() : void {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = $submissionDao->getById($this->submissionId);
@@ -98,7 +105,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
 
     public function testSubmissionGetsTitle() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->title, $scieloSubmission->getTitle());
     }
@@ -123,42 +130,42 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submissionEventLogDao->insertObject($submissionEvent);
 
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application,$this->submissionId, $this->locale);
 
         $this->assertEquals($this->submitter, $scieloSubmission->getSubmitter());
     }
 
     public function testSubmissionGetsDateSubmitted() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->dateSubmitted, $scieloSubmission->getDateSubmitted());
     }
 
     public function testSubmissionGetsStatus() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->statusMessage, $scieloSubmission->getStatus());
     }
 
     public function testSubmissionGetsSectionName() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->sectionName, $scieloSubmission->getSection());
     }
 
     public function testSubmissionGetsLanguage() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->locale, $scieloSubmission->getLanguage());
     }
 
     public function testSubmissionsGetsDaysUntilStatusChange() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $dateSubmitted = new DateTime($this->dateSubmitted);
         $dateLastActivity = new DateTime($this->dateLastActivity);
@@ -169,9 +176,69 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
 
     public function testSubmissionGetsSubmissionAuthors() : void {
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertEquals($this->submissionAuthors, $scieloSubmission->getAuthors());
+    }
+
+    public function testSubmissionGetsFinalDecisionWithDateInitialDecline() : void {
+
+        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
+        $finalDecision = __('common.declined', [], $this->locale);
+        $finalDecisionDate = '2021-05-29 15:00:00';
+        $this->createFinalDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
+
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
+    }
+
+    public function testSubmissionGetsFinalDecisionWithDateDecline() : void {
+        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_DECLINE;
+        $finalDecision = __('common.declined', [], $this->locale);
+        $finalDecisionDate = '2021-04-21 15:00:00';
+        $this->createFinalDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
+        
+    }
+
+    public function testSubmissionGetsFinalDecisionWithDateAcceptInOJS() : void {
+        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_ACCEPT;
+        $finalDecision = __('common.accepted', [], $this->locale);
+        $finalDecisionDate = '2021-06-30 17:31:00';
+        $this->createFinalDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
+    }
+
+    public function testSubmissionGetsFinalDecisionWithDatePostedInOPS() : void {
+        $finalDecision = __('common.accepted', [], $this->locale);
+        $finalDecisionDate = '2021-07-31 19:00:00';
+        
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+        $publication = $publicationDao->getById($this->publicationId);
+        $publication->setData('datePublished', $finalDecisionDate);
+        $publication->setData('status',STATUS_PUBLISHED); 
+        $publicationDao->updateObject($publication);
+
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
     }
 }
 
