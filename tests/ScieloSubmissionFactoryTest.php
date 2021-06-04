@@ -225,7 +225,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
 
     public function testSubmissionGetsFinalDecisionWithDatePostedInOPS() : void {
         $finalDecision = __('common.accepted', [], $this->locale);
-        $finalDecisionDate = '2021-07-31 19:00:00';
+        $finalDecisionDate = '2021-07-31';
         
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = $publicationDao->getById($this->publicationId);
