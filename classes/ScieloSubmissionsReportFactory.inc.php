@@ -1,4 +1,5 @@
 <?php
+import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportDAO');
 import('classes.journal.SectionDAO');
@@ -13,16 +14,12 @@ class ScieloSubmissionsReportFactory {
             $sections[$sectionId] = ($sectionDao->getById($sectionId))->getTitle($locale);
         }
         
-        if(!empty($startSubmissionDateInterval) && !empty($endSubmissionDateInterval)) {
-            $startSubmissionDateInterval .= " 00:00:00";
-            $endSubmissionDateInterval .= " 23:59:59";
-        }
-
-        $startFinalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new DateTime($startFinalDecisionDateInterval .' 00:00:00') : null);
-        $endFinalDecisionDateInterval = (!empty($endFinalDecisionDateInterval) ? new DateTime($endFinalDecisionDateInterval .' 23:59:59') : null);
+        $submissionDateInterval = (!empty($startSubmissionDateInterval) ? new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval) : null);
+        
+        $finalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval) : null);
 
         $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($application, $locale, $contextId, $sectionIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
+        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($application, $locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }

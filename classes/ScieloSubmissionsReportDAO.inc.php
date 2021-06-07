@@ -11,13 +11,14 @@
 
 import('lib.pkp.classes.db.DAO');
 import('classes.log.SubmissionEventLogEntry');
+import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 
 class ScieloSubmissionsReportDAO extends DAO {  
 
-    public function getSubmissions($application, $locale, $contextId, $sectionsIds, $startSubmissionDateInterval, $endSubmissionDateInterval, $startFinalDecisionDateInterval, $endFinalDecisionDateInterval) {
+    public function getSubmissions($application, $locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval) {
 		$query = Capsule::table('submissions')
 		->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
 		->where('submissions.context_id', $contextId)
@@ -25,9 +26,9 @@ class ScieloSubmissionsReportDAO extends DAO {
 		->whereIn('publications.section_id', $sectionsIds)
 		->select('submissions.submission_id');
 		
-		if(!empty($startSubmissionDateInterval) && !empty($endSubmissionDateInterval)){
-			$query = $query->where('submissions.date_submitted', '>=', $startSubmissionDateInterval)
-			->where('submissions.date_submitted', '<=', $endSubmissionDateInterval);
+		if(!is_null($submissionDateInterval)){
+			$query = $query->where('submissions.date_submitted', '>=', $submissionDateInterval->getBeginningDate())
+			->where('submissions.date_submitted', '<=', $submissionDateInterval->getEndDate());
 		}
 
 		$result = $query->get();
@@ -36,12 +37,12 @@ class ScieloSubmissionsReportDAO extends DAO {
 		foreach($result->toArray() as $row) {
 			$submissionId = $this->_submissionFromRow(get_object_vars($row));
 
-			if(!is_null($startFinalDecisionDateInterval) && !is_null($endFinalDecisionDateInterval)){
+			if(!is_null($finalDecisionDateInterval)){
 				$finalDecisionWithDate = $this->getFinalDecisionWithDate($application, $submissionId, $locale);
 
 				if(!empty($finalDecisionWithDate[0]) && !empty($finalDecisionWithDate[1])){
-					$finalDecisionDate = new DateTime($finalDecisionWithDate[1]);
-					if($finalDecisionDate >= $startFinalDecisionDateInterval && $finalDecisionDate <= $endFinalDecisionDateInterval){
+					$finalDecisionDate = $finalDecisionWithDate[1];
+					if($finalDecisionDateInterval->isInsideInterval($finalDecisionDate)){
 						$submissions[] = $submissionId;
 					}
 				}
