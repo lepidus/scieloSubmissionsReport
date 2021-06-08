@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @file plugins/reports/scieloSubmissionsReport/classes/ScieloSubmissionsReportDAO.inc.php
+ * @file plugins/reports/scieloSubmissionsReport/classes/ScieloSubmissionsDAO.inc.php
  *
- * @class ScieloSubmissionsReportDAO
+ * @class ScieloSubmissionsDAO
  * @ingroup plugins_reports_scieloSubmissionsReport
  *
  * Operations for retrieving submissions and other data
@@ -17,7 +17,7 @@ import ('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 
-class ScieloSubmissionsReportDAO extends DAO {  
+class ScieloSubmissionsDAO extends DAO {  
 
     public function getSubmissions($application, $locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval) {
 		$query = Capsule::table('submissions')

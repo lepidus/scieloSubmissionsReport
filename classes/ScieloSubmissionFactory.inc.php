@@ -1,6 +1,6 @@
 <?php
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportDAO');
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
 import('classes.log.SubmissionEventLogEntry');
 
 class ScieloSubmissionFactory {
@@ -21,8 +21,8 @@ class ScieloSubmissionFactory {
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
         $authors = $this->retrieveAuthors($publication, $locale);
 
-        $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $finalDecisionWithDate = $scieloSubmissionsReportDao->getFinalDecisionWithDate($application, $submissionId, $locale);
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $finalDecisionWithDate = $scieloSubmissionsDao->getFinalDecisionWithDate($application, $submissionId, $locale);
 
         $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
         $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
@@ -33,8 +33,8 @@ class ScieloSubmissionFactory {
     }
 
     private function retrieveSubmitter($submissionId) {
-        $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $userId = $scieloSubmissionsReportDao->getIdSubmitterUser($submissionId);
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $userId = $scieloSubmissionsDao->getIdSubmitterUser($submissionId);
 
         if(is_null($userId)) return "";
         

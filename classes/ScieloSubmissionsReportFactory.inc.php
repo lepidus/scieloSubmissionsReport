@@ -1,7 +1,7 @@
 <?php
 import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportDAO');
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
 import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory {
@@ -18,8 +18,8 @@ class ScieloSubmissionsReportFactory {
         
         $finalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval) : null);
 
-        $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        $submissionsIds = $scieloSubmissionsReportDao->getSubmissions($application, $locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $submissionsIds = $scieloSubmissionsDao->getSubmissions($application, $locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }
