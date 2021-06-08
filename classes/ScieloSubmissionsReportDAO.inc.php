@@ -12,6 +12,7 @@
 import('lib.pkp.classes.db.DAO');
 import('classes.log.SubmissionEventLogEntry');
 import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+import ('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -40,8 +41,8 @@ class ScieloSubmissionsReportDAO extends DAO {
 			if(!is_null($finalDecisionDateInterval)){
 				$finalDecisionWithDate = $this->getFinalDecisionWithDate($application, $submissionId, $locale);
 
-				if(!empty($finalDecisionWithDate[0]) && !empty($finalDecisionWithDate[1])){
-					$finalDecisionDate = $finalDecisionWithDate[1];
+				if(!is_null($finalDecisionWithDate)){
+					$finalDecisionDate = $finalDecisionWithDate->getDateDecided();
 					if($finalDecisionDateInterval->isInsideInterval($finalDecisionDate)){
 						$submissions[] = $submissionId;
 					}
@@ -60,7 +61,7 @@ class ScieloSubmissionsReportDAO extends DAO {
 			$submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
             $publication = $submission->getData('publications')[0];
             if ($publication->getData('datePublished')) {
-                return [__('common.accepted', [], $locale), $publication->getData('datePublished')];
+                return new FinalDecision(__('common.accepted', [], $locale), $publication->getData('datePublished'));
             }
 		}
 
@@ -72,7 +73,7 @@ class ScieloSubmissionsReportDAO extends DAO {
 		->orderBy('date_decided', 'asc')
 		->first();
 
-		if(is_null($result)) return ["", ""];
+		if(is_null($result)) return null;
 
 		$finalDecisionWithDate = $this->_finalDecisionFromRow(get_object_vars($result), $locale);
 
@@ -107,7 +108,7 @@ class ScieloSubmissionsReportDAO extends DAO {
 		else if($row['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE)
 			$decision = __('common.declined', [], $locale);
 		
-		return [$decision, $dateDecided];
+		return new FinalDecision($decision, $dateDecided);
 	}
 
 }

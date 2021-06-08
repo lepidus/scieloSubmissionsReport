@@ -91,7 +91,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
-    public function createFinalDecision($submissionId, $decision, $dateDecided) : void {
+    private function createFinalDecision($submissionId, $decision, $dateDecided) : void {
         $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
         $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => $decision, 'dateDecided' => $dateDecided, 'editorId' => 1]);
     }

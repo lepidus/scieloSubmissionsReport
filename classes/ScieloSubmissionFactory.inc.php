@@ -22,7 +22,10 @@ class ScieloSubmissionFactory {
         $authors = $this->retrieveAuthors($publication, $locale);
 
         $scieloSubmissionsReportDao = new ScieloSubmissionsReportDAO();
-        list($finalDecision, $finalDecisionDate) = $scieloSubmissionsReportDao->getFinalDecisionWithDate($application, $submissionId, $locale);
+        $finalDecisionWithDate = $scieloSubmissionsReportDao->getFinalDecisionWithDate($application, $submissionId, $locale);
+
+        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
+        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
 
         $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, $finalDecision, $finalDecisionDate);
 
