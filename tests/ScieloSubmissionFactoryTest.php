@@ -240,6 +240,15 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
         $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
     }
+    
+    public function testSubmissionGetsPublicationStatusInOPS() : void {
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals("1", $scieloSubmission->getPublicationStatus());
+    }
+
 }
 
 ?>

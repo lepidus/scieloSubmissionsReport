@@ -27,6 +27,35 @@ class ScieloSubmissionFactory {
         $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
         $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
 
+        if ($application == 'ops') {
+            $publicationStatus = $publication->getData('status');
+            
+            $publicationDOI = "10.666/949494"; 
+            $moderators = ["Yves"];
+            $sectionModerator = "1";           
+            $notes = ["Um breve resumo sobre a inteligência computacional"];
+
+            $scieloPreprint = new ScieloPreprint(
+                $submissionId,
+                $submissionTitle,
+                $submitter,
+                $dateSubmitted,
+                $daysUntilStatusChange,
+                $status,
+                $authors,
+                $sectionName,
+                $language,
+                $finalDecision,
+                $finalDecisionDate,
+                $moderators,
+                $sectionModerator,
+                $publicationStatus,
+                $publicationDOI,
+                $notes
+            );
+            return $scieloPreprint;
+        }
+
         $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, $finalDecision, $finalDecisionDate);
 
         return $scieloSubmission;
