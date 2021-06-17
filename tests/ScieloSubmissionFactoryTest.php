@@ -22,6 +22,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     private $sectionName = "Biological Sciences";
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
+    private $doi = "10.666/949494";
 
     public function setUp() : void {
         parent::setUp();
@@ -45,7 +46,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submission->setData('status', $this->statusCode);
         $submission->setData('locale', $this->locale);
         $submission->setData('dateLastActivity', $this->dateLastActivity);
-         
+        
         return $submissionDao->insertObject($submission);
     }
 
@@ -55,7 +56,10 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $publication->setData('submissionId', $this->submissionId);
         $publication->setData('title', $this->title, $this->locale);
         $publication->setData('sectionId', $sectionId);
-        
+        $publication->setData('relationStatus', '1');
+        $publication->setData('vorDoi', $this->doi);
+        $publication->setData('status', $this->statusCode);
+
         return $publicationDao->insertObject($publication);
     }
 
@@ -230,7 +234,6 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = $publicationDao->getById($this->publicationId);
         $publication->setData('datePublished', $finalDecisionDate);
-        $publication->setData('status',STATUS_PUBLISHED); 
         $publicationDao->updateObject($publication);
 
         $this->application = 'ops';
@@ -244,11 +247,18 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     public function testSubmissionGetsPublicationStatusInOPS() : void {
         $this->application = 'ops';
         $submissionFactory = new ScieloSubmissionFactory();
-        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        $scieloPreprint = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
-        $this->assertEquals("1", $scieloSubmission->getPublicationStatus());
+        $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
     }
 
+    public function testSubmissionGetsPublicationDOIInOPS() : void {
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertEquals($this->doi, $scieloSubmission->getPublicationDoi());
+    }
 }
 
 ?>
