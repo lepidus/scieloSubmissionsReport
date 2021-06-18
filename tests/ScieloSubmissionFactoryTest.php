@@ -211,7 +211,6 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
 
         $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
         $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
-        
     }
 
     public function testSubmissionGetsFinalDecisionWithDateAcceptInOJS() : void {
@@ -230,7 +229,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     public function testSubmissionGetsFinalDecisionWithDatePostedInOPS() : void {
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-31';
-        
+
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = $publicationDao->getById($this->publicationId);
         $publication->setData('datePublished', $finalDecisionDate);
@@ -243,7 +242,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
         $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
     }
-    
+
     public function testSubmissionGetsPublicationStatusInOPS() : void {
         $this->application = 'ops';
         $submissionFactory = new ScieloSubmissionFactory();
@@ -257,7 +256,29 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submissionFactory = new ScieloSubmissionFactory();
         $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
-        $this->assertEquals($this->doi, $scieloSubmission->getPublicationDoi());
+        $this->assertEquals($this->doi, $scieloSubmission->getPublicationDOI());
+    }
+
+    public function testSubmissionWithoutPublicationDOIInOPS() : void {
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+        $publication = $publicationDao->getById($this->publicationId);
+        $publication->setData('vorDoi', NULL);
+        $publicationDao->updateObject($publication);
+
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        $expectedResult = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+
+        $this->assertEquals($expectedResult, $scieloSubmission->getPublicationDOI());
+    }
+
+    public function testSubmissionIsPreprintInOPS() : void {
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertTrue($scieloSubmission instanceof ScieloPreprint);
     }
 }
 

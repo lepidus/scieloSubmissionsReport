@@ -111,18 +111,11 @@ class ScieloSubmissionsDAO extends DAO {
 		return new FinalDecision($decision, $dateDecided);
 	}
 
-	public function getPublicationDoi($submission) {
+	public function getPublicationDOIBySubmission($submission) : string {
 		$publication = $submission->getCurrentPublication();
-        $relationOptions = Services::get('publication')->getRelationOptions();
         $relationId = $publication->getData('relationStatus');
-        $publicationDoi = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
-
-        if($relationId){
-            if($publication->getData('vorDoi'))
-                $publicationDoi = $publication->getData('vorDoi');
-        }
-
-        return $publicationDoi;
+		$publicationDoi = $publication->getData('vorDoi');
+        return ($relationId && $publicationDoi) ? $publicationDoi : "";
 	}
 }
 

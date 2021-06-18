@@ -5,7 +5,7 @@ class SubmissionAuthor {
     private $country;
     private $affiliation;
 
-public function __construct(string $fullName, string $country, string $affiliation){
+    public function __construct(string $fullName, string $country, string $affiliation){
         $this->fullName = $fullName;
         $this->country = $country;
         $this->affiliation = $affiliation;
