@@ -117,6 +117,33 @@ class ScieloSubmissionsDAO extends DAO {
 		$publicationDoi = $publication->getData('vorDoi');
         return ($relationId && $publicationDoi) ? $publicationDoi : "";
 	}
+
+	public function getModerators($submissionId) {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+
+        $designatedIterator = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+        $keywords = array("moderador de área","moderador");
+        $sectionModeratorUsers = array();
+        $moderatorUsers =  array();
+
+        while($designated = $designatedIterator->next()){
+			$userId = $designated->getUserId();
+			$moderator = $userDao->getById($userId, false);          
+			$userGroup = $userGroupDao->getById($designated->getUserGroupId());
+            $currentGroupName = strtolower($userGroup->getName('pt_BR'));
+
+            if( strstr($currentGroupName, $keywords[0]) )
+                array_push($sectionModeratorUsers, $moderator->getFullName());
+            if( $currentGroupName == $keywords[1] )
+                array_push($moderatorUsers, $moderator->getFullName());
+        }
+        $sectionModerator = (!empty($sectionModeratorUsers) ? $sectionModeratorUsers[0] : "");
+        $moderators[] = (!empty($moderatorUsers)) ? (implode(",", $moderatorUsers)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
+
+        return [$sectionModerator, $moderators]; 
+    }
 }
 
 ?>

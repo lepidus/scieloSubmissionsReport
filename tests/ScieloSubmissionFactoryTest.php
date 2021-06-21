@@ -35,7 +35,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
     }
     
     protected function getAffectedTables() {
-        return ['submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions'];
+        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_settings', 'user_groups','user_group_settings', 'user_user_groups','user_group_stage', 'stage_assignments', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions'];    
     }
 
     private function createSubmission() : int {
@@ -279,6 +279,52 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertTrue($scieloSubmission instanceof ScieloPreprint);
+    }
+
+    public function testSubmissionModeratorsInOPS() : void {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $moderatorGroupId = 3;
+        $moderatorRole = $userGroupDao->getById($moderatorGroupId);
+        
+        $moderatorRoleLocalizedNames = [
+            'en_US'=>'moderator',
+            'pt_BR'=>'moderador',
+            'es_ES'=>'moderador'
+        ];
+        $moderatorRoleLocalizedAbbreviations = [
+            'en_US'=>'MOD',
+            'pt_BR'=>'MOD',
+            'es_ES'=>'MOD'
+        ];
+
+        $moderatorRole->setData("name", $moderatorRoleLocalizedNames);
+        $moderatorRole->setData("abbrev", $moderatorRoleLocalizedAbbreviations);
+        $userGroupDao->updateObject($moderatorRole);
+        
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $userModerator = $userDao->newDataObject();
+        $userModerator->setUsername('f4ustao');
+        $userModerator->setEmail('faustosilva@noexists.com');
+        $userModerator->setPassword('oloco');
+        $userModerator->setGivenName("Fausto", $this->locale);
+        $userModerator->setFamilyName("Silva", $this->locale);
+        $userModeratorId = $userDao->insertObject($userModerator);
+        
+        $userGroupDao->assignUserToGroup($userModeratorId, $moderatorGroupId);
+        
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $stageAssignment = $stageAssignmentDao->newDataObject();
+        $stageAssignment->setSubmissionId($this->submissionId);
+        $stageAssignment->setUserId($userModeratorId);
+        $stageAssignment->setUserGroupId($moderatorGroupId);
+        $stageAssignment->setStageId(5);
+        $stageAssignmentDao->insertObject($stageAssignment);
+        
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals($userModerator->getFullName(), $scieloSubmission->getModerators());
     }
 }
 

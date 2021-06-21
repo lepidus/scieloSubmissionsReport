@@ -30,7 +30,7 @@ class ScieloSubmissionFactory {
         if ($application == 'ops') {
             $publicationStatus = $publication->getData('status');
             $publicationDOI = $scieloSubmissionsDao->getPublicationDOIBySubmission($submission);
-            $moderators = ["Yves"];
+            $moderators = $scieloSubmissionsDao->getModerators($submissionId)[1];
             $sectionModerator = "1";
             $notes = ["Um breve resumo sobre a inteligência computacional"];
 
