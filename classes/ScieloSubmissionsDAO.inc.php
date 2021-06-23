@@ -118,32 +118,29 @@ class ScieloSubmissionsDAO extends DAO {
         return ($relationId && $publicationDoi) ? $publicationDoi : "";
 	}
 
-	public function getModerators($submissionId) {
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+	public function getAllModeratorsBySubmissionId($submissionId) {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
 
-        $designatedIterator = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
-        $keywords = array("moderador de área","moderador");
-        $sectionModeratorUsers = array();
-        $moderatorUsers =  array();
+		$submissionStageId = 5;
+		$sectionModerator = "";
+        $moderatorUsers =  array(); 
+        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, $submissionStageId);
 
-        while($designated = $designatedIterator->next()){
-			$userId = $designated->getUserId();
-			$moderator = $userDao->getById($userId, false);          
-			$userGroup = $userGroupDao->getById($designated->getUserGroupId());
-            $currentGroupName = strtolower($userGroup->getName('pt_BR'));
+		while($stageAssignment = $stageAssignmentsResults->next()) {
+			$user = $userDao->getById($stageAssignment->getUserId(), false);
+			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+			
+				if ($currentUserGroupName == 'section moderator')
+					$sectionModerator = $user->getFullName();
+				if ($currentUserGroupName == 'moderator')
+					array_push($moderatorUsers, $user->getFullName());
+		}
+		return [$sectionModerator, array(!empty($moderatorUsers) ? implode(",", $moderatorUsers) : "")];
+	}
 
-            if( strstr($currentGroupName, $keywords[0]) )
-                array_push($sectionModeratorUsers, $moderator->getFullName());
-            if( $currentGroupName == $keywords[1] )
-                array_push($moderatorUsers, $moderator->getFullName());
-        }
-        $sectionModerator = (!empty($sectionModeratorUsers) ? $sectionModeratorUsers[0] : "");
-        $moderators[] = (!empty($moderatorUsers)) ? (implode(",", $moderatorUsers)) : (__("plugins.reports.scieloSubmissionsReport.warning.noModerators"));
-
-        return [$sectionModerator, $moderators]; 
-    }
 }
 
 ?>
