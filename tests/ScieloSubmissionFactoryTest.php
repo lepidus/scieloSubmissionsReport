@@ -107,6 +107,66 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         $submissionDao->updateObject($submission);
     }
 
+    private function createSectionModeratorUserGroup() {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+
+        $sectionModeratorUserGroupLocalizedNames = [
+            'en_US'=>'section moderator',
+            'pt_BR'=>'moderador de área',
+            'es_ES'=>'moderador de área'
+        ];
+        $sectionModeratorUserGroup = new UserGroup();
+        $sectionModeratorUserGroup->setData('name', $sectionModeratorUserGroupLocalizedNames);
+        $sectionModeratorUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
+        $sectionModeratorUserGroup->setData('contextId', $this->contextId);
+
+        return $userGroupDao->insertObject($sectionModeratorUserGroup);
+    }
+
+    private function createModeratorUsers() : array {
+        $userModerator = new User();
+        $userModerator->setUsername('f4ustao');
+        $userModerator->setEmail('faustosilva@noexists.com');
+        $userModerator->setPassword('oloco');
+        $userModerator->setGivenName("Fausto", $this->locale);
+        $userModerator->setFamilyName("Silva", $this->locale);
+
+        $secondUserModerator = new User();
+        $secondUserModerator->setUsername('silvinho122');
+        $secondUserModerator->setEmail('silvio@stb.com');
+        $secondUserModerator->setPassword('aviaozinho');
+        $secondUserModerator->setGivenName("Silvio", $this->locale);
+        $secondUserModerator->setFamilyName("Santos", $this->locale);
+
+        return [$userModerator, $secondUserModerator];
+    }
+
+    private function createModeratorsStageAssignments(array $moderatorsIds, $moderatorGroupId) : void {
+        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+        $stageAssignmentsIds = array();
+
+        foreach ($moderatorsIds as $moderatorId) {
+            $stageAssignment = new StageAssignment();
+            $stageAssignment->setSubmissionId($this->submissionId);
+            $stageAssignment->setUserId($moderatorId);
+            $stageAssignment->setUserGroupId($moderatorGroupId);
+            $stageAssignment->setStageId(5);            
+            $stageAssignmentDao->insertObject($stageAssignment);
+        }
+    }
+
+    private function updateModeratorUserGroup($moderatorGroupId) : void {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+
+        $moderatorUserGroupLocalizedNames = [
+            'en_US'=>'moderator',
+            'pt_BR'=>'moderador',
+            'es_ES'=>'moderador'];
+        $moderatorUserGroup = $userGroupDao->getById($moderatorGroupId);
+        $moderatorUserGroup->setData("name", $moderatorUserGroupLocalizedNames);
+        $userGroupDao->updateObject($moderatorUserGroup);
+    }
+    
     public function testSubmissionGetsTitle() : void {
         $submissionFactory = new ScieloSubmissionFactory();
         $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
@@ -280,95 +340,43 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
 
         $this->assertTrue($scieloSubmission instanceof ScieloPreprint);
     }
-
+    
     public function testSubmissionModeratorsInOPS() : void {
-        $moderatorUserGroupLocalizedNames = [
-            'en_US'=>'moderator',
-            'pt_BR'=>'moderador',
-            'es_ES'=>'moderador'
-        ];
-        $moderatorGroupId = 3;
-        
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $moderatorUserGroup = $userGroupDao->getById($moderatorGroupId);
-        $moderatorUserGroup->setData("name", $moderatorUserGroupLocalizedNames);
-        $userGroupDao->updateObject($moderatorUserGroup);
-
         $userDao = DAORegistry::getDAO('UserDAO');
-        $userModerator = new User();
-        $userModerator->setUsername('f4ustao');
-        $userModerator->setEmail('faustosilva@noexists.com');
-        $userModerator->setPassword('oloco');
-        $userModerator->setGivenName("Fausto", $this->locale);
-        $userModerator->setFamilyName("Silva", $this->locale);
-        $userModeratorId = $userDao->insertObject($userModerator);
 
-        $secondUserModerator = new User();
-        $secondUserModerator->setUsername('silvinho122');
-        $secondUserModerator->setEmail('silvio@stb.com');
-        $secondUserModerator->setPassword('aviaozinho');
-        $secondUserModerator->setGivenName("Silvio", $this->locale);
-        $secondUserModerator->setFamilyName("Santos", $this->locale);
-        $secondUserModeratorId = $userDao->insertObject($secondUserModerator);
+        $moderatorGroupId = 3;
+        $this->updateModeratorUserGroup($moderatorGroupId);
         
-        $userGroupDao->assignUserToGroup($userModeratorId, $moderatorGroupId);
-        $userGroupDao->assignUserToGroup($userModeratorId, $secondUserModeratorId);
-
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignment = new StageAssignment();
-        $stageAssignment->setSubmissionId($this->submissionId);
-        $stageAssignment->setUserId($userModeratorId);
-        $stageAssignment->setUserGroupId($moderatorGroupId);
-        $stageAssignment->setStageId(5);
-        $stageAssignmentDao->insertObject($stageAssignment);
+        $moderatorUsers = $this->createModeratorUsers();
+        $firstModeratorId = $userDao->insertObject($moderatorUsers[0]);
+        $secondModeratorId = $userDao->insertObject($moderatorUsers[1]);
         
-        $secondStageAssignment = new StageAssignment();
-        $secondStageAssignment->setSubmissionId($this->submissionId);
-        $secondStageAssignment->setUserId($secondUserModeratorId);
-        $secondStageAssignment->setUserGroupId($moderatorGroupId);
-        $secondStageAssignment->setStageId(5);
-        $stageAssignmentDao->insertObject($secondStageAssignment);
-
+        $userGroupDao->assignUserToGroup($firstModeratorId, $moderatorGroupId);
+        $userGroupDao->assignUserToGroup($secondModeratorId, $moderatorGroupId);
+        
+        $this->createModeratorsStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
+        
         $this->application = 'ops';
         $submissionFactory = new ScieloSubmissionFactory();
         $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-
-        $expectedModerators = $userModerator->getFullName() . "," . $secondUserModerator->getFullName();
+        
+        $expectedModerators = $moderatorUsers[0]->getFullName() . "," . $moderatorUsers[1]->getFullName();
         
         $this->assertEquals($expectedModerators, $scieloSubmission->getModerators());
     }
 
     public function testSubmissionSectionModeratorInOPS() {
-        $sectionModeratorUserGroupLocalizedNames = [
-            'en_US'=>'section moderator',
-            'pt_BR'=>'moderador de área',
-            'es_ES'=>'moderador de área'
-        ];
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $sectionModeratorUserGroup = new UserGroup();
-        $sectionModeratorUserGroup->setData('name', $sectionModeratorUserGroupLocalizedNames);
-        $sectionModeratorUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
-        $sectionModeratorUserGroup->setData('contextId', $this->contextId);
-        $sectionModeratorUserGroupId = $userGroupDao->insertObject($sectionModeratorUserGroup);
-        
         $userDao = DAORegistry::getDAO('UserDAO');
-        $userSectionModerator = new User();
-        $userSectionModerator->setUsername('silvinho122');
-        $userSectionModerator->setEmail('silvio@stb.com');
-        $userSectionModerator->setPassword('aviaozinho');
-        $userSectionModerator->setGivenName("Silvio", $this->locale);
-        $userSectionModerator->setFamilyName("Santos", $this->locale);
+
+        $userSectionModerator = $this->createModeratorUsers()[0];
         $userSectionModeratorId = $userDao->insertObject($userSectionModerator);
+        $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
         
         $userGroupDao->assignUserToGroup($userSectionModeratorId, $sectionModeratorUserGroupId);
         
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignment = new StageAssignment();
-        $stageAssignment->setSubmissionId($this->submissionId);
-        $stageAssignment->setUserId($userSectionModeratorId);
-        $stageAssignment->setUserGroupId($sectionModeratorUserGroupId);
-        $stageAssignment->setStageId(5);
-        $stageAssignmentDao->insertObject($stageAssignment);
+        $this->createModeratorsStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
         
         $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, 5);
         
