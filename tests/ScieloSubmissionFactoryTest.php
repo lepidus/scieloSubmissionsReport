@@ -386,6 +386,39 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         
         $this->assertEquals($userSectionModerator->getFullName(), $scieloSubmission->getSectionModerator());
     }
+
+    public function testSubmissionNotesInOPS() {
+        $noteDao = DAORegistry::getDAO('NoteDAO');
+        $contentsForFirstNote = "Um breve resumo sobre a inteligência computacional";
+        $contentsForSecondNote = "Algoritmos Genéticos: Implementação no jogo do dino";
+
+        $note = $noteDao->newDataObject();
+        $note->setContents($contentsForFirstNote);
+        $note->setAssocType(1048585);
+        $note->setAssocId($this->submissionId);
+        $noteDao->insertObject($note);
+
+        $note = $noteDao->newDataObject();
+        $note->setContents($contentsForSecondNote);
+        $note->setAssocType(1048585);
+        $note->setAssocId($this->submissionId);
+        $noteDao->insertObject($note);
+
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        $expectedResult = "Note: Um breve resumo sobre a inteligência computacional. Note: Algoritmos Genéticos: Implementação no jogo do dino";
+
+        $this->assertEquals($expectedResult, $scieloSubmission->getNotes());
+    }
+    
+    public function testSubmissionDoesNotHaveNotesInOPS() {
+        $this->application = 'ops';
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloSubmission->getNotes());
+    }
 }
 
 ?>

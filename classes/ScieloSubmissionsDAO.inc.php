@@ -141,6 +141,23 @@ class ScieloSubmissionsDAO extends DAO {
 		return [$sectionModerator, array(!empty($moderatorUsers) ? implode(",", $moderatorUsers) : "")];
 	}
 
+	public function getSubmissionNotes($submissionId) {
+        $resultNotes = Capsule::table('notes')
+		->where('assoc_type', 1048585)
+		->where('assoc_id', $submissionId)
+		->select('contents')
+		->get();
+		
+		$notes = array();
+
+		foreach ($resultNotes as $noteObject) {
+			$note = get_object_vars($noteObject);
+			array_push($notes, $note['contents']);
+		}
+        return $notes;
+    }
+
+
 }
 
 ?>
