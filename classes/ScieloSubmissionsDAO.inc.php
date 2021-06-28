@@ -114,8 +114,8 @@ class ScieloSubmissionsDAO extends DAO {
 	public function getPublicationDOIBySubmission($submission) : string {
 		$publication = $submission->getCurrentPublication();
         $relationId = $publication->getData('relationStatus');
-		$publicationDoi = $publication->getData('vorDoi');
-        return ($relationId && $publicationDoi) ? $publicationDoi : "";
+		$publicationDOI = $publication->getData('vorDoi');
+        return ($relationId && $publicationDOI) ? $publicationDOI : "";
 	}
 
 	public function getAllModeratorsBySubmissionId($submissionId) {
