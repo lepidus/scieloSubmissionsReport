@@ -419,6 +419,13 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase {
         
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloSubmission->getNotes());
     }
+
+    public function testSubmissionIsArticleInOJS() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+
+        $this->assertTrue($scieloSubmission instanceof ScieloArticle);
+    }
 }
 
 ?>
