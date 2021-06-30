@@ -118,7 +118,7 @@ class ScieloSubmissionsDAO extends DAO {
         return ($relationId && $publicationDOI) ? $publicationDOI : "";
 	}
 
-	public function getAllModeratorsBySubmissionId($submissionId) {
+	public function getAllModeratorsBySubmissionId($submissionId) : array {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
@@ -138,10 +138,10 @@ class ScieloSubmissionsDAO extends DAO {
 				if ($currentUserGroupName == 'moderator')
 					array_push($moderatorUsers, $user->getFullName());
 		}
-		return [$sectionModerator, array(!empty($moderatorUsers) ? implode(",", $moderatorUsers) : "")];
+		return [$sectionModerator, !empty($moderatorUsers) ? implode(",", $moderatorUsers) : array()];
 	}
 
-	public function getSubmissionNotes($submissionId) {
+	public function getSubmissionNotes($submissionId) : array {
         $resultNotes = Capsule::table('notes')
 		->where('assoc_type', 1048585)
 		->where('assoc_id', $submissionId)
