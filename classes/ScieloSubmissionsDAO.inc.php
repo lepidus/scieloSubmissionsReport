@@ -11,8 +11,9 @@
 
 import('lib.pkp.classes.db.DAO');
 import('classes.log.SubmissionEventLogEntry');
-import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import ('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
+import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
+import('plugins.reports.articles.ArticleReportPlugin');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -167,6 +168,19 @@ class ScieloSubmissionsDAO extends DAO {
 		}
 		return [$journalEditors, $sectionEditor];
 	}
+
+	public function getLastDecision($submissionId) : string {
+        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
+        $decisionsSubmission = $editDecisionDao->getEditorDecisions($submissionId); 
+		$lastDecision = '';
+        foreach($decisionsSubmission as $decisions) {
+			$lastDecision = $decisions['decision'];
+        }
+		$report = new ArticleReportPlugin();
+		error_log($lastDecision);
+		error_log($report->getDecisionMessage($lastDecision));
+        return $report->getDecisionMessage($lastDecision);
+    }
 
 	public function getSubmissionNotes($submissionId) : array {
         $resultNotes = Capsule::table('notes')

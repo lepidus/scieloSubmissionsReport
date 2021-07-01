@@ -56,7 +56,7 @@ class ScieloSubmissionFactory {
         if ($application == 'ojs') {
             list($editors, $sectionEditor) = $scieloSubmissionsDao->getEditors($submissionId);
             $reviews = array();
-            $lastDecision = '';
+            $lastDecision = $scieloSubmissionsDao->getLastDecision($submissionId);
 
             $scieloArticle = new ScieloArticle(
                 $submissionId,
