@@ -101,7 +101,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         $submissionDao->updateObject($submission);
     }
     
-    private function createUsers() : array {
+    private function createModeratorsUsers() : array {
         $userModerator = new User();
         $userModerator->setUsername('f4ustao');
         $userModerator->setEmail('faustosilva@noexists.com');
@@ -221,7 +221,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
 
             $moderatorGroupId = $this->createModeratorUserGroup();
             
-            $moderatorUsers = $this->createUsers();
+            $moderatorUsers = $this->createModeratorsUsers();
             $firstModeratorId = $userDao->insertObject($moderatorUsers[0]);
             $secondModeratorId = $userDao->insertObject($moderatorUsers[1]);
             
@@ -242,7 +242,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
             $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
             $userDao = DAORegistry::getDAO('UserDAO');
 
-            $userSectionModerator = $this->createUsers()[0];
+            $userSectionModerator = $this->createModeratorsUsers()[0];
             $userSectionModeratorId = $userDao->insertObject($userSectionModerator);
             $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
             

@@ -114,20 +114,20 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         $submissionDao->updateObject($submission);
     }
 
-    private function createUsers() : array {
+    private function createEditorUsers() : array {
         $userModerator = new User();
-        $userModerator->setUsername('f4ustao');
-        $userModerator->setEmail('faustosilva@noexists.com');
-        $userModerator->setPassword('oloco');
-        $userModerator->setGivenName("Fausto", $this->locale);
-        $userModerator->setFamilyName("Silva", $this->locale);
+        $userModerator->setUsername('joaozinho');
+        $userModerator->setEmail('joao@abobrinha.com');
+        $userModerator->setPassword('abobrinha');
+        $userModerator->setGivenName("Joao", $this->locale);
+        $userModerator->setFamilyName("Abobra", $this->locale);
 
         $secondUserModerator = new User();
-        $secondUserModerator->setUsername('silvinho122');
-        $secondUserModerator->setEmail('silvio@stb.com');
-        $secondUserModerator->setPassword('aviaozinho');
-        $secondUserModerator->setGivenName("Silvio", $this->locale);
-        $secondUserModerator->setFamilyName("Santos", $this->locale);
+        $secondUserModerator->setUsername('sergio_do_xuxu');
+        $secondUserModerator->setEmail('sergin@xuxu.com');
+        $secondUserModerator->setPassword('ilovexuxu');
+        $secondUserModerator->setGivenName("Sergio", $this->locale);
+        $secondUserModerator->setFamilyName("Xuxunaldo", $this->locale);
 
         return [$userModerator, $secondUserModerator];
     }
@@ -168,6 +168,27 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
 
         $this->assertTrue($scieloSubmission instanceof ScieloArticle);
+    }
+
+    public function testSubmissionGetsEditorsInOJS() : void {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+        
+        $editorGroupId = $this->createEditorUserGroup();
+        $editorsUsers = $this->createEditorUsers();
+        $firstEditorId = $userDao->insertObject($editorsUsers[0]);
+        $secondEditorId = $userDao->insertObject($editorsUsers[1]);
+        
+        $userGroupDao->assignUserToGroup($firstEditorId, $editorGroupId);
+        $userGroupDao->assignUserToGroup($secondEditorId, $editorGroupId);
+        $this->createStageAssignments([$firstEditorId, $secondEditorId], $editorGroupId);
+        $userGroupDao->assignGroupToStage($this->contextId, $editorGroupId, 5);
+        
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $expectedEditors = $editorsUsers[0]->getFullName() . "," . $editorsUsers[1]->getFullName();
+        $this->assertEquals($expectedEditors, $scieloSubmission->getJournalEditors());
     }
 }
 ?>
