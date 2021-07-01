@@ -54,8 +54,7 @@ class ScieloSubmissionFactory {
             return $scieloPreprint;
         }
         if ($application == 'ojs') {
-            $editors = $scieloSubmissionsDao->getJournalEditors($submissionId);
-            $sectionEditor = '';
+            list($editors, $sectionEditor) = $scieloSubmissionsDao->getEditors($submissionId);
             $reviews = array();
             $lastDecision = '';
 

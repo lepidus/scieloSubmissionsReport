@@ -95,11 +95,11 @@ class ScieloSubmissionsDAO extends DAO {
 		return $userId;
 	}
 
-	private function _submissionFromRow($row){
+	private function _submissionFromRow($row) {
 		return $row['submission_id'];
 	}
 
-	private function _finalDecisionFromRow($row, $locale){
+	private function _finalDecisionFromRow($row, $locale) {
 		$dateDecided = $row['date_decided'];
 		$decision = "";
 		
@@ -141,22 +141,31 @@ class ScieloSubmissionsDAO extends DAO {
 		return [$sectionModerator, !empty($moderatorUsers) ? implode(",", $moderatorUsers) : array()];
 	}
 
-	public function getJournalEditors($submissionId) {
+	public function getEditors($submissionId) : array {
 		$userDao = DAORegistry::getDAO('UserDAO');
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-		$stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, 5);
-		$editors = array();
+		$stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, 5);
+		$stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+		
+		$journalEditors = array();
+		$sectionEditor = '';
 
-		while ($stageAssignment = $stageAssignmentsResults->next()) {
+		while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
 			$user = $userDao->getById($stageAssignment->getUserId(), false);
 			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));			
-			
 			if ($currentUserGroupName == 'editor')
-				array_push($editors, $user->getFullName());
+				array_push($journalEditors, $user->getFullName());
 		}
-		return $editors;
+		while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
+			$user = $userDao->getById($stageAssignment->getUserId(), false);
+			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+			if ($currentUserGroupName == 'section editor')
+				$sectionEditor = $user->getFullName();
+		}
+		return [$journalEditors, $sectionEditor];
 	}
 
 	public function getSubmissionNotes($submissionId) : array {
@@ -174,8 +183,6 @@ class ScieloSubmissionsDAO extends DAO {
 		}
         return $notes;
     }
-
-
 }
 
 ?>

@@ -62,6 +62,19 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         return $publicationDao->insertObject($publication);
     }
 
+    private function createSectionEditorUserGroup() : int {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $sectionEditorUserGroupLocalizedNames = [
+            'en_US'=>'section editor',
+            'pt_BR'=>'editor de seção',
+            'es_ES'=> 'editor de sección'];
+        $sectionEditorsUserGroup = new UserGroup();
+        $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
+        $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
+        $sectionEditorsUserGroup->setData('contextId', $this->contextId);
+        return $userGroupDao->insertObject($sectionEditorsUserGroup);
+    }
+
     private function createEditorUserGroup() : int {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $editorUserGroupLocalizedNames = [
@@ -189,6 +202,24 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         
         $expectedEditors = $editorsUsers[0]->getFullName() . "," . $editorsUsers[1]->getFullName();
         $this->assertEquals($expectedEditors, $scieloSubmission->getJournalEditors());
+    }
+
+    public function testSubmissionGetsSectionEditorInOJS() : void {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+
+        $sectionEditorGroupId = $this->createSectionEditorUserGroup();
+        $sectionEditorsUser = $this->createEditorUsers()[0];
+        $sectionEditorUserId = $userDao->insertObject($sectionEditorsUser);
+
+        $userGroupDao->assignUserToGroup($sectionEditorUserId, $sectionEditorGroupId);
+        $this->createStageAssignments([$sectionEditorUserId], $sectionEditorGroupId);
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
+        
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals($sectionEditorsUser->getFullName(), $scieloSubmission->getSectionEditor());
     }
 }
 ?>
