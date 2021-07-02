@@ -35,7 +35,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
     }
 
     protected function getAffectedTables() {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
+        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
+        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'review_assignments'];
     }
 
     private function createSubmission() : int {
@@ -223,6 +225,19 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         $this->assertEquals($sectionEditorsUser->getFullName(), $scieloSubmission->getSectionEditor());
     }
 
+    public function testSubmissionGetsNoSectionEditorInOJS() : void {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        
+        $sectionEditorGroupId = $this->createSectionEditorUserGroup();
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $noEditorMessage = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $this->assertEquals($noEditorMessage, $scieloSubmission->getSectionEditor());
+    }
+
     public function testSubmissionGetsLastDecisionInOJS() : void {
         $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
         $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()));
@@ -232,6 +247,28 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         
         $report = new ArticleReportPlugin();
         $this->assertEquals($report->getDecisionMessage($decision), $scieloSubmission->getLastDecision());
+    }
+    
+    public function testSubmissionGetsReviewsInOJS() : void {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $recommendation = SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
+    
+        $reviewAssignment = new ReviewAssignment();
+        $reviewAssignment->setRecommendation($recommendation);
+        $reviewAssignment->setSubmissionId($this->submissionId);
+        $reviewAssignment->setReviewerId(1);
+        $reviewAssignment->setDateAssigned(Core::getCurrentDate());
+        $reviewAssignment->setStageId(1);
+        $reviewAssignment->setRound(1);
+        $reviewAssignment->setReviewRoundId(1);
+        $reviewAssignment->setDateCompleted(Core::getCurrentDate());
+    
+        $reviewAssignmentDao->insertObject($reviewAssignment);
+    
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals($reviewAssignment->getLocalizedRecommendation(), $scieloSubmission->getReviews());
     }
 }
 ?>

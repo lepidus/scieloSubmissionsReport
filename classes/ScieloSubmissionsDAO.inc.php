@@ -177,8 +177,6 @@ class ScieloSubmissionsDAO extends DAO {
 			$lastDecision = $decisions['decision'];
         }
 		$report = new ArticleReportPlugin();
-		error_log($lastDecision);
-		error_log($report->getDecisionMessage($lastDecision));
         return $report->getDecisionMessage($lastDecision);
     }
 
@@ -196,6 +194,21 @@ class ScieloSubmissionsDAO extends DAO {
 			array_push($notes, $note['contents']);
 		}
         return $notes;
+    }
+
+	public function getReviews($submissionId) : array {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $submissionReviews = $reviewAssignmentDao->getBySubmissionId($submissionId);
+        $completeReviews = false;
+        $reviews = array();
+
+        foreach($submissionReviews as $review) {
+            if($review->getDateCompleted()){
+                $completeReviews = true;
+                $reviews[] = $review->getLocalizedRecommendation();
+            }
+        }
+        return $reviews;
     }
 }
 
