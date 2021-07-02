@@ -7,6 +7,7 @@ class ScieloArticle extends ScieloSubmission {
     private $reviews;
     private $lastDecision;
     private $noEditors;
+    private $noDecision;
 
     public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $editors, string $sectionEditor, array $reviews, string $lastDecision) {
         parent::__construct($id, $title, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
@@ -15,6 +16,7 @@ class ScieloArticle extends ScieloSubmission {
         $this->reviews = $reviews;
         $this->lastDecision = $lastDecision;
         $this->noEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $this->noDecision = __("plugins.reports.scieloSubmissionsReport.warning.noDecision");
     }
     
     public function asRecord() : array {
@@ -38,11 +40,10 @@ class ScieloArticle extends ScieloSubmission {
             if(!empty($review))
                 return true;
         }
-
         return false;
     }
 
     public function getLastDecision() : string {
-        return $this->lastDecision;
+        return $this->fillEmptyFields($this->lastDecision, $this->noDecision);
     }
 }

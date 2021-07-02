@@ -216,6 +216,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         $this->assertEquals($expectedEditors, $scieloSubmission->getJournalEditors());
     }
 
+    public function testSubmissionGetsNoEditorsInOJS() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $scieloSubmission->getJournalEditors());
+    }
+
     public function testSubmissionGetsSectionEditorInOJS() : void {
         $sectionEditorsUser = $this->createEditorUsers(true);
 
@@ -247,6 +254,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase {
         
         $report = new ArticleReportPlugin();
         $this->assertEquals($report->getDecisionMessage($decision), $scieloSubmission->getLastDecision());
+    }
+
+    public function testSubmissionGetsNoLastDecisionInOJS() : void {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        
+        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $scieloSubmission->getLastDecision());
     }
     
     public function testSubmissionGetsReviewsInOJS() : void {

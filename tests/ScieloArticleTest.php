@@ -64,7 +64,7 @@ class ScieloArticleTest extends TestCase {
 
     public function testHasNoLastDecision() : void {
         $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, "");
-        $this->assertEquals("", $article->getLastDecision());
+        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $article->getLastDecision());
     }
 
     public function testHasReviewsWhenHasAtLeastOneReview() : void {
