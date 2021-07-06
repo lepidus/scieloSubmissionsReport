@@ -32,6 +32,7 @@
     <message key="plugins.reports.scieloSubmissionsReport.warning.noNotes">No notes</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noModerators">No moderators assigned</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noEditors">No editors assigned</message>
+    <message key="plugins.reports.scieloSubmissionsReport.warning.noDecision">No decision</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noSubmitter">The submitting author was not found</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus">No publication's status</message>
     <message key="plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI">No publication's DOI</message>
@@ -57,4 +58,3 @@
     <message key="plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime">Average reviewing time (in days) of approved and rejected manuscripts (disregarding rejected submissions on receipt)</message>
     <message key="plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval">Time between submission and final decision</message>
 </locale>
-

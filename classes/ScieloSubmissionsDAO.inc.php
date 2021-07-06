@@ -11,8 +11,9 @@
 
 import('lib.pkp.classes.db.DAO');
 import('classes.log.SubmissionEventLogEntry');
-import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import ('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
+import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
+import('plugins.reports.articles.ArticleReportPlugin');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -95,11 +96,11 @@ class ScieloSubmissionsDAO extends DAO {
 		return $userId;
 	}
 
-	private function _submissionFromRow($row){
+	private function _submissionFromRow($row) {
 		return $row['submission_id'];
 	}
 
-	private function _finalDecisionFromRow($row, $locale){
+	private function _finalDecisionFromRow($row, $locale) {
 		$dateDecided = $row['date_decided'];
 		$decision = "";
 		
@@ -118,7 +119,7 @@ class ScieloSubmissionsDAO extends DAO {
         return ($relationId && $publicationDOI) ? $publicationDOI : "";
 	}
 
-	public function getAllModeratorsBySubmissionId($submissionId) {
+	public function getAllModeratorsBySubmissionId($submissionId) : array {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
@@ -133,15 +134,53 @@ class ScieloSubmissionsDAO extends DAO {
 			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
 			
-				if ($currentUserGroupName == 'section moderator')
-					$sectionModerator = $user->getFullName();
-				if ($currentUserGroupName == 'moderator')
-					array_push($moderatorUsers, $user->getFullName());
+			if ($currentUserGroupName == 'section moderator')
+				$sectionModerator = $user->getFullName();
+			if ($currentUserGroupName == 'moderator')
+				array_push($moderatorUsers, $user->getFullName());
 		}
-		return [$sectionModerator, array(!empty($moderatorUsers) ? implode(",", $moderatorUsers) : "")];
+		return [$sectionModerator, !empty($moderatorUsers) ? implode(",", $moderatorUsers) : array()];
 	}
 
-	public function getSubmissionNotes($submissionId) {
+	public function getEditors($submissionId) : array {
+		$userDao = DAORegistry::getDAO('UserDAO');
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+		$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+		$stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, 5);
+		$stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, 5);
+		
+		$journalEditors = array();
+		$sectionEditor = '';
+
+		while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
+			$user = $userDao->getById($stageAssignment->getUserId(), false);
+			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $currentUserGroupName = strtolower($userGroup->getName('en_US'));			
+			if ($currentUserGroupName == 'editor')
+				array_push($journalEditors, $user->getFullName());
+		}
+		while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
+			$user = $userDao->getById($stageAssignment->getUserId(), false);
+			$userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+			if ($currentUserGroupName == 'section editor')
+				$sectionEditor = $user->getFullName();
+		}
+		return [$journalEditors, $sectionEditor];
+	}
+
+	public function getLastDecision($submissionId) : string {
+        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
+        $decisionsSubmission = $editDecisionDao->getEditorDecisions($submissionId); 
+		$lastDecision = '';
+        foreach($decisionsSubmission as $decisions) {
+			$lastDecision = $decisions['decision'];
+        }
+		$report = new ArticleReportPlugin();
+        return $report->getDecisionMessage($lastDecision);
+    }
+
+	public function getSubmissionNotes($submissionId) : array {
         $resultNotes = Capsule::table('notes')
 		->where('assoc_type', 1048585)
 		->where('assoc_id', $submissionId)
@@ -157,7 +196,20 @@ class ScieloSubmissionsDAO extends DAO {
         return $notes;
     }
 
+	public function getReviews($submissionId) : array {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $submissionReviews = $reviewAssignmentDao->getBySubmissionId($submissionId);
+        $completeReviews = false;
+        $reviews = array();
 
+        foreach($submissionReviews as $review) {
+            if($review->getDateCompleted()){
+                $completeReviews = true;
+                $reviews[] = $review->getLocalizedRecommendation();
+            }
+        }
+        return $reviews;
+    }
 }
 
 ?>

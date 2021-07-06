@@ -53,9 +53,32 @@ class ScieloSubmissionFactory {
             );
             return $scieloPreprint;
         }
+        if ($application == 'ojs') {
+            list($editors, $sectionEditor) = $scieloSubmissionsDao->getEditors($submissionId);
+            $reviews = $scieloSubmissionsDao->getReviews($submissionId);
+            $lastDecision = $scieloSubmissionsDao->getLastDecision($submissionId);
+
+            $scieloArticle = new ScieloArticle(
+                $submissionId,
+                $submissionTitle,
+                $submitter,
+                $dateSubmitted,
+                $daysUntilStatusChange,
+                $status,
+                $authors,
+                $sectionName,
+                $language,
+                $finalDecision,
+                $finalDecisionDate,
+                $editors,
+                $sectionEditor,
+                $reviews,
+                $lastDecision
+            );
+            return $scieloArticle;
+        }
 
         $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, $finalDecision, $finalDecisionDate);
-
         return $scieloSubmission;
     }
 
