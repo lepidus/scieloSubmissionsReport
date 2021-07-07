@@ -37,6 +37,14 @@ class ScieloSubmissionFactory
         );
     }
 
+    protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array
+    {
+        $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($this->application, $submissionId, $locale);
+        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
+        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
+        return array($finalDecision, $finalDecisionDate);
+    }
+
     protected function retrieveSectionName($publication, $locale)
     {
         $sectionId = $publication->getData('sectionId');
@@ -47,7 +55,7 @@ class ScieloSubmissionFactory
     protected function retrieveSubmitter($submissionId)
     {
         $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $userId = $scieloSubmissionsDao->getIdSubmitterUser($submissionId);
+        $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
 
         if (is_null($userId)) {
             return "";

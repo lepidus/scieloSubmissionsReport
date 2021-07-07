@@ -11,7 +11,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
     {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();
-        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $scieloPreprintsDAO = new ScieloPreprintsDAO();
 
         $submissionTitle = $publication->getData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
@@ -21,15 +21,12 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $authors = $this->retrieveAuthors($publication, $locale);
         $sectionName = $this->retrieveSectionName($publication, $locale);
         $language = $submission->getData('locale');
-
-        $finalDecisionWithDate = $scieloSubmissionsDao->getFinalDecisionWithDate($this->application, $submissionId, $locale);
-        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
-        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
-
+        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
+        $sectionModerator = $scieloPreprintsDAO->getSectionModerator($submissionId);
+        $moderators = $scieloPreprintsDAO->getModerators($submissionId);
         $publicationStatus = $publication->getData('status');
-        $publicationDOI = $scieloSubmissionsDao->getPublicationDOIBySubmission($submission);
-        list($sectionModerator, $moderators) = $scieloSubmissionsDao->getAllModeratorsBySubmissionId($submissionId);
-        $notes = $scieloSubmissionsDao->getSubmissionNotes($submissionId);
+        $publicationDOI = $scieloPreprintsDAO->getPublicationDOIBySubmission($submission);
+        $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
 
         return new ScieloPreprint(
             $submissionId,

@@ -11,7 +11,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
     {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();
-        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $scieloArticlesDAO = new ScieloArticlesDAO();
 
         $submissionTitle = $publication->getData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
@@ -22,10 +22,11 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $sectionName = $this->retrieveSectionName($publication, $locale);
         $language = $submission->getData('locale');
 
-        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionsDao, $submissionId, $locale);
-        list($editors, $sectionEditor) = $scieloSubmissionsDao->getEditors($submissionId);
-        $reviews = $scieloSubmissionsDao->getReviews($submissionId);
-        $lastDecision = $scieloSubmissionsDao->getLastDecision($submissionId);
+        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
+        $editors = $scieloArticlesDAO->getEditors($submissionId);
+        $sectionEditor = $scieloArticlesDAO->getSectionEditor($submissionId);
+        $reviews = $scieloArticlesDAO->getReviews($submissionId);
+        $lastDecision = $scieloArticlesDAO->getLastDecision($submissionId);
 
         return new ScieloArticle(
             $submissionId,
@@ -46,11 +47,4 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         );
     }
 
-    private function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionsDao, $submissionId, $locale): array
-    {
-        $finalDecisionWithDate = $scieloSubmissionsDao->getFinalDecisionWithDate($this->application, $submissionId, $locale);
-        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
-        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
-        return array($finalDecision, $finalDecisionDate);
-    }
 }

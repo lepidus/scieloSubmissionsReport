@@ -1,7 +1,8 @@
 <?php
 import ('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
+import ('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
 import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory {
@@ -18,8 +19,14 @@ class ScieloSubmissionsReportFactory {
         
         $finalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval) : null);
 
-        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $submissionsIds = $scieloSubmissionsDao->getSubmissions($application, $locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        if($application == 'ops'){
+            $scieloPreprintsDao = new ScieloPreprintsDAO();
+            $submissionsIds = $scieloPreprintsDao->getSubmissions($locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        }
+        else if($application == 'ojs') {
+            $scieloArticlesDao = new ScieloArticlesDAO();
+            $submissionsIds = $scieloArticlesDao->getSubmissions($locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        }
         
         return new ScieloSubmissionsReport($sections, $submissionsIds);
     }

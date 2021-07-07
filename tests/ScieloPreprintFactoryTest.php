@@ -177,7 +177,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     }
 
 
-    public function testSubmissionGetsFinalDecisionWithDatePostedInOPS(): void
+    public function testSubmissionGetsFinalDecisionWithDatePosted(): void
     {
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-31';
@@ -194,7 +194,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
-    public function testSubmissionGetsPublicationStatusInOPS(): void
+    public function testSubmissionGetsPublicationStatus(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -202,7 +202,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
     }
 
-    public function testSubmissionGetsPublicationDOIInOPS(): void
+    public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -210,7 +210,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->doi, $scieloPreprint->getPublicationDOI());
     }
 
-    public function testSubmissionWithoutPublicationDOIInOPS(): void
+    public function testSubmissionWithoutPublicationDOI(): void
     {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = $publicationDao->getById($this->publicationId);
@@ -224,7 +224,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
 
-    public function testSubmissionIsPreprintInOPS(): void
+    public function testSubmissionIsPreprint(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -232,7 +232,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
 
-    public function testSubmissionGetsModeratorsInOPS(): void
+    public function testSubmissionGetsModerators(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
@@ -256,7 +256,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedModerators, $scieloPreprint->getModerators());
     }
 
-    public function testSubmissionGetsSectionModeratorInOPS(): void
+    public function testSubmissionGetsSectionModerator(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
@@ -277,7 +277,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerator());
     }
 
-    public function testSubmissionGetsNotesInOPS(): void
+    public function testSubmissionGetsNotes(): void
     {
         $noteDao = DAORegistry::getDAO('NoteDAO');
         $contentsForFirstNote = "Um breve resumo sobre a inteligência computacional";
@@ -302,7 +302,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
     }
 
-    public function testSubmissionDoesNotHaveNotesInOPS(): void
+    public function testSubmissionDoesNotHaveNotes(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
