@@ -1,14 +1,15 @@
 <?php
+
 import('lib.pkp.tests.DatabaseTestCase');
 import('classes.submission.Submission');
 import('classes.publication.Publication');
 import('classes.journal.Section');
 import('classes.article.Author');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintFactory');
 import('classes.workflow.EditorDecisionActionsManager');
 
-class ScieloPreprintFactoryTest extends DatabaseTestCase {
-    private $application = 'ops';
+class ScieloPreprintFactoryTest extends DatabaseTestCase
+{
     private $locale = 'en_US';
     private $contextId = 1;
     private $submissionId;
@@ -23,7 +24,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
     private $submissionAuthors;
     private $doi = "10.666/949494";
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         parent::setUp();
         $sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
@@ -33,11 +35,13 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         $this->addCurrentPublicationToSubmission();
     }
 
-    protected function getAffectedTables() {
+    protected function getAffectedTables()
+    {
         return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
-    private function createSubmission() : int {
+    private function createSubmission(): int
+    {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = new Submission();
         $submission->setData('contextId', $this->contextId);
@@ -45,11 +49,12 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         $submission->setData('status', $this->statusCode);
         $submission->setData('locale', $this->locale);
         $submission->setData('dateLastActivity', $this->dateLastActivity);
-        
+
         return $submissionDao->insertObject($submission);
     }
 
-    private function createPublication($sectionId) : int {
+    private function createPublication($sectionId): int
+    {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = new Publication();
         $publication->setData('submissionId', $this->submissionId);
@@ -62,7 +67,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         return $publicationDao->insertObject($publication);
     }
 
-    private function createSection() : int {
+    private function createSection(): int
+    {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $section = new Section();
         $section->setTitle($this->sectionName, $this->locale);
@@ -71,7 +77,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         return $sectionId;
     }
 
-    private function createAuthors() : array {
+    private function createAuthors(): array
+    {
         $authorDao = DAORegistry::getDAO('AuthorDAO');
         $author1 = new Author();
         $author2 = new Author();
@@ -94,14 +101,16 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
-    private function addCurrentPublicationToSubmission() : void {
+    private function addCurrentPublicationToSubmission(): void
+    {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = $submissionDao->getById($this->submissionId);
         $submission->setData('currentPublicationId', $this->publicationId);
         $submissionDao->updateObject($submission);
     }
-    
-    private function createModeratorsUsers() : array {
+
+    private function createModeratorsUsers(): array
+    {
         $userModerator = new User();
         $userModerator->setUsername('f4ustao');
         $userModerator->setEmail('faustosilva@noexists.com');
@@ -119,7 +128,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         return [$userModerator, $secondUserModerator];
     }
 
-    private function createStageAssignments(array $userIds, $groupId) : void {
+    private function createStageAssignments(array $userIds, $groupId): void
+    {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
         foreach ($userIds as $userId) {
@@ -127,12 +137,13 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
             $stageAssignment->setSubmissionId($this->submissionId);
             $stageAssignment->setUserId($userId);
             $stageAssignment->setUserGroupId($groupId);
-            $stageAssignment->setStageId(5);            
+            $stageAssignment->setStageId(5);
             $stageAssignmentDao->insertObject($stageAssignment);
         }
     }
 
-    private function createModeratorUserGroup() : int {
+    private function createModeratorUserGroup(): int
+    {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $moderatorUserGroupLocalizedNames = [
@@ -148,7 +159,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
         return $userGroupDao->insertObject($moderatorUserGroup);
     }
 
-    private function createSectionModeratorUserGroup() : int {
+    private function createSectionModeratorUserGroup(): int
+    {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $sectionModeratorUserGroupLocalizedNames = [
@@ -165,130 +177,136 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase {
     }
 
 
-    public function testSubmissionGetsFinalDecisionWithDatePostedInOPS() : void {
-            $finalDecision = __('common.accepted', [], $this->locale);
-            $finalDecisionDate = '2021-07-31';
+    public function testSubmissionGetsFinalDecisionWithDatePostedInOPS(): void
+    {
+        $finalDecision = __('common.accepted', [], $this->locale);
+        $finalDecisionDate = '2021-07-31';
 
-            $publicationDao = DAORegistry::getDAO('PublicationDAO');
-            $publication = $publicationDao->getById($this->publicationId);
-            $publication->setData('datePublished', $finalDecisionDate);
-            $publicationDao->updateObject($publication);
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+        $publication = $publicationDao->getById($this->publicationId);
+        $publication->setData('datePublished', $finalDecisionDate);
+        $publicationDao->updateObject($publication);
 
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-            $this->assertEquals($finalDecision, $scieloSubmission->getFinalDecision());
-            $this->assertEquals($finalDecisionDate, $scieloSubmission->getFinalDecisionDate());
+        $this->assertEquals($finalDecision, $scieloPreprint->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
-    public function testSubmissionGetsPublicationStatusInOPS() : void {
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloPreprint = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+    public function testSubmissionGetsPublicationStatusInOPS(): void
+    {
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-            $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
+        $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
     }
 
-    public function testSubmissionGetsPublicationDOIInOPS() : void {
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+    public function testSubmissionGetsPublicationDOIInOPS(): void
+    {
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-            $this->assertEquals($this->doi, $scieloSubmission->getPublicationDOI());
+        $this->assertEquals($this->doi, $scieloPreprint->getPublicationDOI());
     }
 
-    public function testSubmissionWithoutPublicationDOIInOPS() : void {
-            $publicationDao = DAORegistry::getDAO('PublicationDAO');
-            $publication = $publicationDao->getById($this->publicationId);
-            $publication->setData('vorDoi', NULL);
-            $publicationDao->updateObject($publication);
+    public function testSubmissionWithoutPublicationDOIInOPS(): void
+    {
+        $publicationDao = DAORegistry::getDAO('PublicationDAO');
+        $publication = $publicationDao->getById($this->publicationId);
+        $publication->setData('vorDoi', null);
+        $publicationDao->updateObject($publication);
 
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-            $expectedResult = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+        $expectedResult = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
 
-            $this->assertEquals($expectedResult, $scieloSubmission->getPublicationDOI());
+        $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
 
-    public function testSubmissionIsPreprintInOPS() : void {
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
+    public function testSubmissionIsPreprintInOPS(): void
+    {
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-            $this->assertTrue($scieloSubmission instanceof ScieloPreprint);
-    }
-        
-    public function testSubmissionGetsModeratorsInOPS() : void {
-            $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-            $userDao = DAORegistry::getDAO('UserDAO');
-
-            $moderatorGroupId = $this->createModeratorUserGroup();
-            
-            $moderatorUsers = $this->createModeratorsUsers();
-            $firstModeratorId = $userDao->insertObject($moderatorUsers[0]);
-            $secondModeratorId = $userDao->insertObject($moderatorUsers[1]);
-            
-            $userGroupDao->assignUserToGroup($firstModeratorId, $moderatorGroupId);
-            $userGroupDao->assignUserToGroup($secondModeratorId, $moderatorGroupId);
-            
-            $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
-            
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-            
-            $expectedModerators = $moderatorUsers[0]->getFullName() . "," . $moderatorUsers[1]->getFullName();
-            
-            $this->assertEquals($expectedModerators, $scieloSubmission->getModerators());
+        $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
 
-    public function testSubmissionGetsSectionModeratorInOPS() : void {
-            $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-            $userDao = DAORegistry::getDAO('UserDAO');
+    public function testSubmissionGetsModeratorsInOPS(): void
+    {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
 
-            $userSectionModerator = $this->createModeratorsUsers()[0];
-            $userSectionModeratorId = $userDao->insertObject($userSectionModerator);
-            $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
-            
-            $userGroupDao->assignUserToGroup($userSectionModeratorId, $sectionModeratorUserGroupId);
-            
-            $this->createStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
-            
-            $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, 5);
-            
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-            
-            $this->assertEquals($userSectionModerator->getFullName(), $scieloSubmission->getSectionModerator());
+        $moderatorGroupId = $this->createModeratorUserGroup();
+
+        $moderatorUsers = $this->createModeratorsUsers();
+        $firstModeratorId = $userDao->insertObject($moderatorUsers[0]);
+        $secondModeratorId = $userDao->insertObject($moderatorUsers[1]);
+
+        $userGroupDao->assignUserToGroup($firstModeratorId, $moderatorGroupId);
+        $userGroupDao->assignUserToGroup($secondModeratorId, $moderatorGroupId);
+
+        $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
+
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $expectedModerators = $moderatorUsers[0]->getFullName() . "," . $moderatorUsers[1]->getFullName();
+
+        $this->assertEquals($expectedModerators, $scieloPreprint->getModerators());
     }
 
-    public function testSubmissionGetsNotesInOPS() : void {
-            $noteDao = DAORegistry::getDAO('NoteDAO');
-            $contentsForFirstNote = "Um breve resumo sobre a inteligência computacional";
-            $contentsForSecondNote = "Algoritmos Genéticos: Implementação no jogo do dino";
+    public function testSubmissionGetsSectionModeratorInOPS(): void
+    {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
 
-            $note = $noteDao->newDataObject();
-            $note->setContents($contentsForFirstNote);
-            $note->setAssocType(1048585);
-            $note->setAssocId($this->submissionId);
-            $noteDao->insertObject($note);
+        $userSectionModerator = $this->createModeratorsUsers()[0];
+        $userSectionModeratorId = $userDao->insertObject($userSectionModerator);
+        $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
 
-            $note = $noteDao->newDataObject();
-            $note->setContents($contentsForSecondNote);
-            $note->setAssocType(1048585);
-            $note->setAssocId($this->submissionId);
-            $noteDao->insertObject($note);
+        $userGroupDao->assignUserToGroup($userSectionModeratorId, $sectionModeratorUserGroupId);
 
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-            $expectedResult = "Note: Um breve resumo sobre a inteligência computacional. Note: Algoritmos Genéticos: Implementação no jogo do dino";
+        $this->createStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
 
-            $this->assertEquals($expectedResult, $scieloSubmission->getNotes());
-    }
-        
-    public function testSubmissionDoesNotHaveNotesInOPS() : void {
-            $submissionFactory = new ScieloSubmissionFactory();
-            $scieloSubmission = $submissionFactory->createSubmission($this->application, $this->submissionId, $this->locale);
-            
-            $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloSubmission->getNotes());
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, 5);
+
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerator());
     }
 
+    public function testSubmissionGetsNotesInOPS(): void
+    {
+        $noteDao = DAORegistry::getDAO('NoteDAO');
+        $contentsForFirstNote = "Um breve resumo sobre a inteligência computacional";
+        $contentsForSecondNote = "Algoritmos Genéticos: Implementação no jogo do dino";
+
+        $note = $noteDao->newDataObject();
+        $note->setContents($contentsForFirstNote);
+        $note->setAssocType(1048585);
+        $note->setAssocId($this->submissionId);
+        $noteDao->insertObject($note);
+
+        $note = $noteDao->newDataObject();
+        $note->setContents($contentsForSecondNote);
+        $note->setAssocType(1048585);
+        $note->setAssocId($this->submissionId);
+        $noteDao->insertObject($note);
+
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+        $expectedResult = "Note: Um breve resumo sobre a inteligência computacional. Note: Algoritmos Genéticos: Implementação no jogo do dino";
+
+        $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
+    }
+
+    public function testSubmissionDoesNotHaveNotesInOPS(): void
+    {
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloPreprint->getNotes());
+    }
 }
-
-?>
