@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+<version>
+	<application>scieloSubmissionsReport</application>
+	<type>plugins.reports</type>
+	<release>1.5.0.0</release>
+	<date></date>
+	<lazy-load>1</lazy-load>
+	<class>ScieloSubmissionsReportPlugin</class>
+</version>
