@@ -58,7 +58,7 @@ class ScieloSubmissionsDAO extends DAO
         return $submissions;
     }
 
-    protected function getFinalDecisionWithDate($submissionId, $locale)
+    public function getFinalDecisionWithDate($submissionId, $locale)
     {
         $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file plugins/reports/scieloSubmissionsReport/classes/ScieloArticlesDAO.inc.php
  *
@@ -40,7 +39,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $userDao = DAORegistry::getDAO('UserDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), false);
@@ -58,7 +57,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $userDao = DAORegistry::getDAO('UserDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, SUBMISSION_STAGE_ID);
+        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
         $journalEditors = array();
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {

@@ -5,7 +5,7 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
-    private $application = 'ojs';
+    protected $application = 'ojs';
 
     public function createSubmission(int $submissionId, string $locale): ScieloArticle
     {

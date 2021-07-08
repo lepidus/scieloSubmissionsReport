@@ -39,7 +39,7 @@ class ScieloSubmissionFactory
 
     protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array
     {
-        $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($this->application, $submissionId, $locale);
+        $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($submissionId, $locale);
         $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
         $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
         return array($finalDecision, $finalDecisionDate);

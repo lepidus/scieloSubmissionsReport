@@ -5,7 +5,7 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory'
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory
 {
-    private $application = 'ops';
+    protected $application = 'ops';
 
     public function createSubmission(int $submissionId, string $locale): ScieloPreprint
     {
