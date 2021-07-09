@@ -11,15 +11,8 @@
  * @brief SciELO Submissions report Form
  */
 import('lib.pkp.classes.form.Form');
-
-function startDateLessThanEndDate($startDate, $endDate)
-{
-    if ($startDate<=$endDate) {
-        return true;
-    } else {
-        return false;
-    }
-}
+import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
 
 class ScieloSubmissionsReportForm extends Form
 {
@@ -57,36 +50,37 @@ class ScieloSubmissionsReportForm extends Form
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
     }
 
-    /*public function generateReport($request, $sessions, $initialSubmissionDate = null, $finalSubmissionDate = null, $initialDecisionDate = null, $finalDecisionDate = null)
+    public function generateReport($request, $sections, $startSubmissionDateInterval = null, $endSubmissionDateInterval = null, $startFinalDecisionDateInterval = null, $endFinalDecisionDateInterval = null)
     {
-        if ($initialSubmissionDate && !startDateLessThanEndDate($initialSubmissionDate, $finalSubmissionDate)) {
+        if(!is_null($startSubmissionDateInterval))
+            $submissionDateInterval = new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval);
+        
+        if(!is_null($startFinalDecisionDateInterval))
+            $finalDecisionDateInterval = new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
+
+        if (!$submissionDateInterval->isValid()) {
             echo __('plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
             return;
         }
 
-        if ($initialDecisionDate && !startDateLessThanEndDate($initialDecisionDate, $finalDecisionDate)) {
+        if (!$finalDecisionDateInterval->isValid()) {
             echo __('plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
             return;
         }
 
-        $journal = $request->getJournal();
+        $context = $request->getContext();
         header('content-type: text/comma-separated-values');
-        $acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $journal->getLocalizedAcronym());
+        $acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $context->getLocalizedAcronym());
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
-        $scieloSubmissionsReportDAO = DAORegistry::getDAO('ScieloSubmissionsReportDAO');
+        
+        //Gerar o csv
+        $application = substr(Application::getName(), 0, 3);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory();
+        $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval);
 
-        $submissionsData = $scieloSubmissionsReportDAO->getReportWithSections($this->_application, $journal->getId(), $initialSubmissionDate, $finalSubmissionDate, $initialDecisionDate, $finalDecisionDate, $sessions);
-        $fp = fopen('php://output', 'wt');
-
-        // Add BOM (byte order mark) to fix UTF-8 in Excel
-        fprintf($fp, chr(0xEF).chr(0xBB).chr(0xBF));
-
-        $this->printCsvHeader($fp);
-        foreach ($submissionsData as $submissionLine) {
-            fputcsv($fp, $submissionLine);
-        }
-        fclose($fp);
-    }*/
+        $csvFile = fopen('php://output', 'wt');
+        $scieloSubmissionsReport->buildCSV($csvFile);
+    }
 
     public function display($request = null, $template = null)
     {

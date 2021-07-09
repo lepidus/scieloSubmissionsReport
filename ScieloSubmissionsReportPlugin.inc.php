@@ -92,15 +92,15 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($requestHandler->isPost($request)) {
             $postVars = $requestHandler->getUserVars($request);
             if ($postVars['generate'] === "1") {
-                array_key_exists('sessions', $postVars) ? $sessions = $postVars['sessions'] : $sessions = null;
+                array_key_exists('sections', $postVars) ? $sections = $postVars['sections'] : $sections = null;
                 $filterType = $postVars['selectFilterTypeDate'];
 
                 if ($filterType == 1) {
-                    $form->generateReport($request, $sessions, $postVars['initialSubmissionDate'], $postVars['finalSubmissionDate']);
+                    $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval']);
                 } elseif ($filterType == 2) {
-                    $form->generateReport($request, $sessions, null, null, $postVars['initialDecisionDate'], $postVars['finalDecisionDate']);
+                    $form->generateReport($request, $sections, null, null, $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
                 } else {
-                    $form->generateReport($request, $sessions, $postVars['initialSubmissionDate'], $postVars['finalSubmissionDate'], $postVars['initialDecisionDate'], $postVars['finalDecisionDate']);
+                    $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval'], $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
                 }
             }
         } else {
