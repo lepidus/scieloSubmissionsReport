@@ -1,11 +1,11 @@
 <?php
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
-import('classes.log.SubmissionEventLogEntry');
 
-class ScieloSubmissionFactory {
-    
-    public function createSubmission(string $application, int $submissionId, string $locale) : ScieloSubmission {
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+
+class ScieloSubmissionFactory
+{
+    public function createSubmission(int $submissionId, string $locale): ScieloSubmission
+    {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = $submissionDao->getById($submissionId);
         $publication = $submission->getCurrentPublication();
@@ -14,87 +14,61 @@ class ScieloSubmissionFactory {
         $submitter = $this->retrieveSubmitter($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $status = __($submission->getStatusKey());
-        $sectionId = $publication->getData('sectionId');
-        $section = DAORegistry::getDAO('SectionDAO')->getById($sectionId);
-        $sectionName = $section->getTitle($locale);
+        $sectionName = $this->retrieveSectionName($publication, $locale);
         $language = $submission->getData('locale');
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
         $authors = $this->retrieveAuthors($publication, $locale);
 
-        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $finalDecisionWithDate = $scieloSubmissionsDao->getFinalDecisionWithDate($application, $submissionId, $locale);
+        $finalDecision = "";
+        $finalDecisionDate = "";
 
-        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
-        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
-
-        if ($application == 'ops') {
-            $publicationStatus = $publication->getData('status');
-            $publicationDOI = $scieloSubmissionsDao->getPublicationDOIBySubmission($submission);
-            list($sectionModerator, $moderators) = $scieloSubmissionsDao->getAllModeratorsBySubmissionId($submissionId);
-            $notes = $scieloSubmissionsDao->getSubmissionNotes($submissionId);
-
-            $scieloPreprint = new ScieloPreprint(
-                $submissionId,
-                $submissionTitle,
-                $submitter,
-                $dateSubmitted,
-                $daysUntilStatusChange,
-                $status,
-                $authors,
-                $sectionName,
-                $language,
-                $finalDecision,
-                $finalDecisionDate,
-                $moderators,
-                $sectionModerator,
-                $publicationStatus,
-                $publicationDOI,
-                $notes
-            );
-            return $scieloPreprint;
-        }
-        if ($application == 'ojs') {
-            list($editors, $sectionEditor) = $scieloSubmissionsDao->getEditors($submissionId);
-            $reviews = $scieloSubmissionsDao->getReviews($submissionId);
-            $lastDecision = $scieloSubmissionsDao->getLastDecision($submissionId);
-
-            $scieloArticle = new ScieloArticle(
-                $submissionId,
-                $submissionTitle,
-                $submitter,
-                $dateSubmitted,
-                $daysUntilStatusChange,
-                $status,
-                $authors,
-                $sectionName,
-                $language,
-                $finalDecision,
-                $finalDecisionDate,
-                $editors,
-                $sectionEditor,
-                $reviews,
-                $lastDecision
-            );
-            return $scieloArticle;
-        }
-
-        $scieloSubmission = new ScieloSubmission($submissionId, $submissionTitle, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $sectionName, $language, $finalDecision, $finalDecisionDate);
-        return $scieloSubmission;
+        return new ScieloSubmission(
+            $submissionId,
+            $submissionTitle,
+            $submitter,
+            $dateSubmitted,
+            $daysUntilStatusChange,
+            $status,
+            $authors,
+            $sectionName,
+            $language,
+            $finalDecision,
+            $finalDecisionDate
+        );
     }
 
-    private function retrieveSubmitter($submissionId) {
-        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $userId = $scieloSubmissionsDao->getIdSubmitterUser($submissionId);
+    protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array
+    {
+        $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($submissionId, $locale);
+        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
+        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
+        return array($finalDecision, $finalDecisionDate);
+    }
 
-        if(is_null($userId)) return "";
-        
+    protected function retrieveSectionName($publication, $locale)
+    {
+        $sectionId = $publication->getData('sectionId');
+        $section = DAORegistry::getDAO('SectionDAO')->getById($sectionId);
+        return $section->getTitle($locale);
+    }
+
+    protected function retrieveSubmitter($submissionId)
+    {
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
+
+        if (is_null($userId)) {
+            return "";
+        }
+
         $userDao = DAORegistry::getDAO('UserDAO');
         $submitter = $userDao->getById($userId);
-        
+
         return $submitter->getFullName();
     }
 
-    private function calculateDaysUntilStatusChange($submission) {
+    protected function calculateDaysUntilStatusChange($submission)
+    {
         $dateSubmitted = new DateTime($submission->getData('dateSubmitted'));
         $dateLastActivity = new DateTime($submission->getData('dateLastActivity'));
         $daysUntilStatusChange = $dateLastActivity->diff($dateSubmitted)->format('%a');
@@ -102,20 +76,18 @@ class ScieloSubmissionFactory {
         return $daysUntilStatusChange;
     }
 
-    private function retrieveAuthors($publication, $locale){
+    protected function retrieveAuthors($publication, $locale)
+    {
         $authors =  $publication->getData('authors');
         $submissionAuthors = [];
 
-        foreach ($authors as $author){
+        foreach ($authors as $author) {
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
             $affiliation = $author->getAffiliation($locale);
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
-    
+
         return $submissionAuthors;
     }
-
 }
-
-?>
