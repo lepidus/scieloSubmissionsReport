@@ -104,7 +104,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 }
             }
         } else {
-            $form->display($dates);
+            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', $dates);
         }
 
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);

@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-07-09T18:28:18+00:00\n"
-"PO-Revision-Date: 2021-07-09T18:28:18+00:00\n"
+"POT-Creation-Date: 2021-07-09T19:38:52+00:00\n"
+"PO-Revision-Date: 2021-07-09T19:38:52+00:00\n"
 "Language: \n"
 
 msgid "plugins.reports.scieloSubmissionsReport.displayName"
@@ -18,28 +18,22 @@ msgid "plugins.reports.scieloSubmissionsReport.description"
 msgstr "This plugin implements a .csv format sheet report that contains information that Scielo usually request. Developed by Lepidus Tecnologia."
 
 msgid "plugins.reports.scieloSubmissionsReport.filterMessage"
-msgstr "Select the desired range below:"
+msgstr "Select the desired filtering type:"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterSubmission"
-msgstr "Filter by submission's date"
+msgstr "Filter by submitted date"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterDecision"
-msgstr "Filter by decision's date"
+msgstr "Filter by final decision date"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterBoth"
-msgstr "Filter by submission's date and decision"
+msgstr "Filter by submitted date and final decision"
 
-msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedStart"
-msgstr "Initial submission date:"
+msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedInterval"
+msgstr "Submitted date range"
 
-msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedEnd"
-msgstr "Final submission date:"
-
-msgid "plugins.reports.scieloSubmissionsReport.dateDecisionStart"
-msgstr "Initial decision date:"
-
-msgid "plugins.reports.scieloSubmissionsReport.dateDecisionEnd"
-msgstr "Final decision date:"
+msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
+msgstr "Final decision date range"
 
 msgid "plugins.reports.scieloSubmissionsReport.type"
 msgstr "Report Type"
@@ -53,17 +47,11 @@ msgstr "Period"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Sections"
 
-msgid "plugins.reports.scieloSubmissionsReport.warning.noNotes"
-msgstr "No notes"
-
 msgid "plugins.reports.scieloSubmissionsReport.warning.noModerators"
 msgstr "No moderators assigned"
 
 msgid "plugins.reports.scieloSubmissionsReport.warning.noEditors"
 msgstr "No editors assigned"
-
-msgid "plugins.reports.scieloSubmissionsReport.warning.noDecision"
-msgstr "No decision"
 
 msgid "plugins.reports.scieloSubmissionsReport.warning.noSubmitter"
 msgstr "The submitting author was not found"

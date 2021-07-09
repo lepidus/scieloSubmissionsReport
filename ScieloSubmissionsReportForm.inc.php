@@ -52,20 +52,22 @@ class ScieloSubmissionsReportForm extends Form
 
     public function generateReport($request, $sections, $startSubmissionDateInterval = null, $endSubmissionDateInterval = null, $startFinalDecisionDateInterval = null, $endFinalDecisionDateInterval = null)
     {
-        if(!is_null($startSubmissionDateInterval))
-            $submissionDateInterval = new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval);
+        $submissionDateInterval = $finalDecisionDateInterval = null;
         
-        if(!is_null($startFinalDecisionDateInterval))
-            $finalDecisionDateInterval = new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
-
-        if (!$submissionDateInterval->isValid()) {
-            echo __('plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
-            return;
+        if(!is_null($startSubmissionDateInterval)){
+            $submissionDateInterval = new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval);
+            if (!$submissionDateInterval->isValid()) {
+                echo __('plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
+                return;
+            }
         }
-
-        if (!$finalDecisionDateInterval->isValid()) {
-            echo __('plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
-            return;
+        
+        if(!is_null($startFinalDecisionDateInterval)){
+            $finalDecisionDateInterval = new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
+            if (!$finalDecisionDateInterval->isValid()) {
+                echo __('plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
+                return;
+            }
         }
 
         $context = $request->getContext();
@@ -75,24 +77,39 @@ class ScieloSubmissionsReportForm extends Form
         
         //Gerar o csv
         $application = substr(Application::getName(), 0, 3);
+        $locale = AppLocale::getLocale();
         $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory();
-        $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval);
+        $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval, $locale);
 
         $csvFile = fopen('php://output', 'wt');
         $scieloSubmissionsReport->buildCSV($csvFile);
     }
 
-    public function display($request = null, $template = null)
+    public function display($request = null, $template = null, $args = null)
     {
-        $sections = $this->getAvailableSections($this->contextId());
+        $sections = $this->getAvailableSections($this->contextId);
         $sections_options = $this->getSectionsOptions($this->contextId, $sections);
 
         $templateManager = TemplateManager::getManager();
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', array(0=>$request[0], 1=>$request[1]));
+        $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
+        $templateManager->assign([
+			'breadcrumbs' => [
+				[
+					'id' => 'reports',
+					'name' => __('manager.statistics.reports'),
+					'url' => $request->getRouter()->url($request, null, 'stats', 'reports'),
+				],
+				[
+					'id' => 'scieloSubmissionsReport',
+					'name' => __('plugins.reports.scieloSubmissionsReport.displayName')
+				],
+			],
+			'pageTitle', __('plugins.reports.scieloSubmissionsReport.displayName')
+		]);
 
-        $templateManager->display($this->plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
+        $templateManager->display($this->plugin->getTemplateResource($template));
     }
 
     private function getAvailableSections($contextId) {
@@ -116,6 +133,6 @@ class ScieloSubmissionsReportForm extends Form
             }
         }
 
-        return $newSectionsOptions;
+        return $sectionsOptions;
     }
 }

@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-07-09T18:28:50+00:00\n"
-"PO-Revision-Date: 2021-07-09T18:28:50+00:00\n"
+"POT-Creation-Date: 2021-07-09T19:39:21+00:00\n"
+"PO-Revision-Date: 2021-07-09T19:39:21+00:00\n"
 "Language: \n"
 
 msgid "plugins.reports.scieloSubmissionsReport.displayName"
@@ -18,28 +18,22 @@ msgid "plugins.reports.scieloSubmissionsReport.description"
 msgstr "Este plugin implementa um relatório no formato CSV (planilha eletrônica) contendo informações que no geral são solicitadas pelo Scielo. Desenvolvido por Lepidus Tecnologia."
 
 msgid "plugins.reports.scieloSubmissionsReport.filterMessage"
-msgstr "Selecione o intervalo desejado abaixo:"
+msgstr "Selecione o tipo de filtragem desejada:"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterSubmission"
 msgstr "Filtrar por data de submissão"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterDecision"
-msgstr "Filtrar por data de decisão"
+msgstr "Filtrar por data de decisão final"
 
 msgid "plugins.reports.scieloSubmissionsReport.filterBoth"
-msgstr "Filtrar por data de submissão e decisão"
+msgstr "Filtrar por data de submissão e decisão final"
 
-msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedStart"
-msgstr "Data de submissão inicial:"
+msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedInterval"
+msgstr "Intervalo da data de submissão"
 
-msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedEnd"
-msgstr "Data de submissão final:"
-
-msgid "plugins.reports.scieloSubmissionsReport.dateDecisionStart"
-msgstr "Data de decisão inicial:"
-
-msgid "plugins.reports.scieloSubmissionsReport.dateDecisionEnd"
-msgstr "Data de decisão final:"
+msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
+msgstr "Intervalo da data de decisão final"
 
 msgid "plugins.reports.scieloSubmissionsReport.generate"
 msgstr "Gerar Relatório"
@@ -52,9 +46,6 @@ msgstr "Período"
 
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Seções"
-
-msgid "plugins.reports.scieloSubmissionsReport.warning.noNotes"
-msgstr "Sem notas"
 
 msgid "plugins.reports.scieloSubmissionsReport.warning.noModerators"
 msgstr "Sem moderadores designados"
