@@ -202,6 +202,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
     }
 
+	/**
+	 * @group OPS
+	 */
     public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -232,6 +235,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
 
+	/**
+	 * @group OPS
+	 */
     public function testSubmissionGetsModerators(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
