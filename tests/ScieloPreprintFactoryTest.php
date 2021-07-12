@@ -37,7 +37,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     protected function getAffectedTables()
     {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
+        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
+        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
     private function createSubmission(): int
@@ -254,6 +256,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
 
+        $submissionStageId = 5;
+        $userGroupDao->assignGroupToStage($this->contextId, $moderatorGroupId, $submissionStageId);
+
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
@@ -275,7 +280,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
 
-        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, 5);
+        $submissionStageId = 5;
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, $submissionStageId);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);

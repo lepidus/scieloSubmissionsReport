@@ -7,7 +7,6 @@ import('classes.journal.Section');
 import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
 import('classes.workflow.EditorDecisionActionsManager');
-import('plugins.reports.articles.ArticleReportPlugin');
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -255,8 +254,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $report = new ArticleReportPlugin();
-        $this->assertEquals($report->getDecisionMessage($decision), $scieloArticle->getLastDecision());
+        $scieloArticlesDAO = new ScieloArticlesDAO();
+        $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
     }
 
     public function testSubmissionGetsNoLastDecision(): void
