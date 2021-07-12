@@ -197,6 +197,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         }
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionIsArticle(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -205,6 +208,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsEditors(): void
     {
         $editorsUsers = $this->createEditorUsers();
@@ -216,6 +222,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsNoEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -224,6 +233,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $scieloArticle->getJournalEditors());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsSectionEditor(): void
     {
         $sectionEditorsUser = $this->createEditorUsers(true);
@@ -234,6 +246,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsNoSectionEditor(): void
     {
         $sectionEditorGroupId = $this->createSectionEditorUserGroup();
@@ -246,6 +261,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($noEditorMessage, $scieloArticle->getSectionEditor());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsLastDecision(): void
     {
         $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -258,6 +276,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsNoLastDecision(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -266,6 +287,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $scieloArticle->getLastDecision());
     }
 
+	/**
+	 * @group OJS
+	*/
     public function testSubmissionGetsReviews(): void
     {
         $recommendation = SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
@@ -288,6 +312,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($reviewAssignment->getLocalizedRecommendation(), $scieloArticle->getReviews());
     }
 
+    /**
+	 * @group OJS
+	*/
     public function testSubmissionGetsFinalDecisionWithDateInitialDecline(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -302,6 +329,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloArticle->getFinalDecisionDate());
     }
 
+    /**
+	 * @group OJS
+	*/
     public function testSubmissionGetsFinalDecisionWithDateDecline(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_DECLINE;
@@ -316,6 +346,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloArticle->getFinalDecisionDate());
     }
 
+    /**
+	 * @group OJS
+	*/
     public function testSubmissionGetsFinalDecisionWithDateAccept(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_ACCEPT;

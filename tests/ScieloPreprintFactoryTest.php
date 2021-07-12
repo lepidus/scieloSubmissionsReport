@@ -178,7 +178,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return $userGroupDao->insertObject($sectionModeratorUserGroup);
     }
 
-
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionGetsFinalDecisionWithDatePosted(): void
     {
         $finalDecision = __('common.accepted', [], $this->locale);
@@ -196,6 +198,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionGetsPublicationStatus(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -206,7 +211,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
 	/**
 	 * @group OPS
-	 */
+	*/
     public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -215,6 +220,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->doi, $scieloPreprint->getPublicationDOI());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionWithoutPublicationDOI(): void
     {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
@@ -229,6 +237,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionIsPreprint(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -267,6 +278,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedModerators, $scieloPreprint->getModerators());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionGetsSectionModerator(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
@@ -289,6 +303,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerator());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionGetsNotes(): void
     {
         $noteDao = DAORegistry::getDAO('NoteDAO');
@@ -314,6 +331,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionDoesNotHaveNotes(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
