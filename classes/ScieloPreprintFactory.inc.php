@@ -1,6 +1,7 @@
 <?php
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory
@@ -13,7 +14,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $publication = $submission->getCurrentPublication();
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
 
-        $submissionTitle = $publication->getData('title', $locale);
+        $submissionTitle = $publication->getLocalizedData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);

@@ -1,5 +1,7 @@
 <?php
 
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
+
 class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport {
     
     protected function getHeaders() : array {

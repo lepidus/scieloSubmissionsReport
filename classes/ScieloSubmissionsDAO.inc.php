@@ -10,6 +10,7 @@
  */
 
 import('lib.pkp.classes.db.DAO');
+import('classes.workflow.EditorDecisionActionsManager');
 import('classes.log.SubmissionEventLogEntry');
 import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');

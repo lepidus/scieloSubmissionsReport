@@ -1,5 +1,7 @@
 <?php
 
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+
 class ScieloPreprint extends ScieloSubmission {
 
     private $moderators;

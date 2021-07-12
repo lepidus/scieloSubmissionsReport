@@ -71,7 +71,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
                 array_push($moderatorUsers, $user->getFullName());
             }
         }
-        return !empty($moderatorUsers) ? implode(",", $moderatorUsers) : array();
+        return !empty($moderatorUsers) ? $moderatorUsers : array();
     }
 
     public function getPublicationDOIBySubmission($submission): string

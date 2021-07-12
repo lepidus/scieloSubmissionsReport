@@ -2,6 +2,7 @@
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
