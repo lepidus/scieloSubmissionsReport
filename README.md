@@ -1,4 +1,4 @@
-# SciELO Submissions Report Plugin 
+# SciELO Submissions Report Plugin
 
 This plugin generates a **CSV** spreadsheet with information that is usually requested by SciELO, based on the website submissions. It allows the user to filter submissions within a date interval, using for this the submission date, last decision date or both. The user can also filter from which sections the submissions should be obtained.
 
@@ -53,6 +53,24 @@ To download the plugin, go to the [Releases page](https://github.com/lepidus/sci
 3. Under __Upload file__ select the file __ScieloSubmissionsReportPlugin.tar.gz__.
 4. Click __Save__ and the plugin will be installed on your website.
 
+## Unit Test for Development
+
+To run the tests your plugin can't be installed in OJS/OPS through a symbolic link,
+if it is, you must copy/move it directly to the plugins/report/ directory.
+
+Then, you can run this command at application's root directory:
+
+``` bash
+find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group oppositeApplication -v "{}" ";"
+```
+
+Replace `oppositeApplication` with the application that tests will not run. E.g.: OJS or OPS
+
+Example command to run OJS tests:
+
+``` bash
+find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group OPS -v "{}" ";"
+```
 
 # License
 __This plugin is licensed under the GNU General Public License v3.0__
