@@ -62,6 +62,9 @@ msgstr "Sem estado de publicação"
 msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI"
 msgstr "Sem DOI de publicação"
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noNotes"
+msgstr "Sem notas"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate"
 msgstr "A data inicial de submissão não pode ser maior que a data final de submissão"
 

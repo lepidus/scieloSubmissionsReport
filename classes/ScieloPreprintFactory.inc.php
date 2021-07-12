@@ -13,6 +13,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
 
         $submissionTitle = $publication->getLocalizedData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
@@ -25,8 +26,8 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerator = $scieloPreprintsDAO->getSectionModerator($submissionId);
         $moderators = $scieloPreprintsDAO->getModerators($submissionId);
-        $publicationStatus = $publication->getData('status');
-        $publicationDOI = $scieloPreprintsDAO->getPublicationDOIBySubmission($submission);
+        $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publication);
+        $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publication);
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
 
         return new ScieloPreprint(

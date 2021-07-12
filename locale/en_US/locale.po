@@ -62,6 +62,9 @@ msgstr "No publication's status"
 msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI"
 msgstr "No publication's DOI"
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noNotes"
+msgstr "No notes"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate"
 msgstr "The initial submitted date cannot be greater than the final submitted date"
 

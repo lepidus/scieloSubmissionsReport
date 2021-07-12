@@ -103,7 +103,7 @@ class ScieloSubmissionsDAO extends DAO
 
     protected function finalDecisionFromRow($row, $locale)
     {
-        $dateDecided = $row['date_decided'];
+        $dateDecided = new DateTime($row['date_decided']);
         $decision = "";
 
         if ($row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
@@ -112,6 +112,6 @@ class ScieloSubmissionsDAO extends DAO
             $decision = __('common.declined', [], $locale);
         }
 
-        return new FinalDecision($decision, $dateDecided);
+        return new FinalDecision($decision, $dateDecided->format('Y-m-d'));
     }
 }

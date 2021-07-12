@@ -74,12 +74,23 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         return !empty($moderatorUsers) ? $moderatorUsers : array();
     }
 
-    public function getPublicationDOIBySubmission($submission): string
+    public function getPublicationStatus($publication): string
     {
-        $publication = $submission->getCurrentPublication();
+        $relationStatus = $publication->getData('relationStatus');
+        $relationsMap = [
+            PUBLICATION_RELATION_NONE => 'publication.relation.none',
+            PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
+            PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
+        ];
+
+        return (!is_null($relationStatus)) ? __($relationsMap[$relationStatus]) : "";
+    }
+
+    public function getPublicationDOI($publication): string
+    {
         $relationId = $publication->getData('relationStatus');
         $publicationDOI = $publication->getData('vorDoi');
-        return ($relationId && $publicationDOI) ? $publicationDOI : "";
+        return (!is_null($relationId) && !is_null($publicationDOI)) ? $publicationDOI : "";
     }
 
     public function getFinalDecisionWithDate($submissionId, $locale)
