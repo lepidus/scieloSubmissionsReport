@@ -25,7 +25,7 @@ class ScieloSubmissionsDAO extends DAO
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = Capsule::table('submissions')
-        ->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
+        ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
         ->where('submissions.context_id', $contextId)
         ->whereNotNull('submissions.date_submitted')
         ->whereIn('publications.section_id', $sectionsIds)
