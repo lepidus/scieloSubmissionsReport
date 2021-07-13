@@ -88,7 +88,8 @@ class ScieloSubmissionFactory
             $country = $author->getCountryLocalized();
             $affiliation = $author->getLocalizedData('affiliation', $locale);
 
-            $affiliation = (!empty($affiliation)) ? ($affiliation) : ("");
+            $country = (!is_null($country)) ? ($country) : ("");
+            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ("");
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
 
