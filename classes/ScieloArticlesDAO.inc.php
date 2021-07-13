@@ -71,32 +71,39 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     }
 
     public function getDecisionMessage($decision) {
-		import('classes.workflow.EditorDecisionActionsManager'); // SUBMISSION_EDITOR_...
-		switch ($decision) {
-			case SUBMISSION_EDITOR_DECISION_ACCEPT:
-				return __('editor.submission.decision.accept');
-			case SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS:
-				return __('editor.submission.decision.requestRevisions');
-			case SUBMISSION_EDITOR_DECISION_RESUBMIT:
-				return __('editor.submission.decision.resubmit');
-			case SUBMISSION_EDITOR_DECISION_DECLINE:
-				return __('editor.submission.decision.decline');
-			case SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION:
-				return __('editor.submission.decision.sendToProduction');
-			case SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW:
-				return __('editor.submission.decision.sendExternalReview');
-			case SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE:
-				return __('editor.submission.decision.decline');
-			case SUBMISSION_EDITOR_RECOMMEND_ACCEPT:
-				return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept')));
-			case SUBMISSION_EDITOR_RECOMMEND_DECLINE:
-				return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline')));
-			case SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS:
-				return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions')));
-			case SUBMISSION_EDITOR_RECOMMEND_RESUBMIT:
-				return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit')));
-			default:
-				return '';
+		import('classes.workflow.EditorDecisionActionsManager');
+
+		$messagesPerDecision = array(
+			SUBMISSION_EDITOR_DECISION_ACCEPT =>
+				__('editor.submission.decision.accept'),
+			SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS =>
+				__('editor.submission.decision.requestRevisions'),
+			SUBMISSION_EDITOR_DECISION_RESUBMIT =>
+				__('editor.submission.decision.resubmit'),
+			SUBMISSION_EDITOR_DECISION_DECLINE =>
+				__('editor.submission.decision.decline'),
+			SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION =>
+				__('editor.submission.decision.sendToProduction'),
+			SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW =>
+				__('editor.submission.decision.sendExternalReview'),
+			SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE =>
+				__('editor.submission.decision.decline'),
+			SUBMISSION_EDITOR_RECOMMEND_ACCEPT =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept'))),
+			SUBMISSION_EDITOR_RECOMMEND_DECLINE =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline'))),
+			SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions'))),
+			SUBMISSION_EDITOR_RECOMMEND_RESUBMIT =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit'))),
+		);
+
+		if ($decision) {
+			$decisionIndex = intval($decision);
+			return $messagesPerDecision[$decisionIndex];
+		}
+		else {
+			return '';
 		}
 	}
 
@@ -108,6 +115,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         foreach ($decisionsSubmission as $decisions) {
             $lastDecision = $decisions['decision'];
         }
+
         return $this->getDecisionMessage($lastDecision);
     }
 }
