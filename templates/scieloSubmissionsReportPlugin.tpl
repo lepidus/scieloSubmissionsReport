@@ -20,9 +20,9 @@
             <div id="filterTypeField">	
                 <p>{translate key="plugins.reports.scieloSubmissionsReport.filterMessage"}</p>
                 <select name="selectFilterTypeDate" id="selectFilterTypeDate">
-                    <option value="1">{translate key="plugins.reports.scieloSubmissionsReport.filterSubmission"}</option>
-                    <option value="2">{translate key="plugins.reports.scieloSubmissionsReport.filterDecision"}</option>
-                    <option value="3">{translate key="plugins.reports.scieloSubmissionsReport.filterBoth"}</option>
+                    <option value="filterBySubmission">{translate key="plugins.reports.scieloSubmissionsReport.filterSubmission"}</option>
+                    <option value="filterByFinalDecision">{translate key="plugins.reports.scieloSubmissionsReport.filterDecision"}</option>
+                    <option value="filterByBoth">{translate key="plugins.reports.scieloSubmissionsReport.filterBoth"}</option>
                 </select>
             </div>
 
@@ -99,11 +99,11 @@
 
             filterTypeSelection.addEventListener("change", function(){ldelim}
                 var selectedValue = filterTypeSelection.value;
-                if(selectedValue == 1){ldelim}
+                if(selectedValue == "filterBySubmission"){ldelim}
                     submissionDiv.hidden = false;
                     decisionDiv.hidden = true;
                 {rdelim}
-                else if(selectedValue == 2){ldelim}
+                else if(selectedValue == "filterByFinalDecision"){ldelim}
                     submissionDiv.hidden = true;
                     decisionDiv.hidden = false;
                 {rdelim}

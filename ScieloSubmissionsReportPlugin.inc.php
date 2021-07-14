@@ -95,9 +95,9 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 array_key_exists('sections', $postVars) ? $sections = $postVars['sections'] : $sections = null;
                 $filterType = $postVars['selectFilterTypeDate'];
 
-                if ($filterType == 1) {
+                if ($filterType == 'filterBySubmission') {
                     $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval']);
-                } elseif ($filterType == 2) {
+                } elseif ($filterType == 'filterByFinalDecision') {
                     $form->generateReport($request, $sections, null, null, $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
                 } else {
                     $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval'], $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
