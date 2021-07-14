@@ -23,6 +23,8 @@ class ScieloSubmissionsReportForm extends Form
     private $plugin;
 
     private $application;
+    private $submissionDateInterval;
+    private $finalDecisionDateInterval;
 
     /**
      * Constructor
@@ -34,6 +36,8 @@ class ScieloSubmissionsReportForm extends Form
         $this->application = $application;
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
+        $this->submissionDateInterval = null;
+        $this->finalDecisionDateInterval = null;
 
         parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
         $this->addCheck(new FormValidatorPost($this));
@@ -50,35 +54,31 @@ class ScieloSubmissionsReportForm extends Form
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
     }
 
-    public function generateReport($request, $sections, $startSubmissionDateInterval = null, $endSubmissionDateInterval = null, $startFinalDecisionDateInterval = null, $endFinalDecisionDateInterval = null)
+    public function setSubmissionDateInterval($submissionDateInterval)
     {
-        $submissionDateInterval = $finalDecisionDateInterval = null;
-        
-        if(!is_null($startSubmissionDateInterval)){
-            $submissionDateInterval = new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval);
-            if (!$submissionDateInterval->isValid()) {
-                echo __('plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
-                return;
-            }
-        }
-        
-        if(!is_null($startFinalDecisionDateInterval)){
-            $finalDecisionDateInterval = new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval);
-            if (!$finalDecisionDateInterval->isValid()) {
-                echo __('plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
-                return;
-            }
-        }
+        $this->submissionDateInterval = $submissionDateInterval;
+    }
 
+    public function setFinalDecisionDateInterval($finalDecisionDateInterval)
+    {
+        $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+    }
+
+    private function emitHttpHeaders($request)
+    {
         $context = $request->getContext();
         header('content-type: text/comma-separated-values');
         $acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $context->getLocalizedAcronym());
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
+    }
+
+    public function generateReport($request, $sections)
+    {
+        $this->emitHttpHeaders($request);
         
         //Gerar o csv
-        $application = substr(Application::getName(), 0, 3);
         $locale = AppLocale::getLocale();
-        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval, $locale);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
         $csvFile = fopen('php://output', 'wt');

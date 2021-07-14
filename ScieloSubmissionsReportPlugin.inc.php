@@ -15,6 +15,8 @@
 
 import('lib.pkp.classes.plugins.ReportPlugin');
 import('classes.submission.Submission');
+import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+
 class ScieloSubmissionsReportPlugin extends ReportPlugin
 {
     /**
@@ -75,6 +77,16 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return new ScieloSubmissionsReportForm($this);
     }
 
+    private function validateDateInterval($startInterval, $endInterval, $errorMessage)
+    {
+        $dateInterval = new ClosedDateInterval($startInterval, $endInterval);
+        if (!$dateInterval->isValid()) {
+            echo __($errorMessage);
+            return null;
+        }
+        return $dateInterval;
+    }
+
     /**
      * @copydoc ReportPlugin::display()
      */
@@ -95,13 +107,23 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 array_key_exists('sections', $postVars) ? $sections = $postVars['sections'] : $sections = null;
                 $filterType = $postVars['selectFilterTypeDate'];
 
-                if ($filterType == 'filterBySubmission') {
-                    $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval']);
-                } elseif ($filterType == 'filterByFinalDecision') {
-                    $form->generateReport($request, $sections, null, null, $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
-                } else {
-                    $form->generateReport($request, $sections, $postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval'], $postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval']);
+                if ($filterType == 'filterBySubmission' || $filterType == 'filterByBoth') {
+                    $submissionDateInterval = $this->validateDateInterval($postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
+                    if(is_null($submissionDateInterval))
+                        return;
+                    else
+                        $form->setSubmissionDateInterval($submissionDateInterval);
                 }
+                
+                if ($filterType == 'filterByFinalDecision' || $filterType == 'filterByBoth') {
+                    $finalDecisionDateInterval = $this->validateDateInterval($postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
+                    if(is_null($finalDecisionDateInterval))
+                        return;
+                    else
+                        $form->setFinalDecisionDateInterval($finalDecisionDateInterval);
+                }
+
+                $form->generateReport($request, $sections);
             }
         } else {
             $form->display($request, 'scieloSubmissionsReportPlugin.tpl', $dates);
