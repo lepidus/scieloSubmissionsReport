@@ -78,8 +78,8 @@ class ScieloSubmissionsReportForm extends Form
         //Gerar o csv
         $application = substr(Application::getName(), 0, 3);
         $locale = AppLocale::getLocale();
-        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory();
-        $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval, $locale);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($application, $this->contextId, $sections, $submissionDateInterval, $finalDecisionDateInterval, $locale);
+        $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
         $csvFile = fopen('php://output', 'wt');
         $scieloSubmissionsReport->buildCSV($csvFile);

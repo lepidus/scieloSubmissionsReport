@@ -12,51 +12,56 @@ import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory
 {
-    public function createReport(string $application, int $contextId, array $sectionIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale): ScieloSubmissionsReport
+    private $application;
+    private $locale;
+    private $contextId;
+    private $sectionsIds;
+    private $submissionDateInterval;
+    private $finalDecisionDateInterval;
+
+    public function __construct(string $application, int $contextId, array $sectionsIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale)
+    {
+        $this->application = $application;
+        $this->locale = $locale;
+        $this->contextId = $contextId;
+        $this->sectionsIds = $sectionsIds;
+        $this->submissionDateInterval = $submissionDateInterval;
+        $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+    }
+    
+    public function createReport(): ScieloSubmissionsReport
     {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sections = [];
 
-        foreach ($sectionIds as $sectionId) {
-            $sections[$sectionId] = ($sectionDao->getById($sectionId))->getTitle($locale);
+        foreach ($this->sectionsIds as $sectionId) {
+            $sections[$sectionId] = ($sectionDao->getById($sectionId))->getTitle($this->locale);
         }
 
-        if ($application == 'ops') {
-            return $this->buildReportForOPS($locale, $contextId, $sections, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        if ($this->application == 'ops') {
+            $submissionsDao = new ScieloPreprintsDAO();
+            $submissionFactory = new ScieloPreprintFactory();
+            $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
+            return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions);
         }
-        elseif ($application == 'ojs') {
-            return $this->buildReportForOJS($locale, $contextId, $sections, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        elseif ($this->application == 'ojs') {
+            $submissionsDao = new ScieloArticlesDAO();
+            $submissionFactory = new ScieloArticleFactory();
+            $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
+            return new ScieloSubmissionsOJSReport($sections, $scieloSubmissions);
         }
     }
 
-    private function buildReportForOJS($locale, $contextId, $sections, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval): ScieloSubmissionsOJSReport 
+    private function getScieloSubmissions($submissionsDao, $submissionFactory): array 
     {
-        $scieloArticlesDao = new ScieloArticlesDAO();
-        $scieloArticleFactory = new ScieloArticleFactory();
-
-        $submissionsIds = $scieloArticlesDao->getSubmissions($locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
+        $submissionsIds = $submissionsDao->getSubmissions($this->locale, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval);
         $scieloSubmissions = [];
 
         foreach($submissionsIds as $submissionId) {
-            $scieloSubmissions[] = $scieloArticleFactory->createSubmission($submissionId, $locale);
+            $scieloSubmissions[] = $submissionFactory->createSubmission($submissionId, $this->locale);
         }
 
-        return new ScieloSubmissionsOJSReport($sections, $scieloSubmissions);
+        return $scieloSubmissions;
     }
-    
 
-    private function buildReportForOPS($locale, $contextId, $sections, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval): ScieloSubmissionsOPSReport 
-    {
-        $scieloPreprintsDao = new ScieloPreprintsDAO();
-        $scieloPreprintFactory = new ScieloPreprintFactory();
-
-        $submissionsIds = $scieloPreprintsDao->getSubmissions($locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
-        $scieloSubmissions = [];
-
-        foreach($submissionsIds as $submissionId) {
-            $scieloSubmissions[] = $scieloPreprintFactory->createSubmission($submissionId, $locale);
-        }
-
-        return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions);
-    }
 }
