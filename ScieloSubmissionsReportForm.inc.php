@@ -23,6 +23,7 @@ class ScieloSubmissionsReportForm extends Form
     private $plugin;
 
     private $application;
+    private $sections;
     private $submissionDateInterval;
     private $finalDecisionDateInterval;
 
@@ -30,12 +31,13 @@ class ScieloSubmissionsReportForm extends Form
      * Constructor
      * @param $plugin ReviewersReport Manual payment plugin
      */
-    public function __construct($plugin, $application)
+    public function __construct($plugin)
     {
         $this->plugin = $plugin;
-        $this->application = $application;
+        $this->application = substr(Application::getName(), 0, 3);
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
+        $this->sections = array();
         $this->submissionDateInterval = null;
         $this->finalDecisionDateInterval = null;
 
@@ -54,14 +56,34 @@ class ScieloSubmissionsReportForm extends Form
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
     }
 
-    public function setSubmissionDateInterval($submissionDateInterval)
+    public function validateReportData($args)
     {
-        $this->submissionDateInterval = $submissionDateInterval;
+        if(array_key_exists('sections', $args)) $this->sections = $args['sections'];
+        $filteringType = $args['selectFilterTypeDate'];
+
+        if ($filteringType == 'filterBySubmission' || $filteringType == 'filterByBoth') {
+            $submissionDateInterval = $this->validateDateInterval($args['startSubmissionDateInterval'], $args['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
+            if(is_null($submissionDateInterval)) return false;
+            $this->submissionDateInterval = $submissionDateInterval;
+        }
+        
+        if ($filteringType == 'filterByFinalDecision' || $filteringType == 'filterByBoth') {
+            $finalDecisionDateInterval = $this->validateDateInterval($args['startFinalDecisionDateInterval'], $args['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
+            if(is_null($finalDecisionDateInterval)) return false;
+            $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+        }
+
+        return true;
     }
 
-    public function setFinalDecisionDateInterval($finalDecisionDateInterval)
+    private function validateDateInterval($startInterval, $endInterval, $errorMessage)
     {
-        $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+        $dateInterval = new ClosedDateInterval($startInterval, $endInterval);
+        if (!$dateInterval->isValid()) {
+            echo __($errorMessage);
+            return null;
+        }
+        return $dateInterval;
     }
 
     private function emitHttpHeaders($request)
@@ -72,12 +94,12 @@ class ScieloSubmissionsReportForm extends Form
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
     }
 
-    public function generateReport($request, $sections)
+    public function generateReport($request)
     {
         $this->emitHttpHeaders($request);
 
         $locale = AppLocale::getLocale();
-        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
         $csvFile = fopen('php://output', 'wt');

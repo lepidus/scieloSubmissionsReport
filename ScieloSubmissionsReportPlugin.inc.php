@@ -29,8 +29,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($success && Config::getVar('general', 'installed')) {
             $this->import('ScieloSubmissionsReportForm');
 
-            $application = substr(Application::getName(), 0, 3);
-            $form = new ScieloSubmissionsReportForm($this, $application);
+            $form = new ScieloSubmissionsReportForm($this);
 
             $request = Application::getRequest();
             $url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
@@ -77,58 +76,23 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return new ScieloSubmissionsReportForm($this);
     }
 
-    private function validateDateInterval($startInterval, $endInterval, $errorMessage)
-    {
-        $dateInterval = new ClosedDateInterval($startInterval, $endInterval);
-        if (!$dateInterval->isValid()) {
-            echo __($errorMessage);
-            return null;
-        }
-        return $dateInterval;
-    }
-
     /**
      * @copydoc ReportPlugin::display()
      */
     public function display($args, $request)
     {
-        $application = substr(Application::getName(), 0, 3);
-        $form    = new ScieloSubmissionsReportForm($this, $application);
-        $dateStart = date("Y-01-01");
-        $dateEnd   = date("Y-m-d");
-        $dates     = array($dateStart, $dateEnd);
-
+        AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);
+        $form = new ScieloSubmissionsReportForm($this);
         $form->initData();
-        import('classes.statistics.StatisticsHelper');
         $requestHandler = new PKPRequest();
         if ($requestHandler->isPost($request)) {
-            $postVars = $requestHandler->getUserVars($request);
-            if ($postVars['generate'] === "1") {
-                array_key_exists('sections', $postVars) ? $sections = $postVars['sections'] : $sections = null;
-                $filterType = $postVars['selectFilterTypeDate'];
-
-                if ($filterType == 'filterBySubmission' || $filterType == 'filterByBoth') {
-                    $submissionDateInterval = $this->validateDateInterval($postVars['startSubmissionDateInterval'], $postVars['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
-                    if(is_null($submissionDateInterval))
-                        return;
-                    else
-                        $form->setSubmissionDateInterval($submissionDateInterval);
-                }
-                
-                if ($filterType == 'filterByFinalDecision' || $filterType == 'filterByBoth') {
-                    $finalDecisionDateInterval = $this->validateDateInterval($postVars['startFinalDecisionDateInterval'], $postVars['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
-                    if(is_null($finalDecisionDateInterval))
-                        return;
-                    else
-                        $form->setFinalDecisionDateInterval($finalDecisionDateInterval);
-                }
-
-                $form->generateReport($request, $sections);
-            }
+            $args = $requestHandler->getUserVars($request);
+            $dataOkay = $form->validateReportData($args);
+            if($dataOkay) $form->generateReport($request);
         } else {
-            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', $dates);
+            $dateStart = date("Y-01-01");
+            $dateEnd   = date("Y-m-d");
+            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', array($dateStart, $dateEnd));
         }
-
-        AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);
     }
 }
