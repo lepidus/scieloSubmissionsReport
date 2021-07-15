@@ -75,8 +75,7 @@ class ScieloSubmissionsReportForm extends Form
     public function generateReport($request, $sections)
     {
         $this->emitHttpHeaders($request);
-        
-        //Gerar o csv
+
         $locale = AppLocale::getLocale();
         $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
@@ -95,25 +94,26 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager->assign('sections_options', $sections_options);
         $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
         $templateManager->assign([
-			'breadcrumbs' => [
-				[
-					'id' => 'reports',
-					'name' => __('manager.statistics.reports'),
-					'url' => $request->getRouter()->url($request, null, 'stats', 'reports'),
-				],
-				[
-					'id' => 'scieloSubmissionsReport',
-					'name' => __('plugins.reports.scieloSubmissionsReport.displayName')
-				],
-			],
-			'pageTitle', __('plugins.reports.scieloSubmissionsReport.displayName')
-		]);
+            'breadcrumbs' => [
+                [
+                    'id' => 'reports',
+                    'name' => __('manager.statistics.reports'),
+                    'url' => $request->getRouter()->url($request, null, 'stats', 'reports'),
+                ],
+                [
+                    'id' => 'scieloSubmissionsReport',
+                    'name' => __('plugins.reports.scieloSubmissionsReport.displayName')
+                ],
+            ],
+            'pageTitle', __('plugins.reports.scieloSubmissionsReport.displayName')
+        ]);
 
         $templateManager->display($this->plugin->getTemplateResource($template));
     }
 
-    private function getAvailableSections($contextId) {
-		$sections = Services::get('section')->getSectionList($contextId);
+    private function getAvailableSections($contextId)
+    {
+        $sections = Services::get('section')->getSectionList($contextId);
 
         $listOfSections = array();
         foreach ($sections as $section) {
@@ -122,13 +122,14 @@ class ScieloSubmissionsReportForm extends Form
         return $listOfSections;
     }
 
-    public function getSectionsOptions($contextId, $sections) {
+    public function getSectionsOptions($contextId, $sections)
+    {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sectionsOptions = array();
-        
+
         foreach ($sections as $sectionId => $sectionName) {
             $sectionObject = $sectionDao->getById($sectionId, $contextId);
-            if($sectionObject->getMetaReviewed() == 1){
+            if ($sectionObject->getMetaReviewed() == 1) {
                 $sectionsOptions[$sectionObject->getLocalizedTitle()] = $sectionObject->getLocalizedTitle();
             }
         }
