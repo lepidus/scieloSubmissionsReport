@@ -61,10 +61,10 @@ if it is, you must copy/move it directly to the plugins/report/ directory.
 Then, you can run this command at application's root directory:
 
 ``` bash
-find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group oppositeApplication -v "{}" ";"
+find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group applicationUnderTests -v "{}" ";"
 ```
 
-Replace `oppositeApplication` with the application that tests will not run. E.g.: OJS or OPS
+Replace `applicationUnderTests` with the application that tests will not run. E.g.: OJS or OPS
 
 Example command to run OJS tests:
 
