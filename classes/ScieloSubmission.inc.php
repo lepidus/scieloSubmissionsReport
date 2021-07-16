@@ -47,7 +47,7 @@ class ScieloSubmission {
     }
 
     public function getTitle() : string {
-        return $this->title;
+        return preg_replace('/\s+/', ' ', $this->title);
     }
 
     public function getSubmitter() : string {

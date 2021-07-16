@@ -2,6 +2,7 @@
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
@@ -12,8 +13,9 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();
         $scieloArticlesDAO = new ScieloArticlesDAO();
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
 
-        $submissionTitle = $publication->getData('title', $locale);
+        $submissionTitle = $publication->getLocalizedData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);

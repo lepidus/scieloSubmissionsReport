@@ -1,33 +1,67 @@
 <?php
 
 import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOJSReport');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintFactory');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
 import('classes.journal.SectionDAO');
 
 class ScieloSubmissionsReportFactory
 {
-    public function createReport(string $application, int $contextId, array $sectionIds, string $startSubmissionDateInterval, string $endSubmissionDateInterval, string $startFinalDecisionDateInterval, string $endFinalDecisionDateInterval, string $locale): ScieloSubmissionsReport
+    private $application;
+    private $locale;
+    private $contextId;
+    private $sectionsIds;
+    private $submissionDateInterval;
+    private $finalDecisionDateInterval;
+
+    public function __construct(string $application, int $contextId, array $sectionsIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale)
+    {
+        $this->application = $application;
+        $this->locale = $locale;
+        $this->contextId = $contextId;
+        $this->sectionsIds = $sectionsIds;
+        $this->submissionDateInterval = $submissionDateInterval;
+        $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+    }
+    
+    public function createReport(): ScieloSubmissionsReport
     {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sections = [];
 
-        foreach ($sectionIds as $sectionId) {
-            $sections[$sectionId] = ($sectionDao->getById($sectionId))->getTitle($locale);
+        foreach ($this->sectionsIds as $sectionId) {
+            $sections[$sectionId] = ($sectionDao->getById($sectionId))->getTitle($this->locale);
         }
 
-        $submissionDateInterval = (!empty($startSubmissionDateInterval) ? new ClosedDateInterval($startSubmissionDateInterval, $endSubmissionDateInterval) : null);
-
-        $finalDecisionDateInterval = (!empty($startFinalDecisionDateInterval) ? new ClosedDateInterval($startFinalDecisionDateInterval, $endFinalDecisionDateInterval) : null);
-
-        if ($application == 'ops') {
-            $scieloSubmissionsDao = new ScieloPreprintsDAO();
-        } elseif ($application == 'ojs') {
-            $scieloSubmissionsDao = new ScieloArticlesDAO();
+        if ($this->application == 'ops') {
+            $submissionsDao = new ScieloPreprintsDAO();
+            $submissionFactory = new ScieloPreprintFactory();
+            $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
+            return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions);
         }
-        $submissionsIds = $scieloSubmissionsDao->getSubmissions($locale, $contextId, $sectionIds, $submissionDateInterval, $finalDecisionDateInterval);
-
-        return new ScieloSubmissionsReport($sections, $submissionsIds);
+        elseif ($this->application == 'ojs') {
+            $submissionsDao = new ScieloArticlesDAO();
+            $submissionFactory = new ScieloArticleFactory();
+            $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
+            return new ScieloSubmissionsOJSReport($sections, $scieloSubmissions);
+        }
     }
+
+    private function getScieloSubmissions($submissionsDao, $submissionFactory): array 
+    {
+        $submissionsIds = $submissionsDao->getSubmissions($this->locale, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval);
+        $scieloSubmissions = [];
+
+        foreach($submissionsIds as $submissionId) {
+            $scieloSubmissions[] = $submissionFactory->createSubmission($submissionId, $this->locale);
+        }
+
+        return $scieloSubmissions;
+    }
+
 }

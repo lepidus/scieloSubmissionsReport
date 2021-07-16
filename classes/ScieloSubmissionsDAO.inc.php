@@ -10,6 +10,7 @@
  */
 
 import('lib.pkp.classes.db.DAO');
+import('classes.workflow.EditorDecisionActionsManager');
 import('classes.log.SubmissionEventLogEntry');
 import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
@@ -24,7 +25,7 @@ class ScieloSubmissionsDAO extends DAO
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = Capsule::table('submissions')
-        ->join('publications', 'submissions.submission_id', '=', 'publications.submission_id')
+        ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
         ->where('submissions.context_id', $contextId)
         ->whereNotNull('submissions.date_submitted')
         ->whereIn('publications.section_id', $sectionsIds)
@@ -102,7 +103,7 @@ class ScieloSubmissionsDAO extends DAO
 
     protected function finalDecisionFromRow($row, $locale)
     {
-        $dateDecided = $row['date_decided'];
+        $dateDecided = new DateTime($row['date_decided']);
         $decision = "";
 
         if ($row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
@@ -111,6 +112,6 @@ class ScieloSubmissionsDAO extends DAO
             $decision = __('common.declined', [], $locale);
         }
 
-        return new FinalDecision($decision, $dateDecided);
+        return new FinalDecision($decision, $dateDecided->format('Y-m-d'));
     }
 }

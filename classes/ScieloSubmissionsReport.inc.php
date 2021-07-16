@@ -21,7 +21,14 @@ class ScieloSubmissionsReport {
     }
 
     protected function filterWithAverageReviewingTimeOnly() {
-        return $this->submissions;
+        $submissions = array();
+        
+        foreach ($this->submissions as $submission) {
+            if (!empty($submission->getFinalDecision())) {
+                $submissions[] = $submission;
+            }
+        }
+        return $submissions;
     }
 
     public function getAverageReviewingTime() : int {
