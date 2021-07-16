@@ -86,9 +86,9 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         $form->initData();
         $requestHandler = new PKPRequest();
         if ($requestHandler->isPost($request)) {
-            $args = $requestHandler->getUserVars($request);
-            $dataOkay = $form->validateReportData($args);
-            if($dataOkay) $form->generateReport($request);
+            $reportParams = $requestHandler->getUserVars($request);
+            $validationResult = $form->validateReportData($reportParams);
+            if($validationResult) $form->generateReport($request);
         } else {
             $dateStart = date("Y-01-01");
             $dateEnd   = date("Y-m-d");

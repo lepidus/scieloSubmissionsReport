@@ -56,19 +56,19 @@ class ScieloSubmissionsReportForm extends Form
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
     }
 
-    public function validateReportData($args)
+    public function validateReportData($reportParams)
     {
-        if(array_key_exists('sections', $args)) $this->sections = $args['sections'];
-        $filteringType = $args['selectFilterTypeDate'];
+        if(array_key_exists('sections', $reportParams)) $this->sections = $reportParams['sections'];
+        $filteringType = $reportParams['selectFilterTypeDate'];
 
         if ($filteringType == 'filterBySubmission' || $filteringType == 'filterByBoth') {
-            $submissionDateInterval = $this->validateDateInterval($args['startSubmissionDateInterval'], $args['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
+            $submissionDateInterval = $this->validateDateInterval($reportParams['startSubmissionDateInterval'], $reportParams['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
             if(is_null($submissionDateInterval)) return false;
             $this->submissionDateInterval = $submissionDateInterval;
         }
         
         if ($filteringType == 'filterByFinalDecision' || $filteringType == 'filterByBoth') {
-            $finalDecisionDateInterval = $this->validateDateInterval($args['startFinalDecisionDateInterval'], $args['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
+            $finalDecisionDateInterval = $this->validateDateInterval($reportParams['startFinalDecisionDateInterval'], $reportParams['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
             if(is_null($finalDecisionDateInterval)) return false;
             $this->finalDecisionDateInterval = $finalDecisionDateInterval;
         }
