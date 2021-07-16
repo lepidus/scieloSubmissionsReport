@@ -11,7 +11,6 @@
 import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
-import('plugins.reports.articles.ArticleReportPlugin');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -71,6 +70,46 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         return $journalEditors;
     }
 
+    public function getDecisionMessage($decision) {
+		import('classes.workflow.EditorDecisionActionsManager');
+
+		$messagesPerDecision = array(
+			SUBMISSION_EDITOR_DECISION_ACCEPT =>
+				__('editor.submission.decision.accept'),
+			SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS =>
+				__('editor.submission.decision.requestRevisions'),
+			SUBMISSION_EDITOR_DECISION_RESUBMIT =>
+				__('editor.submission.decision.resubmit'),
+			SUBMISSION_EDITOR_DECISION_DECLINE =>
+				__('editor.submission.decision.decline'),
+			SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION =>
+				__('editor.submission.decision.sendToProduction'),
+			SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW =>
+				__('editor.submission.decision.sendExternalReview'),
+			SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE =>
+				__('editor.submission.decision.decline'),
+			SUBMISSION_EDITOR_RECOMMEND_ACCEPT =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept'))),
+			SUBMISSION_EDITOR_RECOMMEND_DECLINE =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline'))),
+			SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions'))),
+			SUBMISSION_EDITOR_RECOMMEND_RESUBMIT =>
+				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit'))),
+		);
+
+        $message = "";
+
+        if ($decision) 
+        {
+            $decisionIndex = intval($decision);
+            $message = $messagesPerDecision[$decisionIndex];
+        }
+
+        return $message;
+
+	}
+
     public function getLastDecision($submissionId): string
     {
         $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
@@ -79,7 +118,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         foreach ($decisionsSubmission as $decisions) {
             $lastDecision = $decisions['decision'];
         }
-        $report = new ArticleReportPlugin();
-        return $report->getDecisionMessage($lastDecision);
+
+        return $this->getDecisionMessage($lastDecision);
     }
 }

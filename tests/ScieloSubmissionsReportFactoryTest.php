@@ -48,7 +48,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
 
     private function createSubmission($dateSubmitted = null, $dateFinalDecision = null) : int {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        
+
         $submission = new Submission();
         $submission->setData('contextId', $this->contextId);
         $submission->setData('locale', $this->locale);
@@ -77,7 +77,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
 
     private function createPublication($submissionId, $sectionId, $datePublished = null) {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
-        
+
         $publication = new Publication();
         $publication->setData('submissionId', $submissionId);
         $publication->setData('sectionId', $sectionId);
@@ -126,7 +126,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $expectedSections = [$this->sectionsIds[0] => $this->firstSectionName, $this->sectionsIds[1] => $this->secondSectionName];
         $this->assertEquals($expectedSections, $report->getSections());
     }
-    
+
     public function testReportHasSubmissions() : void {
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale);
 		$report = $this->reportFactory->createReport();
@@ -155,7 +155,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $scieloSubmissionsIds = $this->mapScieloSubmissionsToIds($report->getSubmissions());
         $this->assertEquals($expectedSubmissions, $scieloSubmissionsIds);
     }
-    
+
     public function testReportFilterByNoSectionsSelected() : void {
         $emptySections = [];
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $emptySections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale);
@@ -173,7 +173,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $scieloSubmissionsIds = $this->mapScieloSubmissionsToIds($report->getSubmissions());
         $this->assertEquals($expectedSubmissions, $scieloSubmissionsIds);
     }
-    
+
     public function testReportFilterBySubmissionDateSubmissionAtIntervalStart() : void {
         $this->submissionDateInterval = new ClosedDateInterval('2021-05-29', '2021-06-02');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale);
@@ -247,6 +247,9 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase {
         $this->assertEquals([$this->submissionsIds[2]], $scieloSubmissionsIds);
     }
 
+	/**
+	 * @group OPS
+	 */
     public function testReportFilterByFinalDecisionDateInOPSGetsPostedSubmissions() : void {
 		$postedSubmissionId = $this->createSubmission('2021-06-14 04:30:08');
         $publicationId = $this->createPublication($postedSubmissionId, $this->sectionsIds[0], '2021-06-21 14:13:20');

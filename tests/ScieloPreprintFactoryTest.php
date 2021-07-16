@@ -10,6 +10,8 @@ import('classes.workflow.EditorDecisionActionsManager');
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
+	protected const WORKFLOW_STAGE_ID_SUBMISSION = 5;
+
     private $locale = 'en_US';
     private $contextId = 1;
     private $submissionId;
@@ -37,7 +39,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     protected function getAffectedTables()
     {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings', 'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections', 'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
+        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
+        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
     private function createSubmission(): int
@@ -176,7 +180,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return $userGroupDao->insertObject($sectionModeratorUserGroup);
     }
 
-
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionGetsFinalDecisionWithDatePosted(): void
     {
         $finalDecision = __('common.accepted', [], $this->locale);
@@ -194,6 +200,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionGetsPublicationStatus(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -202,6 +211,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -210,6 +222,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->doi, $scieloPreprint->getPublicationDOI());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionWithoutPublicationDOI(): void
     {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
@@ -224,6 +239,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionIsPreprint(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -232,6 +250,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
 
+	/**
+	 * @group OPS
+	 */
     public function testSubmissionGetsModerators(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
@@ -248,6 +269,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
 
+        $userGroupDao->assignGroupToStage($this->contextId, $moderatorGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
+
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
@@ -256,6 +279,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedModerators, $scieloPreprint->getModerators());
     }
 
+    /**
+	 * @group OPS
+	*/
     public function testSubmissionGetsSectionModerator(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
@@ -269,7 +295,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
 
-        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, 5);
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -277,6 +303,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerator());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionGetsNotes(): void
     {
         $noteDao = DAORegistry::getDAO('NoteDAO');
@@ -302,6 +331,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
     }
 
+	/**
+	 * @group OPS
+	*/
     public function testSubmissionDoesNotHaveNotes(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
