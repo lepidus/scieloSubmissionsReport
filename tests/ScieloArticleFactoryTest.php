@@ -146,18 +146,18 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $userDao = DAORegistry::getDAO('UserDAO');
 
         $firstEditorUser = new User();
-        $firstEditorUser->setUsername('joaozinho');
-        $firstEditorUser->setEmail('joao@abobrinha.com');
-        $firstEditorUser->setPassword('abobrinha');
-        $firstEditorUser->setGivenName("Joao", $this->locale);
-        $firstEditorUser->setFamilyName("Abobra", $this->locale);
+        $firstEditorUser->setUsername('examplePeter');
+        $firstEditorUser->setEmail('peter@exemple.com');
+        $firstEditorUser->setPassword('examplepass');
+        $firstEditorUser->setGivenName("Peter", $this->locale);
+        $firstEditorUser->setFamilyName("Parker", $this->locale);
 
         $secondEditorUser = new User();
-        $secondEditorUser->setUsername('sergio_do_xuxu');
-        $secondEditorUser->setEmail('sergin@xuxu.com');
-        $secondEditorUser->setPassword('ilovexuxu');
-        $secondEditorUser->setGivenName("Sergio", $this->locale);
-        $secondEditorUser->setFamilyName("Xuxunaldo", $this->locale);
+        $secondEditorUser->setUsername('exampleJhon');
+        $secondEditorUser->setEmail('jhon@exemple.com');
+        $secondEditorUser->setPassword('exemplepass');
+        $secondEditorUser->setGivenName("Jhon", $this->locale);
+        $secondEditorUser->setFamilyName("Carter", $this->locale);
 
         $firstEditorUserId = $userDao->insertObject($firstEditorUser);
         $secondEditorUserId = $userDao->insertObject($secondEditorUser);
