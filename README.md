@@ -53,24 +53,24 @@ To download the plugin, go to the [Releases page](https://github.com/lepidus/sci
 3. Under __Upload file__ select the file __ScieloSubmissionsReportPlugin.tar.gz__.
 4. Click __Save__ and the plugin will be installed on your website.
 
-## Unit Test for Development
+## Development: Running Unit Tests
 
-To run the tests your plugin can't be installed in OJS/OPS through a symbolic link,
-if it is, you must copy/move it directly to the plugins/report/ directory.
-
-Then, you can run this command at application's root directory:
+Run this command at application's (OJS or OPS) root directory:
 
 ``` bash
-find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group applicationUnderTests -v "{}" ";"
+find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group applicationToIgnoreTests -v "{}" ";"
 ```
 
-Replace `applicationUnderTests` with the application that tests will not run. E.g.: OJS or OPS
+Replace `applicationToIgnoreTests` with the application that tests will **not** run, because it's not the plugin's host application.
 
-Example command to run OJS tests:
+Example command to run the tests in OJS:
 
 ``` bash
 find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group OPS -v "{}" ";"
 ```
+
+Note: To run the tests your plugin can't be installed in OJS/OPS through a symbolic link,
+if it is, you must copy/move it directly to the plugins/report/ directory.
 
 # License
 __This plugin is licensed under the GNU General Public License v3.0__
