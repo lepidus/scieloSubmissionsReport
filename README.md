@@ -38,8 +38,8 @@ The information obtained only in OPS are:
 
 The latest release of this plugin is compatible with the following PKP applications:
 
-* OJS 3.2.1
-* OPS 3.2.1
+* OJS 3.3.0
+* OPS 3.3.0
 
 
 ## Plugin Download
