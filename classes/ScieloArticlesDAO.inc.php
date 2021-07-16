@@ -98,13 +98,16 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit'))),
 		);
 
-		if ($decision) {
-			$decisionIndex = intval($decision);
-			return $messagesPerDecision[$decisionIndex];
-		}
-		else {
-			return '';
-		}
+        $message = "";
+
+        if ($decision) 
+        {
+            $decisionIndex = intval($decision);
+            $message = $messagesPerDecision[$decisionIndex];
+        }
+
+        return $message;
+
 	}
 
     public function getLastDecision($submissionId): string
