@@ -16,6 +16,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $contextId = 1;
     private $submissionId;
     private $publicationId;
+    private $sectionId;
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
     private $dateSubmitted = '2021-05-31 15:38:24';
@@ -24,17 +25,18 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $sectionName = "Biological Sciences";
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
-    private $doi = "10.666/949494";
+    private $vorDoi = "10.666/949494";
+    private $relationStatus = PUBLICATION_RELATION_PUBLISHED;
 
     public function setUp(): void
     {
         parent::setUp();
-        $sectionId = $this->createSection();
+        $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication($sectionId);
+        $this->publicationId = $this->createPublication($this->submissionId);
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en_US');
-        $this->addCurrentPublicationToSubmission();
+        $this->addCurrentPublicationToSubmission($this->submissionId, $this->publicationId);
     }
 
     protected function getAffectedTables()
@@ -57,16 +59,16 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return $submissionDao->insertObject($submission);
     }
 
-    private function createPublication($sectionId): int
+    private function createPublication($submissionId, $datePublished = null): int
     {
         $publicationDao = DAORegistry::getDAO('PublicationDAO');
         $publication = new Publication();
-        $publication->setData('submissionId', $this->submissionId);
+        $publication->setData('submissionId', $submissionId);
         $publication->setData('title', $this->title, $this->locale);
-        $publication->setData('sectionId', $sectionId);
-        $publication->setData('relationStatus', '1');
-        $publication->setData('vorDoi', $this->doi);
-        $publication->setData('status', $this->statusCode);
+        $publication->setData('sectionId', $this->sectionId);
+        $publication->setData('relationStatus', $this->relationStatus);
+        $publication->setData('vorDoi', $this->vorDoi);
+        if(!is_null($datePublished)) $publication->setData('datePublished', $datePublished);
 
         return $publicationDao->insertObject($publication);
     }
@@ -105,11 +107,11 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
-    private function addCurrentPublicationToSubmission(): void
+    private function addCurrentPublicationToSubmission($submissionId, $publicationId): void
     {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $submission = $submissionDao->getById($this->submissionId);
-        $submission->setData('currentPublicationId', $this->publicationId);
+        $submission = $submissionDao->getById($submissionId);
+        $submission->setData('currentPublicationId', $publicationId);
         $submissionDao->updateObject($submission);
     }
 
@@ -188,13 +190,12 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-31';
 
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-        $publication = $publicationDao->getById($this->publicationId);
-        $publication->setData('datePublished', $finalDecisionDate);
-        $publicationDao->updateObject($publication);
+        $submissionId = $this->createSubmission();
+        $publicationId = $this->createPublication($submissionId, $finalDecisionDate);
+        $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
 
         $preprintFactory = new ScieloPreprintFactory();
-        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+        $scieloPreprint = $preprintFactory->createSubmission($submissionId, $this->locale);
 
         $this->assertEquals($finalDecision, $scieloPreprint->getFinalDecision());
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
@@ -208,7 +209,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals($this->statusCode, $scieloPreprint->getPublicationStatus());
+        $relationsMap = [
+            PUBLICATION_RELATION_NONE => 'publication.relation.none',
+            PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
+            PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
+        ];
+        $expectedPublicationStatus = __($relationsMap[$this->relationStatus]);
+
+        $this->assertEquals($expectedPublicationStatus, $scieloPreprint->getPublicationStatus());
     }
 
 	/**
@@ -219,7 +227,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals($this->doi, $scieloPreprint->getPublicationDOI());
+        $this->assertEquals($this->vorDoi, $scieloPreprint->getPublicationDOI());
     }
 
 	/**
