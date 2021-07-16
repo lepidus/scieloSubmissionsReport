@@ -4,8 +4,8 @@
 <version>
 	<application>scieloSubmissionsReport</application>
 	<type>plugins.reports</type>
-	<release>1.5.0.0</release>
-	<date></date>
+	<release>2.0.0.0</release>
+	<date>2021-07-16</date>
 	<lazy-load>1</lazy-load>
 	<class>ScieloSubmissionsReportPlugin</class>
 </version>
