@@ -10,7 +10,7 @@ import('classes.workflow.EditorDecisionActionsManager');
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
-	protected const SUBMISSION_STAGE_ID = 5;
+	protected const WORKFLOW_STAGE_ID_SUBMISSION = 5;
 
     private $locale = 'en_US';
     private $contextId = 1;
@@ -269,7 +269,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
 
-        $userGroupDao->assignGroupToStage($this->contextId, $moderatorGroupId, self::SUBMISSION_STAGE_ID);
+        $userGroupDao->assignGroupToStage($this->contextId, $moderatorGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -295,7 +295,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->createStageAssignments([$userSectionModeratorId], $sectionModeratorUserGroupId);
 
-        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, self::SUBMISSION_STAGE_ID);
+        $userGroupDao->assignGroupToStage($this->contextId, $sectionModeratorUserGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
