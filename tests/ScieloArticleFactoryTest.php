@@ -319,7 +319,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
         $finalDecision = __('common.declined', [], $this->locale);
-        $finalDecisionDate = '2021-05-29 15:00:00';
+        $finalDecisionDate = '2021-05-29';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
 
         $articleFactory = new ScieloArticleFactory();
@@ -336,7 +336,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_DECLINE;
         $finalDecision = __('common.declined', [], $this->locale);
-        $finalDecisionDate = '2021-04-21 15:00:00';
+        $finalDecisionDate = '2021-04-21';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
 
         $articleFactory = new ScieloArticleFactory();
@@ -353,7 +353,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_ACCEPT;
         $finalDecision = __('common.accepted', [], $this->locale);
-        $finalDecisionDate = '2021-07-07 11:00:00';
+        $finalDecisionDate = '2021-07-07';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
 
         $articleFactory = new ScieloArticleFactory();

@@ -24,7 +24,8 @@ class SubmissionAuthor {
     }
 
     public function asRecord() : string {
-        return implode(", ", [$this->fullName, $this->country, $this->affiliation]);
+        $treatedAffiliation = preg_replace('/\s+/', ' ', $this->affiliation);
+        return implode(", ", [$this->fullName, $this->country, $treatedAffiliation]);
     }
 }
     

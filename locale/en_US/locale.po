@@ -1,0 +1,126 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2021-07-09T19:38:52+00:00\n"
+"PO-Revision-Date: 2021-07-09T19:38:52+00:00\n"
+"Language: \n"
+
+msgid "plugins.reports.scieloSubmissionsReport.displayName"
+msgstr "SciELO Submissions Report"
+
+msgid "plugins.reports.scieloSubmissionsReport.description"
+msgstr "This plugin implements a .csv format sheet report that contains information that Scielo usually request. Developed by Lepidus Tecnologia."
+
+msgid "plugins.reports.scieloSubmissionsReport.filterMessage"
+msgstr "Select the desired filtering type:"
+
+msgid "plugins.reports.scieloSubmissionsReport.filterSubmission"
+msgstr "Filter by submitted date"
+
+msgid "plugins.reports.scieloSubmissionsReport.filterDecision"
+msgstr "Filter by final decision date"
+
+msgid "plugins.reports.scieloSubmissionsReport.filterBoth"
+msgstr "Filter by submitted date and final decision"
+
+msgid "plugins.reports.scieloSubmissionsReport.dateSubmittedInterval"
+msgstr "Submitted date range"
+
+msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
+msgstr "Final decision date range"
+
+msgid "plugins.reports.scieloSubmissionsReport.type"
+msgstr "Report Type"
+
+msgid "plugins.reports.scieloSubmissionsReport.generate"
+msgstr "Generate Report"
+
+msgid "plugins.reports.scieloSubmissionsReport.period"
+msgstr "Period"
+
+msgid "plugins.reports.scieloSubmissionsReport.sections"
+msgstr "Sections"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noModerators"
+msgstr "No moderators assigned"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noEditors"
+msgstr "No editors assigned"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noSubmitter"
+msgstr "The submitting author was not found"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus"
+msgstr "No publication's status"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI"
+msgstr "No publication's DOI"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.noNotes"
+msgstr "No notes"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate"
+msgstr "The initial submitted date cannot be greater than the final submitted date"
+
+msgid "plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate"
+msgstr "The initial decision date cannot be greater than the final decision date"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.submissionId"
+msgstr "Submission's ID"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"
+msgstr "Days until status changing"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.submissionStatus"
+msgstr "Submission's status"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.publicationStatus"
+msgstr "Publication's status"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.publicationDOI"
+msgstr "Publication's DOI"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.areaModerator"
+msgstr "Area moderator"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.moderators"
+msgstr "Moderators"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.journalEditors"
+msgstr "Journal editors"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.sectionEditor"
+msgstr "Section editor"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.context"
+msgstr "Journal / Server"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.section"
+msgstr "Section"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.reviews"
+msgstr "Reviews"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.finalDecisionDate"
+msgstr "Final decision date"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.FinalDecision"
+msgstr "Final decision"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.LastDecision"
+msgstr "Last decision"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.ReviewingTime"
+msgstr "Time in reviewing"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"
+msgstr "Average reviewing time (in days) of approved and rejected manuscripts (disregarding rejected submissions on receipt)"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"
+msgstr "Time between submission and final decision"

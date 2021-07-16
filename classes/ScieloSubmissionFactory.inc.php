@@ -1,6 +1,8 @@
 <?php
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
 
 class ScieloSubmissionFactory
 {
@@ -84,7 +86,10 @@ class ScieloSubmissionFactory
         foreach ($authors as $author) {
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
-            $affiliation = $author->getAffiliation($locale);
+            $affiliation = $author->getLocalizedData('affiliation', $locale);
+
+            $country = (!is_null($country)) ? ($country) : ("");
+            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ("");
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
 
