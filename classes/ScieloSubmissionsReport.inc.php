@@ -68,8 +68,8 @@ class ScieloSubmissionsReport {
 
     private function getSecondHeaders() : array {
         return [
-            "Tempo médio em avaliação",
-            "Seções"
+            __("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"),
+            __("section.sections")
         ];
     }
 

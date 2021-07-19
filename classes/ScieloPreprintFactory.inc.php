@@ -8,7 +8,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 {
     protected $application = 'ops';
 
-    public function createSubmission(int $submissionId, string $locale): ScieloPreprint
+    public function createSubmission(int $submissionId, string $locale)
     {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();

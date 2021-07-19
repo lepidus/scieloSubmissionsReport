@@ -8,7 +8,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 {
     protected $application = 'ojs';
 
-    public function createSubmission(int $submissionId, string $locale): ScieloArticle
+    public function createSubmission(int $submissionId, string $locale)
     {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getCurrentPublication();

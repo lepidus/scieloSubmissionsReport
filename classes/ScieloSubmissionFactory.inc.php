@@ -6,7 +6,7 @@ import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
 
 class ScieloSubmissionFactory
 {
-    public function createSubmission(int $submissionId, string $locale): ScieloSubmission
+    public function createSubmission(int $submissionId, string $locale)
     {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = $submissionDao->getById($submissionId);
