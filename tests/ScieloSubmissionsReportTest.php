@@ -54,7 +54,7 @@ class ScieloSubmissionsReportTest extends TestCase {
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
         $penultimateRow = $csvRows[sizeof($csvRows)-2];
-        $expectedPenultimateRow = ["Tempo médio em avaliação", "Seções"];
+        $expectedPenultimateRow = [__("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"), __("section.sections")];
 
         $this->assertEquals($expectedPenultimateRow, $penultimateRow);
     }
