@@ -84,10 +84,14 @@
             </table> 
         {/if}
 
-        <p id="actionsButton">
+        <p id="noticeTimeGenerateReport">
+            {translate key="plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"}
+        </p>
+
+        <div id="actionsButton">
             <input class="pkp_button submitFormButton" type="submit" value="{translate key="plugins.reports.scieloSubmissionsReport.generate"}" class="button defaultButton" />
             <input type="button" class="pkp_button submitFormButton" value="{translate key="common.cancel"}" class="button" onclick="document.location.href='{url path="index" escape=false}'" /> 
-        </p>
+        </div>
     </form>
 
     <script>

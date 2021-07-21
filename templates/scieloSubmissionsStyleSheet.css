@@ -83,3 +83,10 @@
 #selectFilterTypeDate {
     margin-bottom: 24px;
 }
+
+#noticeTimeGenerateReport {
+    font-style: italic;
+    line-height: 22px;
+    margin-bottom: 0px;
+    margin-top: 28px;
+}

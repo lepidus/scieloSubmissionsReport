@@ -47,6 +47,11 @@ msgstr "Período"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Secciones"
 
+msgid "plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"
+msgstr ""
+"El proceso de generación de informes puede tardar unos minutos, según los parámetros seleccionados y la cantidad de envíos presentes en el sistema. "
+"Si la demora dura más, comuníquese con el equipo de soporte."
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noModerators"
 msgstr "Sin moderadores designados"
 
