@@ -53,6 +53,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),
             __("submission.submitter"),
+            __("plugins.reports.scieloSubmissionsReport.header.submitterCountry"),
             __("common.dateSubmitted"),
             __("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
             __("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
