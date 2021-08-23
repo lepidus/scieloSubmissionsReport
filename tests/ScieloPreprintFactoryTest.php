@@ -170,7 +170,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $sectionModeratorUserGroupLocalizedNames = [
-            'en_US'=>'section moderator',
+            'en_US'=>'area moderator',
             'pt_BR'=>'moderador de área',
             'es_ES'=>'moderador de área'
         ];

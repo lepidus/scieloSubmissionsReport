@@ -46,7 +46,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
 
-            if ($currentUserGroupName == 'section moderator') {
+            if ($currentUserGroupName == 'area moderator') {
                 return $user->getFullName();
             }
         }
