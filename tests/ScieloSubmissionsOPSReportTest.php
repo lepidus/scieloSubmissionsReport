@@ -36,9 +36,9 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $submittedDateForPreprint3 = "2020-11-8";
         $finalDecisionDateForPreprint3 = "2020-11-15";
 
-        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "No DOI informed", [""]);
-        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
-        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
 
         return [$preprint1, $preprint2, $preprint3];
     }

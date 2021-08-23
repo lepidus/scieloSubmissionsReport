@@ -10,8 +10,8 @@ class ScieloPreprint extends ScieloSubmission {
     private $publicationDOI;
     private $notes;
 
-    public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, string $sectionModerator, string $publicationStatus, string $publicationDOI, array $notes) {
-        parent::__construct($id, $title, $submitter, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, string $sectionModerator, string $publicationStatus, string $publicationDOI, array $notes) {
+        parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
         $this->moderators = $moderators;
         $this->sectionModerator = $sectionModerator;
         $this->publicationStatus = $publicationStatus;
