@@ -79,6 +79,9 @@ msgstr "The initial decision date cannot be greater than the final decision date
 msgid "plugins.reports.scieloSubmissionsReport.header.submissionId"
 msgstr "Submission's ID"
 
+msgid "plugins.reports.scieloSubmissionsReport.header.submitterCountry"
+msgstr "Submitter country"
+
 msgid "plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"
 msgstr "Days until status changing"
 
