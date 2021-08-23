@@ -14,6 +14,7 @@ class ScieloSubmissionFactory
 
         $submissionTitle = $publication->getData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
+        $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $status = __($submission->getStatusKey());
         $sectionName = $this->retrieveSectionName($publication, $locale);
@@ -28,6 +29,7 @@ class ScieloSubmissionFactory
             $submissionId,
             $submissionTitle,
             $submitter,
+            $submitterCountry, 
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,
@@ -67,6 +69,21 @@ class ScieloSubmissionFactory
         $submitter = $userDao->getById($userId);
 
         return $submitter->getFullName();
+    }
+
+    protected function retrieveSubmitterCountry($submissionId)
+    {
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
+
+        if (is_null($userId)) {
+            return "";
+        }
+
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $submitter = $userDao->getById($userId);
+
+        return $submitter->getCountryLocalized();
     }
 
     protected function calculateDaysUntilStatusChange($submission)
