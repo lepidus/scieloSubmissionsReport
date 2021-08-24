@@ -33,11 +33,11 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
         $finalDecisionDatesForArticles = ["2021-04-23", "2021-03-08", "2020-11-15", "", "2020-11-18"];
         $noReviews = ["", ""];
         
-        $article1 = new ScieloArticle(1, "Title 1", "Paola Franchesca", $submittedDatesForArticles[0], 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDatesForArticles[0], ["Jean Paul Cardin"], "Jean Paul Cardin", ["Accept", "See comments"], "Accept");
-        $article2 = new ScieloArticle(2, "Titulo 2", "Pablo Giorgio", $submittedDatesForArticles[1], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDatesForArticles[1], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
-        $article3 = new ScieloArticle(3, "Titulo 3", "Pablo Giorgio", $submittedDatesForArticles[2], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDatesForArticles[2], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
-        $article4 = new ScieloArticle(4, "Titulo 4", "Pablo Giorgio", $submittedDatesForArticles[3], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "", $finalDecisionDatesForArticles[3], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
-        $article5 = new ScieloArticle(5, "Titulo 5", "Pablo Giorgio", $submittedDatesForArticles[4], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "", $finalDecisionDatesForArticles[4], ["Richard Feynman"], "Neil Tyson", $noReviews, "Accept");
+        $article1 = new ScieloArticle(1, "Title 1", "Paola Franchesca", "Brasil", $submittedDatesForArticles[0], 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDatesForArticles[0], ["Jean Paul Cardin"], "Jean Paul Cardin", ["Accept", "See comments"], "Accept");
+        $article2 = new ScieloArticle(2, "Titulo 2", "Pablo Giorgio", "Brasil", $submittedDatesForArticles[1], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDatesForArticles[1], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
+        $article3 = new ScieloArticle(3, "Titulo 3", "Pablo Giorgio", "Brasil", $submittedDatesForArticles[2], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDatesForArticles[2], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
+        $article4 = new ScieloArticle(4, "Titulo 4", "Pablo Giorgio", "Brasil", $submittedDatesForArticles[3], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "", $finalDecisionDatesForArticles[3], ["Richard Feynman"], "Neil Tyson", ["Accept", "See comments"], "Accept");
+        $article5 = new ScieloArticle(5, "Titulo 5", "Pablo Giorgio", "Brasil", $submittedDatesForArticles[4], 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "", $finalDecisionDatesForArticles[4], ["Richard Feynman"], "Neil Tyson", $noReviews, "Accept");
 
         return [$article1, $article2, $article3, $article4, $article5];
     }
@@ -53,6 +53,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),
             __("submission.submitter"),
+            __("plugins.reports.scieloSubmissionsReport.header.submitterCountry"),
             __("common.dateSubmitted"),
             __("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
             __("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
@@ -126,7 +127,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
         $firstLine = fgetcsv($csvFile);
         fclose($csvFile);
 
-        $expectedLine = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedLine, $firstLine);
     }
 

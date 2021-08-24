@@ -16,6 +16,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
     private $publicationId;
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
+    private $submitterCountry = "Brazil";
     private $dateSubmitted = '2021-05-31 15:38:24';
     private $statusCode = STATUS_PUBLISHED;
     private $statusMessage;
@@ -65,6 +66,28 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $publication->setData('status', $this->statusCode);
 
         return $publicationDao->insertObject($publication);
+    }
+
+    private function createSubmitter()
+    {
+        $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+
+        $userSubmitter = new User();
+        $userSubmitter->setUsername('the_godfather');
+        $userSubmitter->setEmail('donvito@corleone.com');
+        $userSubmitter->setPassword('miaumiau');
+        $userSubmitter->setCountry('BR');
+        $userSubmitter->setGivenName("Don", $this->locale);
+        $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
+        $userSubmitterId = $userDao->insertObject($userSubmitter);
+
+        $submissionEvent = $submissionEventLogDao->newDataObject();
+        $submissionEvent->setSubmissionId($this->submissionId);
+        $submissionEvent->setEventType(SUBMISSION_LOG_SUBMISSION_SUBMIT);
+        $submissionEvent->setUserId($userSubmitterId);
+        $submissionEvent->setDateLogged('2021-05-28 15:19:24');
+        $submissionEventLogDao->insertObject($submissionEvent);
     }
 
     private function createSection(): int
@@ -119,28 +142,21 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
 
     public function testSubmissionGetsSubmitter(): void
     {
-        $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
-        $userDao = DAORegistry::getDAO('UserDAO');
-
-        $userSubmitter = new User();
-        $userSubmitter->setUsername('the_godfather');
-        $userSubmitter->setEmail('donvito@corleone.com');
-        $userSubmitter->setPassword('miaumiau');
-        $userSubmitter->setGivenName("Don", $this->locale);
-        $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
-        $userSubmitterId = $userDao->insertObject($userSubmitter);
-
-        $submissionEvent = $submissionEventLogDao->newDataObject();
-        $submissionEvent->setSubmissionId($this->submissionId);
-        $submissionEvent->setEventType(SUBMISSION_LOG_SUBMISSION_SUBMIT);
-        $submissionEvent->setUserId($userSubmitterId);
-        $submissionEvent->setDateLogged('2021-05-28 15:19:24');
-        $submissionEventLogDao->insertObject($submissionEvent);
+        $this->createSubmitter();
 
         $submissionFactory = new ScieloSubmissionFactory();
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->submitter, $scieloSubmission->getSubmitter());
+    }
+
+    public function testSubmissionGetsSubmitterCountry() : void {
+        $this->createSubmitter();
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->submitterCountry, $scieloSubmission->getSubmitterCountry());
     }
 
     public function testSubmissionGetsDateSubmitted(): void

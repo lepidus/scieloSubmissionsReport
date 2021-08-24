@@ -17,6 +17,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 
         $submissionTitle = $publication->getLocalizedData('title', $locale);
         $submitter = $this->retrieveSubmitter($submissionId);
+        $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
         $dateSubmitted = $submission->getData('dateSubmitted');
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
         $status = __($submission->getStatusKey());
@@ -34,6 +35,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $submissionId,
             $submissionTitle,
             $submitter,
+            $submitterCountry,
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,

@@ -76,6 +76,9 @@ msgstr "La fecha de la decisión inicial no puede ser mayor que la fecha de la d
 msgid "plugins.reports.scieloSubmissionsReport.header.submissionId"
 msgstr "ID de envío"
 
+msgid "plugins.reports.scieloSubmissionsReport.header.submitterCountry"
+msgstr "País del remitente"
+
 msgid "plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"
 msgstr "Días hasta el cambio de estado"
 

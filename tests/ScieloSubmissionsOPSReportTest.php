@@ -36,9 +36,9 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $submittedDateForPreprint3 = "2020-11-8";
         $finalDecisionDateForPreprint3 = "2020-11-15";
 
-        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "No DOI informed", [""]);
-        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
-        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
+        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], "Neil Tyson", "Sent to journal publication", "No DOI informed", [""]);
 
         return [$preprint1, $preprint2, $preprint3];
     }
@@ -54,6 +54,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),
             __("submission.submitter"),
+            __("plugins.reports.scieloSubmissionsReport.header.submitterCountry"),
             __("common.dateSubmitted"),
             __("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
             __("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
@@ -120,7 +121,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $firstLine = fgetcsv($csvFile);
         fclose($csvFile);
 
-        $expectedLine = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedLine, $firstLine);
     }
 }

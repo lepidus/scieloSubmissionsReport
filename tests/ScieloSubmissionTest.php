@@ -9,6 +9,7 @@ class ScieloSubmissionTest extends TestCase {
     private $submissionId = 1233;
     private $title = "Rethinking linguistic relativity";
     private $submitter = "Atila Iamarino";
+    private $submitterCountry = "Brasil";
     private $dateSubmitted = "2013-09-06 19:07:02";
     private $daysUntilStatusChange = 3;
     private $status = "Published";
@@ -21,12 +22,12 @@ class ScieloSubmissionTest extends TestCase {
 
     private function createScieloSubmission() : ScieloSubmission {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
-        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
+        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
     }
 
     private function createSubmissionWithoutFinalDecision() : ScieloSubmission {
         $emptyFinalDecisionDate = "";
-        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
+        return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
     }
     
     private function getTestSubmissions() : array {
@@ -49,8 +50,12 @@ class ScieloSubmissionTest extends TestCase {
         $this->assertEquals($this->submitter, $this->submission->getSubmitter());
     }
 
+    public function testHasSubmitterCountry() : void {
+        $this->assertEquals($this->submitterCountry, $this->submission->getSubmitterCountry());
+    }
+
     public function testWhenEmptySubmitter() : void {
-        $submission = new ScieloSubmission($this->submissionId, $this->title, "", $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
+        $submission = new ScieloSubmission($this->submissionId, $this->title, "", $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
         $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
         $this->assertEquals($messageNoSubmitter, $submission->getSubmitter());
     }

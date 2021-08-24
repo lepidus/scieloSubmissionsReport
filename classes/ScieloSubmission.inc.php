@@ -5,6 +5,7 @@ class ScieloSubmission {
     protected $id;
     protected $title;
     protected $submitter;
+    protected $submitterCountry;
     protected $dateSubmitted;
     protected $daysUntilStatusChange;
     protected $status;
@@ -14,10 +15,11 @@ class ScieloSubmission {
     protected $finalDecision;
     protected $finalDecisionDate;
 
-    public function __construct(int $id, string $title, string $submitter, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate) {
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate) {
         $this->id = $id;
         $this->title = $title;
         $this->submitter = $submitter;
+        $this->submitterCountry = $submitterCountry;
         $this->dateSubmitted = $dateSubmitted;
         $this->daysUntilStatusChange = $daysUntilStatusChange;
         $this->status = $status;
@@ -53,6 +55,10 @@ class ScieloSubmission {
     public function getSubmitter() : string {
         $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
         return $this->fillEmptyFields($this->submitter, $messageNoSubmitter);
+    }
+
+    public function getSubmitterCountry() : string {
+        return $this->submitterCountry;
     }
 
     public function getDateSubmitted() : string {
@@ -112,6 +118,6 @@ class ScieloSubmission {
     }
 
     public function asRecord(): array {
-        return array($this->id, $this->title, $this->submitter, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+        return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
     }
 }
