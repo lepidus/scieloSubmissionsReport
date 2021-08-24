@@ -127,7 +127,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase {
         $firstLine = fgetcsv($csvFile);
         fclose($csvFile);
 
-        $expectedLine = ["1", "Title 1", "Paola Franchesca", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedLine, $firstLine);
     }
 
