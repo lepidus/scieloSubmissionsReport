@@ -97,7 +97,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     {
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
         $publication = $submission->getData('publications')[0];
-        if ($publication->getData('datePublished')) {
+        if ($publication->getData('datePublished') && $submission->getStatus() == STATUS_PUBLISHED) {
             return new FinalDecision(__('common.accepted', [], $locale), $publication->getData('datePublished'));
         }
 
