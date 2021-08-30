@@ -32,7 +32,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->sectionId = $this->createSection();
-        $this->submissionId = $this->createSubmission();
+        $this->submissionId = $this->createSubmission($this->statusCode);
         $this->publicationId = $this->createPublication($this->submissionId);
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en_US');
@@ -46,13 +46,13 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
-    private function createSubmission(): int
+    private function createSubmission($statusCode): int
     {
         $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $submission = new Submission();
         $submission->setData('contextId', $this->contextId);
         $submission->setData('dateSubmitted', $this->dateSubmitted);
-        $submission->setData('status', $this->statusCode);
+        $submission->setData('status', $statusCode);
         $submission->setData('locale', $this->locale);
         $submission->setData('dateLastActivity', $this->dateLastActivity);
 
@@ -71,6 +71,12 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         if(!is_null($datePublished)) $publication->setData('datePublished', $datePublished);
 
         return $publicationDao->insertObject($publication);
+    }
+
+    private function createDecision($submissionId, $decision, $dateDecided): void
+    {
+        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
+        $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => $decision, 'dateDecided' => $dateDecided, 'editorId' => 1]);
     }
 
     private function createSection(): int
@@ -190,9 +196,30 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-31';
 
-        $submissionId = $this->createSubmission();
+        $submissionId = $this->createSubmission(STATUS_PUBLISHED);
         $publicationId = $this->createPublication($submissionId, $finalDecisionDate);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
+
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($submissionId, $this->locale);
+
+        $this->assertEquals($finalDecision, $scieloPreprint->getFinalDecision());
+        $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
+    }
+
+    /**
+	 * @group OPS
+	*/
+    public function testDatePostedNotFinalDecisionWhenSubmissionRejected(): void
+    {
+        $datePosted = '2021-08-27';
+        $finalDecision = __('common.declined', [], $this->locale);
+        $finalDecisionDate = '2021-08-30';
+
+        $submissionId = $this->createSubmission(STATUS_DECLINED);
+        $publicationId = $this->createPublication($submissionId, $datePosted);
+        $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
+        $this->createDecision($submissionId, SUBMISSION_EDITOR_DECISION_DECLINE, $finalDecisionDate);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($submissionId, $this->locale);
