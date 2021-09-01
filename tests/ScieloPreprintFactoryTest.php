@@ -210,7 +210,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     /**
 	 * @group OPS
 	*/
-    public function testDatePostedNotFinalDecisionWhenSubmissionRejected(): void
+    public function testSubmissionDecliningIsFinalDecisionEvenWhenHasPostedDate(): void
     {
         $datePosted = '2021-08-27';
         $finalDecision = __('common.declined', [], $this->locale);
