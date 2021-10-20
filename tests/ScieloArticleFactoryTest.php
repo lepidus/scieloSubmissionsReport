@@ -276,6 +276,21 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
     }
 
+    /**
+	 * @group OJS
+	*/
+    public function testSubmissionGetsLastDecisionOfNewRound(): void
+    {
+        $decision = SUBMISSION_EDITOR_DECISION_NEW_ROUND;
+        $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()));
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $scieloArticlesDAO = new ScieloArticlesDAO();
+        $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
+    }
+
 	/**
 	 * @group OJS
 	*/

@@ -72,42 +72,36 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getDecisionMessage($decision) {
 		import('classes.workflow.EditorDecisionActionsManager');
-
-		$messagesPerDecision = array(
-			SUBMISSION_EDITOR_DECISION_ACCEPT =>
-				__('editor.submission.decision.accept'),
-			SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS =>
-				__('editor.submission.decision.requestRevisions'),
-			SUBMISSION_EDITOR_DECISION_RESUBMIT =>
-				__('editor.submission.decision.resubmit'),
-			SUBMISSION_EDITOR_DECISION_DECLINE =>
-				__('editor.submission.decision.decline'),
-			SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION =>
-				__('editor.submission.decision.sendToProduction'),
-			SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW =>
-				__('editor.submission.decision.sendExternalReview'),
-			SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE =>
-				__('editor.submission.decision.decline'),
-			SUBMISSION_EDITOR_RECOMMEND_ACCEPT =>
-				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept'))),
-			SUBMISSION_EDITOR_RECOMMEND_DECLINE =>
-				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline'))),
-			SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS =>
-				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions'))),
-			SUBMISSION_EDITOR_RECOMMEND_RESUBMIT =>
-				__('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit'))),
-		);
-
-        $message = "";
-
-        if ($decision) 
-        {
-            $decisionIndex = intval($decision);
-            $message = $messagesPerDecision[$decisionIndex];
+        switch($decision) {
+            case SUBMISSION_EDITOR_DECISION_ACCEPT:
+                return __('editor.submission.decision.accept');
+            case SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS:
+                return __('editor.submission.decision.requestRevisions');
+            case SUBMISSION_EDITOR_DECISION_RESUBMIT:
+                return __('editor.submission.decision.resubmit');
+            case SUBMISSION_EDITOR_DECISION_DECLINE:
+                return __('editor.submission.decision.decline');
+            case SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION:
+                return __('editor.submission.decision.sendToProduction');
+            case SUBMISSION_EDITOR_DECISION_NEW_ROUND:
+                return __('editor.submission.decision.newRound');
+            case SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW:
+                return __('editor.submission.decision.sendExternalReview');
+            case SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE:
+                return __('editor.submission.decision.decline');
+            case SUBMISSION_EDITOR_DECISION_REVERT_DECLINE:
+                return __('editor.submission.decision.revertDecline');
+            case SUBMISSION_EDITOR_RECOMMEND_ACCEPT:
+                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept')));
+            case SUBMISSION_EDITOR_RECOMMEND_DECLINE:
+                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline')));
+            case SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS:
+                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions')));
+            case SUBMISSION_EDITOR_RECOMMEND_RESUBMIT:
+                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit')));
+            default:
+                return '';
         }
-
-        return $message;
-
 	}
 
     public function getLastDecision($submissionId): string
