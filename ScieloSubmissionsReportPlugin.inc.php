@@ -29,8 +29,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($success && Config::getVar('general', 'installed')) {
             $this->import('ScieloSubmissionsReportForm');
 
-            $form = new ScieloSubmissionsReportForm($this);
-
             $request = Application::getRequest();
             $url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
             $templateMgr = TemplateManager::getManager($request);
