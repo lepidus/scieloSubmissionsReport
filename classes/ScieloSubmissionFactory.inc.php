@@ -82,8 +82,9 @@ class ScieloSubmissionFactory
 
         $userDao = DAORegistry::getDAO('UserDAO');
         $submitter = $userDao->getById($userId);
+        $submitterCountry = $submitter->getCountryLocalized();
 
-        return $submitter->getCountryLocalized();
+        return !is_null($submitterCountry) ? $submitterCountry : "";
     }
 
     protected function calculateDaysUntilStatusChange($submission)
