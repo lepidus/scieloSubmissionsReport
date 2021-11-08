@@ -95,10 +95,20 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
-        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $publication = $submission->getData('publications')[0];
-        if ($publication->getData('datePublished') && $submission->getStatus() == STATUS_PUBLISHED) {
-            return new FinalDecision(__('common.accepted', [], $locale), $publication->getData('datePublished'));
+        $result = Capsule::table('submissions')
+        ->where('submission_id', $submissionId)
+        ->select('status')
+        ->first();
+        $submissionStatus = get_object_vars($result)['status'];
+
+        $result = Capsule::table('publications')
+        ->where('submission_id', '=', $submissionId)
+        ->select('date_published')
+        ->first();
+        $publicationDatePublished = get_object_vars($result)['date_published'];
+
+        if (is_null($publicationDatePublished) && $submissionStatus == STATUS_PUBLISHED) {
+            return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 
         $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
