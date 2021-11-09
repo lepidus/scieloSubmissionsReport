@@ -74,23 +74,39 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         return !empty($moderatorUsers) ? $moderatorUsers : array();
     }
 
-    public function getPublicationStatus($publication): string
+    public function getPublicationStatus($publicationId): string
     {
-        $relationStatus = $publication->getData('relationStatus');
+        $result = Capsule::table('publication_settings')
+        ->where('publication_id', '=', $publicationId)
+        ->where('setting_name', '=', 'relationStatus')
+        ->select('setting_value as relationStatus')
+        ->first();
+
+        if(is_null($result))
+            return "";
+
+        $relationStatus = get_object_vars($result)['relationStatus'];
         $relationsMap = [
             PUBLICATION_RELATION_NONE => 'publication.relation.none',
             PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
             PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
         ];
 
-        return (!is_null($relationStatus)) ? __($relationsMap[$relationStatus]) : "";
+        return __($relationsMap[$relationStatus]);
     }
 
-    public function getPublicationDOI($publication): string
+    public function getPublicationDOI($publicationId): string
     {
-        $relationId = $publication->getData('relationStatus');
-        $publicationDOI = $publication->getData('vorDoi');
-        return (!is_null($relationId) && !is_null($publicationDOI)) ? $publicationDOI : "";
+        $result = Capsule::table('publication_settings')
+        ->where('publication_id', '=', $publicationId)
+        ->where('setting_name', '=', 'vorDoi')
+        ->select('setting_value as vorDoi')
+        ->first();
+        
+        if(is_null($result))
+            return "";
+        
+        return $publicationDOI = get_object_vars($result)['vorDoi'];
     }
 
     public function getFinalDecisionWithDate($submissionId, $locale)

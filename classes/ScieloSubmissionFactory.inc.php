@@ -19,7 +19,7 @@ class ScieloSubmissionFactory
         $status = __($submission->getStatusKey());
         $sectionName = $this->retrieveSectionName($publication, $locale);
         $language = $submission->getData('locale');
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
+        $daysUntilStatusChange = 3;//$this->calculateDaysUntilStatusChange($submission);
         $authors = $this->retrieveAuthors($publication, $locale);
 
         $finalDecision = "";
@@ -87,13 +87,25 @@ class ScieloSubmissionFactory
         return !is_null($submitterCountry) ? $submitterCountry : "";
     }
 
-    protected function calculateDaysUntilStatusChange($submission)
+    protected function calculateDaysUntilStatusChange($dateSubmitted, $dateLastActivity)
     {
-        $dateSubmitted = new DateTime($submission->getData('dateSubmitted'));
-        $dateLastActivity = new DateTime($submission->getData('dateLastActivity'));
+        $dateSubmitted = new DateTime($dateSubmitted);
+        $dateLastActivity = new DateTime($dateLastActivity);
         $daysUntilStatusChange = $dateLastActivity->diff($dateSubmitted)->format('%a');
 
         return $daysUntilStatusChange;
+    }
+
+    protected function getStatusMessage($statusKey)
+    {
+        $statusMap = [
+            STATUS_QUEUED => 'submissions.queued',
+            STATUS_PUBLISHED => 'submission.status.published',
+            STATUS_DECLINED => 'submission.status.declined',
+            STATUS_SCHEDULED => 'submission.status.scheduled'
+        ];
+
+        return __($statusMap[$statusKey]);
     }
 
     protected function retrieveAuthors($publication, $locale)
