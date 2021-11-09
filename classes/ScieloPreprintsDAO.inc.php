@@ -107,7 +107,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         ->first();
         $publicationDatePublished = get_object_vars($result)['date_published'];
 
-        if (is_null($publicationDatePublished) && $submissionStatus == STATUS_PUBLISHED) {
+        if (!is_null($publicationDatePublished) && $submissionStatus == STATUS_PUBLISHED) {
             return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 
