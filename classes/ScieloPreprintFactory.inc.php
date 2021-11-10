@@ -10,8 +10,6 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
-        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $publication = $submission->getCurrentPublication();
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
         $submissionData = $scieloPreprintsDAO->getSubmissionMainData($submissionId);
@@ -23,7 +21,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $dateSubmitted = $submissionData['date_submitted'];
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submissionData['date_last_activity']);
         $status = $this->getStatusMessage($submissionData['status']);
-        $authors = $this->retrieveAuthors($publication, $locale);
+        $authors = $this->retrieveAuthors($publicationId, $locale);
         $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
         $language = $submissionData['locale'];
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);

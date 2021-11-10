@@ -20,7 +20,7 @@ class ScieloSubmissionFactory
         $sectionName = $this->retrieveSectionName($publication, $locale);
         $language = $submission->getData('locale');
         $daysUntilStatusChange = 3;//$this->calculateDaysUntilStatusChange($submission);
-        $authors = $this->retrieveAuthors($publication, $locale);
+        $authors = $this->retrieveAuthors($publication->getId(), $locale);
 
         $finalDecision = "";
         $finalDecisionDate = "";
@@ -108,12 +108,14 @@ class ScieloSubmissionFactory
         return __($statusMap[$statusKey]);
     }
 
-    protected function retrieveAuthors($publication, $locale)
+    protected function retrieveAuthors($publicationId, $locale)
     {
-        $authors =  $publication->getData('authors');
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $authorsIds =  $scieloSubmissionsDao->getPublicationAuthors($publicationId);
         $submissionAuthors = [];
 
-        foreach ($authors as $author) {
+        foreach ($authorsIds as $authorId) {
+            $author = DAORegistry::getDAO('AuthorDAO')->getById($authorId);
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
             $affiliation = $author->getLocalizedData('affiliation', $locale);

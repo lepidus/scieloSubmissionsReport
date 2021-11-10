@@ -112,6 +112,21 @@ class ScieloSubmissionsDAO extends DAO
         return $sectionTitle;
     }
 
+    public function getPublicationAuthors($publicationId)
+    {
+        $result = Capsule::table('authors')
+        ->where('publication_id', '=', $publicationId)
+        ->select('author_id')
+        ->get();
+
+        $authorsIds = [];
+        foreach($result->toArray() as $row) {
+            $authorsIds[] = get_object_vars($row)['author_id'];
+        }
+
+        return $authorsIds;
+    }
+
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
         $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
