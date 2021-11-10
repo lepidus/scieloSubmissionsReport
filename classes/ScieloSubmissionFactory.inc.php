@@ -8,19 +8,19 @@ class ScieloSubmissionFactory
 {
     public function createSubmission(int $submissionId, string $locale)
     {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $submission = $submissionDao->getById($submissionId);
-        $publication = $submission->getCurrentPublication();
+        $scieloSubmissionsDao = new ScieloSubmissionsDAO();
+        $submissionData = $scieloSubmissionsDao->getSubmissionMainData($submissionId);
+        $publicationId = $submissionData['current_publication_id'];
 
-        $submissionTitle = $publication->getData('title', $locale);
+        $submissionTitle = $scieloSubmissionsDao->getPublicationTitle($publicationId, $locale, $submissionData['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $dateSubmitted = $submission->getData('dateSubmitted');
-        $status = __($submission->getStatusKey());
-        $sectionName = $this->retrieveSectionName($publication, $locale);
-        $language = $submission->getData('locale');
-        $daysUntilStatusChange = 3;//$this->calculateDaysUntilStatusChange($submission);
-        $authors = $this->retrieveAuthors($publication->getId(), $locale);
+        $dateSubmitted = $submissionData['date_submitted'];
+        $status = $this->getStatusMessage($submissionData['status']);
+        $sectionName = $scieloSubmissionsDao->getPublicationSection($publicationId, $locale);
+        $language = $submissionData['locale'];
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submissionData['date_last_activity']);
+        $authors = $this->retrieveAuthors($publicationId, $locale);
 
         $finalDecision = "";
         $finalDecisionDate = "";
