@@ -59,6 +59,74 @@ class ScieloSubmissionsDAO extends DAO
         return $submissions;
     }
 
+    public function getSubmission($submissionId)
+    {
+        $result = Capsule::table('submissions')
+        ->where('submission_id', '=', $submissionId)
+        ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale')
+        ->first();
+        
+        return get_object_vars($result);
+    }
+
+    public function getPublicationTitle($publicationId, $locale, $submissionLocale)
+    {
+        $result = Capsule::table('publication_settings')
+        ->where('publication_id', '=', $publicationId)
+        ->where('setting_name', '=', 'title')
+        ->select('locale', 'setting_value as title')
+        ->get();
+
+        $titles = [];
+        foreach ($result->toArray() as $row) {
+            $title = get_object_vars($row)['title'];
+            $locale = get_object_vars($row)['locale'];
+            $titles[$locale] = $title;
+        }
+
+        if(array_key_exists($locale, $titles))
+            return $titles[$locale];
+        
+        if(array_key_exists($submissionLocale, $titles))
+            return $titles[$submissionLocale];
+
+        return array_pop(array_reverse($titles));
+    }
+
+    public function getPublicationSection($publicationId, $locale)
+    {
+        $result = Capsule::table('publications')
+        ->where('publication_id', '=', $publicationId)
+        ->select('section_id')
+        ->first();
+        $sectionId = get_object_vars($result)['section_id'];
+
+        $result = Capsule::table('section_settings')
+        ->where('section_id', '=', $sectionId)
+        ->where('setting_name', '=', 'title')
+        ->where('locale', '=', $locale)
+        ->select('setting_value as title')
+        ->first();
+        
+        $sectionTitle = get_object_vars($result)['title'];
+        return $sectionTitle;
+    }
+
+    public function getPublicationAuthors($publicationId)
+    {
+        $result = Capsule::table('authors')
+        ->where('publication_id', '=', $publicationId)
+        ->select('author_id')
+        ->get();
+
+        $authorsIds = [];
+        foreach($result->toArray() as $row) {
+            $authorsIds[] = get_object_vars($row)['author_id'];
+        }
+
+        return $authorsIds;
+    }
+
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
         $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];

@@ -10,20 +10,20 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
-        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $publication = $submission->getCurrentPublication();
         $scieloArticlesDAO = new ScieloArticlesDAO();
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
+        $submission = $scieloArticlesDAO->getSubmission($submissionId);
+        $publicationId = $submission['current_publication_id'];
 
-        $submissionTitle = $publication->getLocalizedData('title', $locale);
+        $submissionTitle = $scieloArticlesDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $dateSubmitted = $submission->getData('dateSubmitted');
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
-        $status = __($submission->getStatusKey());
-        $authors = $this->retrieveAuthors($publication, $locale);
-        $sectionName = $this->retrieveSectionName($publication, $locale);
-        $language = $submission->getData('locale');
+        $dateSubmitted = $submission['date_submitted'];
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
+        $status = $this->getStatusMessage($submission['status']);
+        $authors = $this->retrieveAuthors($publicationId, $locale);
+        $sectionName = $scieloArticlesDAO->getPublicationSection($publicationId, $locale);
+        $language = $submission['locale'];
 
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
         $editors = $scieloArticlesDAO->getEditors($submissionId);

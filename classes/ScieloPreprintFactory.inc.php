@@ -10,25 +10,25 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
-        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($submissionId);
-        $publication = $submission->getCurrentPublication();
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
+        $submission = $scieloPreprintsDAO->getSubmission($submissionId);
+        $publicationId = $submission['current_publication_id'];
 
-        $submissionTitle = $publication->getLocalizedData('title', $locale);
+        $submissionTitle = $scieloPreprintsDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $dateSubmitted = $submission->getData('dateSubmitted');
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($submission);
-        $status = __($submission->getStatusKey());
-        $authors = $this->retrieveAuthors($publication, $locale);
-        $sectionName = $this->retrieveSectionName($publication, $locale);
-        $language = $submission->getData('locale');
+        $dateSubmitted = $submission['date_submitted'];
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
+        $status = $this->getStatusMessage($submission['status']);
+        $authors = $this->retrieveAuthors($publicationId, $locale);
+        $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
+        $language = $submission['locale'];
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerator = $scieloPreprintsDAO->getSectionModerator($submissionId);
         $moderators = $scieloPreprintsDAO->getModerators($submissionId);
-        $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publication);
-        $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publication);
+        $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
+        $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publicationId);
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
 
         return new ScieloPreprint(
