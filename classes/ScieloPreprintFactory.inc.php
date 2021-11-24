@@ -12,18 +12,18 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
     {
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
-        $submissionData = $scieloPreprintsDAO->getSubmissionMainData($submissionId);
-        $publicationId = $submissionData['current_publication_id'];
+        $submission = $scieloPreprintsDAO->getSubmission($submissionId);
+        $publicationId = $submission['current_publication_id'];
 
-        $submissionTitle = $scieloPreprintsDAO->getPublicationTitle($publicationId, $locale, $submissionData['locale']);
+        $submissionTitle = $scieloPreprintsDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $dateSubmitted = $submissionData['date_submitted'];
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submissionData['date_last_activity']);
-        $status = $this->getStatusMessage($submissionData['status']);
+        $dateSubmitted = $submission['date_submitted'];
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
+        $status = $this->getStatusMessage($submission['status']);
         $authors = $this->retrieveAuthors($publicationId, $locale);
         $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
-        $language = $submissionData['locale'];
+        $language = $submission['locale'];
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerator = $scieloPreprintsDAO->getSectionModerator($submissionId);
         $moderators = $scieloPreprintsDAO->getModerators($submissionId);

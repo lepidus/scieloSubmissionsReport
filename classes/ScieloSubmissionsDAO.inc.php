@@ -59,7 +59,7 @@ class ScieloSubmissionsDAO extends DAO
         return $submissions;
     }
 
-    public function getSubmissionMainData($submissionId)
+    public function getSubmission($submissionId)
     {
         $result = Capsule::table('submissions')
         ->where('submission_id', '=', $submissionId)

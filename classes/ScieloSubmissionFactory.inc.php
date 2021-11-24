@@ -9,17 +9,17 @@ class ScieloSubmissionFactory
     public function createSubmission(int $submissionId, string $locale)
     {
         $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $submissionData = $scieloSubmissionsDao->getSubmissionMainData($submissionId);
-        $publicationId = $submissionData['current_publication_id'];
+        $submission = $scieloSubmissionsDao->getSubmission($submissionId);
+        $publicationId = $submission['current_publication_id'];
 
-        $submissionTitle = $scieloSubmissionsDao->getPublicationTitle($publicationId, $locale, $submissionData['locale']);
+        $submissionTitle = $scieloSubmissionsDao->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $dateSubmitted = $submissionData['date_submitted'];
-        $status = $this->getStatusMessage($submissionData['status']);
+        $dateSubmitted = $submission['date_submitted'];
+        $status = $this->getStatusMessage($submission['status']);
         $sectionName = $scieloSubmissionsDao->getPublicationSection($publicationId, $locale);
-        $language = $submissionData['locale'];
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submissionData['date_last_activity']);
+        $language = $submission['locale'];
+        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $authors = $this->retrieveAuthors($publicationId, $locale);
 
         $finalDecision = "";
