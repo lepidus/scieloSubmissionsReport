@@ -138,8 +138,14 @@ class ScieloSubmissionsReportForm extends Form {
 		$templateManager->assign('sessions',$sessions);
 		$templateManager->assign('sessions_options',$sessions_options);
 		$templateManager->assign('years', array(0=>$request[0], 1=>$request[1]));
+		
+		$styleSheetUrl = $journalRequest->getBaseUrl() . '/' . $this->_plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
+		$templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $styleSheetUrl, array(
+			'priority' => STYLE_SEQUENCE_CORE,
+			'contexts' => 'backend',
+		));
 		$templateManager->display($this->_plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
 	}
- }
+}
 
 ?>

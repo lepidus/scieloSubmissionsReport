@@ -32,14 +32,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin {
 			$form = new ScieloSubmissionsReportForm($this, $application);
 			$scieloSubmissionsReportDAO = new ScieloSubmissionsReportDAO();
 			DAORegistry::registerDAO('ScieloSubmissionsReportDAO', $scieloSubmissionsReportDAO);
-			
-			$request = Application::getRequest();
-			$url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
-			$templateMgr = TemplateManager::getManager($request);
-			$templateMgr->addStyleSheet('scieloSubmissionsStyleSheet', $url, array(
-				'priority' => STYLE_SEQUENCE_CORE,
-				'contexts' => 'backend',
-			));
 
 			$this->addLocaleData();
 			return $success;
