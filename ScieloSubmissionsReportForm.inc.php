@@ -112,6 +112,11 @@ class ScieloSubmissionsReportForm extends Form
         $sections_options = $this->getSectionsOptions($this->contextId, $sections);
 
         $templateManager = TemplateManager::getManager();
+        $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
+        $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, array(
+            'priority' => STYLE_SEQUENCE_CORE,
+            'contexts' => 'backend',
+        ));
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
         $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
