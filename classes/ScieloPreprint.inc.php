@@ -6,7 +6,7 @@ class ScieloPreprint extends ScieloSubmission {
 
     private $submitterIsScieloJournal;
     private $moderators;
-    private $sectionModerator;
+    private $sectionModerators;
     private $publicationStatus;
     private $publicationDOI;
     private $notes;
@@ -15,7 +15,7 @@ class ScieloPreprint extends ScieloSubmission {
         parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
         $this->submitterIsScieloJournal = $submitterIsScieloJournal;
         $this->moderators = $moderators;
-        $this->sectionModerator = $sectionModerator;
+        $this->sectionModerators = $sectionModerators;
         $this->publicationStatus = $publicationStatus;
         $this->publicationDOI = $publicationDOI;
         $this->notes = $notes;
@@ -34,9 +34,9 @@ class ScieloPreprint extends ScieloSubmission {
         return $this->implodeEmptyFields($this->moderators, $messageNoModerators);
     }
 
-    public function getSectionModerator() : string {
+    public function getSectionModerators() : string {
         $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
-        return $this->fillEmptyFields($this->sectionModerator, $messageNoModerators);
+        return $this->implodeEmptyFields($this->sectionModerators, $messageNoModerators);
     }
 
     public function getPublicationStatus() : string {

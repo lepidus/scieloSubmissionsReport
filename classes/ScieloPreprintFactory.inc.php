@@ -26,7 +26,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
         $language = $submission['locale'];
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
-        $sectionModerator = $scieloPreprintsDAO->getSectionModerator($submissionId);
+        $sectionModerators = $scieloPreprintsDAO->getSectionModerators($submissionId);
         $moderators = $scieloPreprintsDAO->getModerators($submissionId);
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
         $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publicationId);
@@ -47,7 +47,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $finalDecision,
             $finalDecisionDate,
             $moderators,
-            $sectionModerator,
+            $sectionModerators,
             $publicationStatus,
             $publicationDOI,
             $notes

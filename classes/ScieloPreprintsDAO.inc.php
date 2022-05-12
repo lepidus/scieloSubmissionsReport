@@ -53,6 +53,8 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
+        
+        $sectionModeratorUsers =  array();
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
@@ -61,10 +63,10 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
 
             if ($currentUserGroupName == 'area moderator') {
-                return $user->getFullName();
+                array_push($sectionModeratorUsers, $user->getFullName());
             }
         }
-        return '';
+        return $sectionModeratorUsers;
     }
 
     public function getModerators($submissionId): array
@@ -85,7 +87,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
                 array_push($moderatorUsers, $user->getFullName());
             }
         }
-        return !empty($moderatorUsers) ? $moderatorUsers : array();
+        return $moderatorUsers;
     }
 
     public function getPublicationStatus($publicationId): string

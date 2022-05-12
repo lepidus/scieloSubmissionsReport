@@ -22,7 +22,7 @@ class ScieloPreprintTest extends TestCase {
     private $finalDecisionDate = "2013-09-14 22:00:00";
     private $expectedReviewingTime = 8;
     private $moderators = array("Albert Einstein", "Richard Feynman");
-    private $sectionModerator = "Clarice Lispector";
+    private $sectionModerators = array("Clarice Lispector", "Oswaldo de Andrade");
     private $publicationStatus = "Preprint has been published in a journal as an article";
     private $publicationDOI = "https://doi.org/10.1590/0100-3984.2020.53.2e1";
     private $notes = array("The author forgot to cite relevant work on this preprint", "This work is wonderful! Congrats!");
@@ -47,14 +47,14 @@ class ScieloPreprintTest extends TestCase {
         $this->assertEquals($messageNoModerators, $preprint->getModerators());
     }
 
-    public function testHasSectionModerator() : void {
-        $this->assertEquals($this->sectionModerator, $this->submission->getSectionModerator());
+    public function testHasSectionModerators() : void {
+        $this->assertEquals(implode(",", $this->sectionModerators), $this->submission->getSectionModerators());
     }
 
     public function testHasNoSectionModerator() : void {
         $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, "", $this->publicationStatus, $this->publicationDOI, $this->notes);
         $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
-        $this->assertEquals($messageNoModerators, $preprint->getSectionModerator());
+        $this->assertEquals($messageNoModerators, $preprint->getSectionModerators());
     }
 
     public function testHasPublicationStatus() : void {

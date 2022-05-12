@@ -400,7 +400,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerator());
+        $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerators());
     }
 
 	/**
