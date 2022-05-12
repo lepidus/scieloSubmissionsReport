@@ -123,7 +123,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         fclose($csvFile);
 
         $noMsg = __("common.no");
-        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", $noMsg, "", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", $noMsg, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedLine, $firstLine);
     }
 }

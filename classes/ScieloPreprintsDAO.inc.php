@@ -34,6 +34,20 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         return $notes;
     }
 
+    public function getSubmitterIsScieloJournal($submitterId)
+    {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+
+        $submitterUserGroups = $userGroupDao->getByUserId($submitterId);
+        while($userGroup = $submitterUserGroups->next()) {
+            $journalGroupAbbrev = "SciELO";
+            if($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev)
+                return true;
+        }
+
+        return false;
+    }
+
     public function getSectionModerator($submissionId): string
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
