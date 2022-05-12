@@ -48,7 +48,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         return false;
     }
 
-    public function getSectionModerator($submissionId): string
+    public function getSectionModerators($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
