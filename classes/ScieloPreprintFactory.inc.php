@@ -18,6 +18,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $submissionTitle = $scieloPreprintsDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
+        $submitterIsScieloJournal = $this->retrieveSubmitterIsScieloJournal($submissionId);
         $dateSubmitted = $submission['date_submitted'];
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $status = $this->getStatusMessage($submission['status']);
@@ -36,6 +37,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $submissionTitle,
             $submitter,
             $submitterCountry,
+            $submitterIsScieloJournal,
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,
@@ -50,5 +52,17 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $publicationDOI,
             $notes
         );
+    }
+
+    private function retrieveSubmitterIsScieloJournal($submissionId)
+    {
+        $scieloPreprintsDao = new ScieloPreprintsDAO();
+        $submitterId = $scieloPreprintsDao->getIdOfSubmitterUser($submissionId);
+
+        if (is_null($submitterId)) {
+            return false;
+        }
+
+        return $scieloPreprintsDao->getSubmitterIsScieloJournal($submitterId);
     }
 }

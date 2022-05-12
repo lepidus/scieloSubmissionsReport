@@ -82,6 +82,9 @@ msgstr "Submission's ID"
 msgid "plugins.reports.scieloSubmissionsReport.header.submitterCountry"
 msgstr "Submitter country"
 
+msgid "plugins.reports.scieloSubmissionsReport.header.submitterIsScieloJournal"
+msgstr "SciELO Journal"
+
 msgid "plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"
 msgstr "Days until status changing"
 

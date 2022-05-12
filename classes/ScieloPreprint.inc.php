@@ -4,14 +4,16 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
 
 class ScieloPreprint extends ScieloSubmission {
 
+    private $submitterIsScieloJournal;
     private $moderators;
     private $sectionModerators;
     private $publicationStatus;
     private $publicationDOI;
     private $notes;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes) {
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, string $sectionModerator, string $publicationStatus, string $publicationDOI, array $notes) {
         parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
+        $this->submitterIsScieloJournal = $submitterIsScieloJournal;
         $this->moderators = $moderators;
         $this->sectionModerators = $sectionModerators;
         $this->publicationStatus = $publicationStatus;
@@ -20,7 +22,11 @@ class ScieloPreprint extends ScieloSubmission {
     }
 
     public function asRecord(): array {
-        return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getModerators(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+        return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerator(), $this->getModerators(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+    }
+
+    public function getSubmitterIsScieloJournal() : string {
+        return $this->submitterIsScieloJournal ? __("common.yes") : __("common.no");
     }
 
     public function getModerators() : string {

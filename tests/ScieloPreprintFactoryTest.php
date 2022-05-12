@@ -121,6 +121,30 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $submissionDao->updateObject($submission);
     }
 
+    private function createSubmitter(): int
+    {
+        $submissionEventLogDao = DAORegistry::getDAO('SubmissionEventLogDAO');
+        $userDao = DAORegistry::getDAO('UserDAO');
+
+        $userSubmitter = new User();
+        $userSubmitter->setUsername('the_godfather');
+        $userSubmitter->setEmail('donvito@corleone.com');
+        $userSubmitter->setPassword('miaumiau');
+        $userSubmitter->setCountry('BR');
+        $userSubmitter->setGivenName("Don", $this->locale);
+        $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
+        $userSubmitterId = $userDao->insertObject($userSubmitter);
+
+        $submissionEvent = $submissionEventLogDao->newDataObject();
+        $submissionEvent->setSubmissionId($this->submissionId);
+        $submissionEvent->setEventType(SUBMISSION_LOG_SUBMISSION_SUBMIT);
+        $submissionEvent->setUserId($userSubmitterId);
+        $submissionEvent->setDateLogged($this->dateSubmitted);
+        $submissionEventLogDao->insertObject($submissionEvent);
+
+        return $userSubmitterId;
+    }
+
     private function createModeratorsUsers(): array
     {
         $userModerator = new User();
@@ -186,6 +210,29 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $sectionModeratorUserGroup->setData('contextId', $this->contextId);
 
         return $userGroupDao->insertObject($sectionModeratorUserGroup);
+    }
+
+    private function createScieloJournalUserGroup(): int 
+    {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+
+        $scieloJournalUserGroupLocalizedNames = [
+            'en_US'=>'SciELO Journal',
+            'pt_BR'=>'Periódico SciELO',
+            'es_ES'=>'Revista SciELO'
+        ];
+        $scieloJournalUserGroupLocalizedAbbrev = [
+            'en_US'=>'SciELO',
+            'pt_BR'=>'SciELO',
+            'es_ES'=>'SciELO'
+        ];
+        $scieloJournalUserGroup = new UserGroup();
+        $scieloJournalUserGroup->setData('name', $scieloJournalUserGroupLocalizedNames);
+        $scieloJournalUserGroup->setData('abbrev', $scieloJournalUserGroupLocalizedAbbrev);
+        $scieloJournalUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
+        $scieloJournalUserGroup->setData('contextId', $this->contextId);
+
+        return $userGroupDao->insertObject($scieloJournalUserGroup);
     }
 
 	/**
@@ -284,6 +331,24 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
+
+    /**
+	 * @group OPS
+	 */
+    public function testSubmissionGetsIfUserIsScieloJournal(): void
+    {
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        
+        $submitterId = $this->createSubmitter();
+        $scieloJournalGroupId = $this->createScieloJournalUserGroup();
+        $userGroupDao->assignUserToGroup($submitterId, $scieloJournalGroupId);
+
+        $preprintFactory = new ScieloPreprintFactory();
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals(__("common.yes"), $scieloPreprint->getSubmitterIsScieloJournal());
+    }
+    
 
 	/**
 	 * @group OPS

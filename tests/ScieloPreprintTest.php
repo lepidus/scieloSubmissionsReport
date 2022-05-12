@@ -11,6 +11,7 @@ class ScieloPreprintTest extends TestCase {
     private $title = "Rethinking linguistic relativity";
     private $submitter = "Atila Iamarino";
     private $submitterCountry = "Brasil";
+    private $submitterIsScieloJournal = false;
     private $dateSubmitted = "2013-09-06 19:07:02";
     private $daysUntilStatusChange = 3;
     private $status = "Published";
@@ -28,7 +29,12 @@ class ScieloPreprintTest extends TestCase {
 
     public function setUp() : void {
         $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
-        $this->submission = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerators, $this->publicationStatus, $this->publicationDOI, $this->notes);
+        $this->submission = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $this->notes);
+    }
+
+    public function testSubmitterIsScieloJournal() : void {
+        $messageSubmitterIsJournal = __("common.no");
+        $this->assertEquals($messageSubmitterIsJournal, $this->submission->getSubmitterIsScieloJournal());
     }
 
     public function testHasModerators() : void {
@@ -36,7 +42,7 @@ class ScieloPreprintTest extends TestCase {
     }
     
     public function testHasNoModerators() : void {
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, [], $this->sectionModerators, $this->publicationStatus, $this->publicationDOI, $this->notes);
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, [], $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $this->notes);
         $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
         $this->assertEquals($messageNoModerators, $preprint->getModerators());
     }
@@ -45,8 +51,8 @@ class ScieloPreprintTest extends TestCase {
         $this->assertEquals(implode(",", $this->sectionModerators), $this->submission->getSectionModerators());
     }
 
-    public function testHasNoSectionModerators() : void {
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, [], $this->publicationStatus, $this->publicationDOI, $this->notes);
+    public function testHasNoSectionModerator() : void {
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, "", $this->publicationStatus, $this->publicationDOI, $this->notes);
         $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
         $this->assertEquals($messageNoModerators, $preprint->getSectionModerators());
     }
@@ -56,7 +62,7 @@ class ScieloPreprintTest extends TestCase {
     }
 
     public function testWhenPublicationStatusIsEmpty() : void {
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerators, "", $this->publicationDOI, $this->notes);
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, "", $this->publicationDOI, $this->notes);
         $messageNoPublicationStatus = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
         $this->assertEquals($messageNoPublicationStatus, $preprint->getPublicationStatus());
     }
@@ -66,7 +72,7 @@ class ScieloPreprintTest extends TestCase {
     }
 
     public function testWhenPublicationDOIIsEmpty() : void {
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerators, $this->publicationStatus, "", $this->notes);
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, "", $this->notes);
         $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
         $this->assertEquals($messageNoPublicationDOI, $preprint->getPublicationDOI());
     }
@@ -77,24 +83,25 @@ class ScieloPreprintTest extends TestCase {
 
     public function testWhenNotesHaveLinebreaks() : void {
         $noteWithLineBreak = array("The author forgot to cite relevant work on this preprint.\nHe needs to cite more relevant works.");
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerators, $this->publicationStatus, $this->publicationDOI, $noteWithLineBreak);
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $noteWithLineBreak);
 
         $this->assertEquals("Note: The author forgot to cite relevant work on this preprint. He needs to cite more relevant works.", $preprint->getNotes());
     }
     
     public function testWhenPreprintHasNoNotes() : void {
         $emptyNotes = array();
-        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerators, $this->publicationStatus, $this->publicationDOI, $emptyNotes);
+        $preprint = new ScieloPreprint($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->submitterIsScieloJournal, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->moderators, $this->sectionModerator, $this->publicationStatus, $this->publicationDOI, $emptyNotes);
 
         $messageNoNotes = __("plugins.reports.scieloSubmissionsReport.warning.noNotes");
         $this->assertEquals($messageNoNotes, $preprint->getNotes());
     }
 
     public function testGetRecord() : void {
-        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "", [""]);
+        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], "Jean Paul Cardin", "Sent to journal publication", "", [""]);
         $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+        $messageSubmitterIsNotScieloJournal = __("common.no");
 
-        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", $messageSubmitterIsNotScieloJournal, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedRecord, $preprint->asRecord());
     }
 }
