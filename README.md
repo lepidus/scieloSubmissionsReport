@@ -28,11 +28,13 @@ The information obtained only in OJS are:
 - Last decision
 
 The information obtained only in OPS are:
+- Submitter Is Scielo Journal
 - Preprint publication status (not submitted for publication in journal, submitted or submitted and published)
 - Preprint publication DOI (if it has been published in a journal)
 - Section moderator assigned
 - Moderators assigned
 - Submission notes
+
 
 ## Compatibility
 
