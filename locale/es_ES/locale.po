@@ -79,6 +79,9 @@ msgstr "ID de envío"
 msgid "plugins.reports.scieloSubmissionsReport.header.submitterCountry"
 msgstr "País del remitente"
 
+msgid "plugins.reports.scieloSubmissionsReport.header.submitterIsScieloJournal"
+msgstr "Revista SciELO"
+
 msgid "plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"
 msgstr "Días hasta el cambio de estado"
 
