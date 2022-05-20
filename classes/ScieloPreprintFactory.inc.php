@@ -31,6 +31,8 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
         $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publicationId);
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
+        $abstractViews = $scieloPreprintsDAO->getAbstractViews($submissionId);
+        $pdfViews = $scieloPreprintsDAO->getPdfViews($submissionId);
 
         return new ScieloPreprint(
             $submissionId,
@@ -50,7 +52,9 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $sectionModerators,
             $publicationStatus,
             $publicationDOI,
-            $notes
+            $notes,
+            $abstractViews,
+            $pdfViews
         );
     }
 

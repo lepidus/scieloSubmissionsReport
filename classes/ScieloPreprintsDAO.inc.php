@@ -17,6 +17,31 @@ use Illuminate\Support\Collection;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 {
+    public function getAbstractViews($submissionId): int
+    {
+        $statsService = \Services::get('stats');
+        $abstractRecords = $statsService->getRecords([
+            'assocTypes' => ASSOC_TYPE_SUBMISSION,
+            'submissionIds' => [$submissionId],
+        ]);
+        $abstractViews = array_reduce($abstractRecords, [$statsService, 'sumMetric'], 0);
+
+        return $abstractViews;
+    }
+    
+    public function getPdfViews($submissionId): int
+    {
+        $statsService = \Services::get('stats');
+        $galleyRecords = $statsService->getRecords([
+            'assocTypes' => ASSOC_TYPE_SUBMISSION_FILE,
+            'fileType' => STATISTICS_FILE_TYPE_PDF,
+            'submissionIds' => [$submissionId]
+        ]);
+        $pdfViews = array_reduce($galleyRecords, [$statsService, 'sumMetric'], 0);
+        
+        return $pdfViews;
+    }
+
     public function getSubmissionNotes($submissionId): array
     {
         $resultNotes = Capsule::table('notes')
