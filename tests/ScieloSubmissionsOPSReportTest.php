@@ -1,5 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
+import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
@@ -36,9 +37,9 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $submittedDateForPreprint3 = "2020-11-8";
         $finalDecisionDateForPreprint3 = "2020-11-15";
 
-        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "No DOI informed", [""]);
-        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""]);
-        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""]);
+        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
+        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
+        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
 
         return [$preprint1, $preprint2, $preprint3];
     }
@@ -70,7 +71,9 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
             __("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
             __("plugins.reports.scieloSubmissionsReport.header.finalDecisionDate"),
             __("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
-            __("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval")
+            __("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"),
+            __("submission.abstractViews"),
+            __("plugins.reports.scieloSubmissionsReport.header.pdfViews"),
         ];
         fclose($csvFile);
 
@@ -123,7 +126,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         fclose($csvFile);
 
         $noMsg = __("common.no");
-        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", $noMsg, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $expectedLine = ["1", "Title 1", "Paola Franchesca", "Brasil", $noMsg, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", "No DOI informed", "Note:", "Accepted", "2021-04-23", "2", "2", "10", "10"];
         $this->assertEquals($expectedLine, $firstLine);
     }
 }

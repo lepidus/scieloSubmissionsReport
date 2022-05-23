@@ -27,7 +27,9 @@ class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport
             __("plugins.reports.scieloSubmissionsReport.header.FinalDecision"),
             __("plugins.reports.scieloSubmissionsReport.header.finalDecisionDate"),
             __("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
-            __("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval")
+            __("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"),
+            __("submission.abstractViews"),
+            __("plugins.reports.scieloSubmissionsReport.header.pdfViews"),
         ];
     }
 }

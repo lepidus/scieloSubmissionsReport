@@ -135,3 +135,6 @@ msgstr "Average reviewing time (in days) of approved and rejected manuscripts (d
 
 msgid "plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"
 msgstr "Time between submission and final decision"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
+msgstr "PDF Views"

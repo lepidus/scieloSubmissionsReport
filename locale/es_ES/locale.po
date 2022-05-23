@@ -126,3 +126,6 @@ msgstr "Tiempo promedio de evaluación (en días) de los manuscritos aprobados y
 
 msgid "plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"
 msgstr "Tiempo entre la presentación y la decisión final"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
+msgstr "Consultas del PDF"
