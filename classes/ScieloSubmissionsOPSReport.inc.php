@@ -5,9 +5,16 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport'
 class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport 
 {
 
-    protected function getHeaders(): array 
+    private $includeViews;
+
+    public function __construct(array $sections, array $submissions, bool $includeViews = false) {
+        parent::__construct($sections, $submissions);
+        $this->includeViews = $includeViews;
+    }
+
+    public function getHeaders(): array 
     {
-        return [
+        $headers = [
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),
             __("submission.submitter"),
@@ -28,8 +35,12 @@ class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport
             __("plugins.reports.scieloSubmissionsReport.header.finalDecisionDate"),
             __("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"),
             __("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"),
-            __("submission.abstractViews"),
-            __("plugins.reports.scieloSubmissionsReport.header.pdfViews"),
         ];
+
+        if($this->includeViews){
+            $headers = array_merge($headers, [__("submission.abstractViews"), __("plugins.reports.scieloSubmissionsReport.header.pdfViews")]);
+        }
+        
+        return $headers;
     }
 }

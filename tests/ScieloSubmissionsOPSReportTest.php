@@ -15,7 +15,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
 
     public function setUp() : void {
         $this->submissions = $this->createTestPreprints();
-        $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions);
+        $includeViews = true;
+        $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
     }
 
     public function tearDown() : void {
@@ -78,6 +79,17 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         fclose($csvFile);
 
         $this->assertEquals($expectedLine, $firstLine);
+    }
+
+    public function testHeadersColumnsWhenReportNotIncludesViews() : void {
+        $includeViews = false;
+        $report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
+
+        $headers = $report->getHeaders();
+        $penultimateColumn = $headers[count($headers)-2];
+        $lastColumn = $headers[count($headers)-1];
+        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"), $penultimateColumn);
+        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"), $lastColumn);
     }
 
     public function testAverageReviewingTime() : void {
