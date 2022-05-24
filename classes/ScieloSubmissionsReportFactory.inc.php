@@ -18,8 +18,9 @@ class ScieloSubmissionsReportFactory
     private $sectionsIds;
     private $submissionDateInterval;
     private $finalDecisionDateInterval;
+    private $includeViews;
 
-    public function __construct(string $application, int $contextId, array $sectionsIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale)
+    public function __construct(string $application, int $contextId, array $sectionsIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale, bool $includeViews)
     {
         $this->application = $application;
         $this->locale = $locale;
@@ -27,6 +28,7 @@ class ScieloSubmissionsReportFactory
         $this->sectionsIds = $sectionsIds;
         $this->submissionDateInterval = $submissionDateInterval;
         $this->finalDecisionDateInterval = $finalDecisionDateInterval;
+        $this->includeViews = $includeViews;
     }
     
     public function createReport(): ScieloSubmissionsReport
@@ -40,9 +42,9 @@ class ScieloSubmissionsReportFactory
 
         if ($this->application == 'ops') {
             $submissionsDao = new ScieloPreprintsDAO();
-            $submissionFactory = new ScieloPreprintFactory();
+            $submissionFactory = new ScieloPreprintFactory($this->includeViews);
             $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
-            return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions);
+            return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions, $this->includeViews);
         }
         elseif ($this->application == 'ojs') {
             $submissionsDao = new ScieloArticlesDAO();
