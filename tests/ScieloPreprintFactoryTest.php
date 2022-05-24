@@ -477,7 +477,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     public function testSubmissionGetsAbstractViews(): void
     {
         $this->createMetrics();
-        $preprintFactory = new ScieloPreprintFactory();
+        $includeViews = true;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->abstractViews, $scieloPreprint->getAbstractViews());
@@ -489,9 +490,24 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     public function testSubmissionGetsPdfViews(): void
     {
         $this->createMetrics();
-        $preprintFactory = new ScieloPreprintFactory();
+        $includeViews = true;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->pdfViews, $scieloPreprint->getPdfViews());
+    }
+
+    /**
+	 * @group OPS
+	*/
+    public function testSubmissionDoesntGetViews(): void
+    {
+        $this->createMetrics();
+        $includeViews = false;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertNull($scieloPreprint->getAbstractViews());
+        $this->assertNull($scieloPreprint->getPdfViews());
     }
 }
