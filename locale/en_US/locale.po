@@ -47,6 +47,9 @@ msgstr "Period"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Sections"
 
+msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
+msgstr "Include in the report the numbers of views of submissions"
+
 msgid "plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"
 msgstr ""
 "The report generation proccesss can take a few minutes, depending on the parameters selected and the number of submissions present in the system. "

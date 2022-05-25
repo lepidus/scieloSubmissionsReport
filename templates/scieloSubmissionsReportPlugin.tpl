@@ -84,6 +84,13 @@
             </table> 
         {/if}
 
+        {if $application eq "ops"}
+            <div id="includeViewsCheckboxDiv">
+                <input type="checkbox" name="includeViews" id="includeViewsCheckbox" value="1"/>
+                {translate key="plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"}
+            </div>
+        {/if}
+
         <p id="noticeTimeGenerateReport">
             {translate key="plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"}
         </p>

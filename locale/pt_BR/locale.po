@@ -47,6 +47,9 @@ msgstr "Período"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Seções"
 
+msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
+msgstr "Incluir no relatório o número de acessos das submissões"
+
 msgid "plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"
 msgstr ""
 "O processo de geração do relatório pode demorar poucos minutos, dependendo do parâmetros selecionados e do número de submissões presentes no sistema. "
