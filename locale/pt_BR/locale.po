@@ -48,7 +48,7 @@ msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Seções"
 
 msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
-msgstr "Incluir no relatório o número de acessos das submissões"
+msgstr "Incluir no relatório os números de acessos das submissões"
 
 msgid "plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"
 msgstr ""
