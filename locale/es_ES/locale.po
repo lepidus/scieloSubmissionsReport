@@ -47,6 +47,9 @@ msgstr "Período"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Secciones"
 
+msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
+msgstr "Incluir los números de acceso de los envíos en el informe"
+
 msgid "plugins.reports.scieloSubmissionsReport.noticeTimeGenerateReport"
 msgstr ""
 "El proceso de generación de informes puede tardar unos minutos, según los parámetros seleccionados y la cantidad de envíos presentes en el sistema. "
@@ -126,3 +129,6 @@ msgstr "Tiempo promedio de evaluación (en días) de los manuscritos aprobados y
 
 msgid "plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"
 msgstr "Tiempo entre la presentación y la decisión final"
+
+msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
+msgstr "Consultas del PDF"

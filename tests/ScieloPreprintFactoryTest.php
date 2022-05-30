@@ -7,6 +7,9 @@ import('classes.journal.Section');
 import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintFactory');
 import('classes.workflow.EditorDecisionActionsManager');
+import('classes.statistics.MetricsDAO');
+
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
@@ -27,6 +30,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $submissionAuthors;
     private $vorDoi = "10.666/949494";
     private $relationStatus = PUBLICATION_RELATION_PUBLISHED;
+    private $abstractViews = 10;
+    private $pdfViews = 21;
 
     public function setUp(): void
     {
@@ -43,7 +48,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
         'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'metrics'];
     }
 
     private function createSubmission($statusCode): int
@@ -235,6 +240,31 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return $userGroupDao->insertObject($scieloJournalUserGroup);
     }
 
+    private function createMetrics(): void
+    {
+        Capsule::table('metrics')->insert([
+            'load_id' => 'usage_events_20210520.log',
+            'context_id' => $this->contextId,
+            'assoc_type' => ASSOC_TYPE_SUBMISSION,
+            'assoc_id' => $this->submissionId,
+            'submission_id' => $this->submissionId,
+            'metric_type' => METRIC_TYPE_COUNTER,
+            'metric' => $this->abstractViews,
+            'day' => '20220520'
+        ]);
+        Capsule::table('metrics')->insert([
+            'load_id' => 'usage_events_20210520.log',
+            'context_id' => $this->contextId,
+            'assoc_type' => ASSOC_TYPE_SUBMISSION_FILE,
+            'file_type' => STATISTICS_FILE_TYPE_PDF,
+            'assoc_id' => 1,
+            'submission_id' => $this->submissionId,
+            'metric_type' => METRIC_TYPE_COUNTER,
+            'metric' => $this->pdfViews,
+            'day' => '20220520'
+        ]);
+    }
+
 	/**
 	 * @group OPS
 	*/
@@ -348,7 +378,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $this->assertEquals(__("common.yes"), $scieloPreprint->getSubmitterIsScieloJournal());
     }
-    
 
 	/**
 	 * @group OPS
@@ -440,5 +469,45 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloPreprint->getNotes());
+    }
+
+    /**
+	 * @group OPS
+	*/
+    public function testSubmissionGetsAbstractViews(): void
+    {
+        $this->createMetrics();
+        $includeViews = true;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->abstractViews, $scieloPreprint->getAbstractViews());
+    }
+
+    /**
+	 * @group OPS
+	*/
+    public function testSubmissionGetsPdfViews(): void
+    {
+        $this->createMetrics();
+        $includeViews = true;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($this->pdfViews, $scieloPreprint->getPdfViews());
+    }
+
+    /**
+	 * @group OPS
+	*/
+    public function testSubmissionDoesntGetViews(): void
+    {
+        $this->createMetrics();
+        $includeViews = false;
+        $preprintFactory = new ScieloPreprintFactory($includeViews);
+        $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertNull($scieloPreprint->getAbstractViews());
+        $this->assertNull($scieloPreprint->getPdfViews());
     }
 }

@@ -26,6 +26,7 @@ class ScieloSubmissionsReportForm extends Form
     private $sections;
     private $submissionDateInterval;
     private $finalDecisionDateInterval;
+    private $includeViews;
 
     /**
      * Constructor
@@ -40,6 +41,7 @@ class ScieloSubmissionsReportForm extends Form
         $this->sections = array();
         $this->submissionDateInterval = null;
         $this->finalDecisionDateInterval = null;
+        $this->includeViews = false;
 
         parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
         $this->addCheck(new FormValidatorPost($this));
@@ -59,6 +61,7 @@ class ScieloSubmissionsReportForm extends Form
     public function validateReportData($reportParams)
     {
         if(array_key_exists('sections', $reportParams)) $this->sections = $reportParams['sections'];
+        if(array_key_exists('includeViews', $reportParams)) $this->includeViews = $reportParams['includeViews'];
         $filteringType = $reportParams['selectFilterTypeDate'];
 
         if ($filteringType == 'filterBySubmission' || $filteringType == 'filterByBoth') {
@@ -99,7 +102,7 @@ class ScieloSubmissionsReportForm extends Form
         $this->emitHttpHeaders($request);
 
         $locale = AppLocale::getLocale();
-        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale, $this->includeViews);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
         $csvFile = fopen('php://output', 'wt');
@@ -117,6 +120,7 @@ class ScieloSubmissionsReportForm extends Form
             'priority' => STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
         ));
+        $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
         $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));

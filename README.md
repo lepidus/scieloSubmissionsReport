@@ -1,6 +1,11 @@
 # SciELO Submissions Report Plugin
 
-This plugin generates a **CSV** spreadsheet with information that is usually requested by SciELO, based on the website submissions. It allows the user to filter submissions within a date interval, using for this the submission date, last decision date or both. The user can also filter from which sections the submissions should be obtained.
+This plugin generates a **CSV** spreadsheet with information that is  usually requested by SciELO, based on the website submissions.
+
+It allows the user to filter submissions within a date interval, using for this the submission date, last decision date or both. \
+The user can also filter from which sections the submissions should be obtained.
+
+In OPS, the user can also choose if the number of views for abstract and PDF should be included in the report.
 
 Since this plugin can be used in OJS and OPS, the informations change for each application.
 
@@ -34,6 +39,8 @@ The information obtained only in OPS are:
 - Section moderator assigned
 - Moderators assigned
 - Submission notes
+- Abstract Views
+- PDF Views
 
 
 ## Compatibility

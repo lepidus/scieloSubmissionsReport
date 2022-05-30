@@ -63,7 +63,7 @@ class ScieloSubmissionsDAO extends DAO
     {
         $result = Capsule::table('submissions')
         ->where('submission_id', '=', $submissionId)
-        ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale')
+        ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale', 'context_id')
         ->first();
         
         return get_object_vars($result);

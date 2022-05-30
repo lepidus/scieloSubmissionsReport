@@ -4,7 +4,7 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport'
 
 class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport {
     
-    protected function getHeaders() : array {
+    public function getHeaders() : array {
         return [
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),

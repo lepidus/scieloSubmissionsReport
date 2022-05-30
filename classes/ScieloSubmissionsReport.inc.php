@@ -44,7 +44,7 @@ class ScieloSubmissionsReport {
         return round($totalReviewingTime / count($submissionsToUse));
     }
 
-    protected function getHeaders() : array {
+    public function getHeaders() : array {
         return [
             "ID da submissão",
             "Título da Submissão",

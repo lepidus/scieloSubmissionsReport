@@ -7,6 +7,12 @@ import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory'
 class ScieloPreprintFactory extends ScieloSubmissionFactory
 {
     protected $application = 'ops';
+    private $includeViews;
+
+    public function __construct(bool $includeViews = false)
+    {
+        $this->includeViews = $includeViews;
+    }
 
     public function createSubmission(int $submissionId, string $locale)
     {
@@ -31,6 +37,9 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
         $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publicationId);
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
+        
+        $abstractViews = $this->includeViews ? $scieloPreprintsDAO->getAbstractViews($submissionId, $submission['context_id']) : null;
+        $pdfViews = $this->includeViews ? $scieloPreprintsDAO->getPdfViews($submissionId, $submission['context_id']) : null;
 
         return new ScieloPreprint(
             $submissionId,
@@ -50,7 +59,9 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $sectionModerators,
             $publicationStatus,
             $publicationDOI,
-            $notes
+            $notes,
+            $abstractViews,
+            $pdfViews
         );
     }
 
