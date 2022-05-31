@@ -1,6 +1,7 @@
 <?php
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
 
 class ScieloPreprint extends ScieloSubmission {
 
@@ -10,10 +11,9 @@ class ScieloPreprint extends ScieloSubmission {
     private $publicationStatus;
     private $publicationDOI;
     private $notes;
-    private $abstractViews;
-    private $pdfViews;
+    private $stats;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, int $abstractViews = null, int $pdfViews = null) {
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $moderators, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, SubmissionStats $stats = null) {
         parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
         $this->submitterIsScieloJournal = $submitterIsScieloJournal;
         $this->moderators = $moderators;
@@ -21,16 +21,15 @@ class ScieloPreprint extends ScieloSubmission {
         $this->publicationStatus = $publicationStatus;
         $this->publicationDOI = $publicationDOI;
         $this->notes = $notes;
-        $this->abstractViews = $abstractViews;
-        $this->pdfViews = $pdfViews;
+        $this->stats = $stats;
     }
 
     public function asRecord(): array {
         $record = array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getModerators(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
 
-        if(!is_null($this->abstractViews) && !is_null($this->pdfViews)){
-            $record = array_merge($record, [$this->abstractViews, $this->pdfViews]);
-        }
+        if(!is_null($this->stats))
+            $record = array_merge($record, $this->stats->asRecord());
+        
         return $record;
     }
 
@@ -65,12 +64,8 @@ class ScieloPreprint extends ScieloSubmission {
         return trim(preg_replace('/\s+/', ' ', "Note: " . implode(". Note: ", $this->notes)));
     }
 
-    public function getAbstractViews() : ?int {
-        return $this->abstractViews;
-    }
-
-    public function getPdfViews() : ?int {
-        return $this->pdfViews;
+    public function getStats() : ?SubmissionStats {
+        return $this->stats;
     }
 }
 

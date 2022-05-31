@@ -1,6 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
+import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
@@ -37,10 +38,11 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $finalDecisionDateForPreprint2 = "2021-03-08";
         $submittedDateForPreprint3 = "2020-11-8";
         $finalDecisionDateForPreprint3 = "2020-11-15";
+        $stats = new SubmissionStats(10, 10);
 
-        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
-        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
-        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], 10, 10);
+        $preprint1 = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, $submittedDateForPreprint1, 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", $finalDecisionDateForPreprint1, ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "No DOI informed", [""], $stats);
+        $preprint2 = new ScieloPreprint(2, "Titulo 2", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint2, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint2, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], $stats);
+        $preprint3 = new ScieloPreprint(3, "Titulo 3", "Pablo Giorgio", "Brasil", false, $submittedDateForPreprint3, 6, "Posted", array(new SubmissionAuthor("Atila", "Brazil", "USP")), "Biological", "en_US", "Accepted", $finalDecisionDateForPreprint3, ["Richard Feynman"], ["Neil Tyson"], "Sent to journal publication", "No DOI informed", [""], $stats);
 
         return [$preprint1, $preprint2, $preprint3];
     }

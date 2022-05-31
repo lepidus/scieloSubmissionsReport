@@ -2,6 +2,7 @@
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory
@@ -37,9 +38,13 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
         $publicationDOI = $scieloPreprintsDAO->getPublicationDOI($publicationId);
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
-        
-        $abstractViews = $this->includeViews ? $scieloPreprintsDAO->getAbstractViews($submissionId, $submission['context_id']) : null;
-        $pdfViews = $this->includeViews ? $scieloPreprintsDAO->getPdfViews($submissionId, $submission['context_id']) : null;
+        $stats = null;
+
+        if($this->includeViews) {
+            $abstractViews = $scieloPreprintsDAO->getAbstractViews($submissionId, $submission['context_id']);
+            $pdfViews = $scieloPreprintsDAO->getPdfViews($submissionId, $submission['context_id']);
+            $stats = new SubmissionStats($abstractViews, $pdfViews);
+        }
 
         return new ScieloPreprint(
             $submissionId,
@@ -60,8 +65,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $publicationStatus,
             $publicationDOI,
             $notes,
-            $abstractViews,
-            $pdfViews
+            $stats
         );
     }
 
