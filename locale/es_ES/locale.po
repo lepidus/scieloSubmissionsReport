@@ -55,6 +55,9 @@ msgstr ""
 "El proceso de generación de informes puede tardar unos minutos, según los parámetros seleccionados y la cantidad de envíos presentes en el sistema. "
 "Si la demora dura más, comuníquese con el equipo de soporte."
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noResponsibles"
+msgstr "Sin responsables designados"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noModerators"
 msgstr "Sin moderadores designados"
 
@@ -100,8 +103,8 @@ msgstr "Publicación DOI"
 msgid "plugins.reports.scieloSubmissionsReport.header.areaModerator"
 msgstr "Moderador de área"
 
-msgid "plugins.reports.scieloSubmissionsReport.header.moderators"
-msgstr "Moderadores"
+msgid "plugins.reports.scieloSubmissionsReport.header.responsibles"
+msgstr "Responsables"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.context"
 msgstr "Periódico / Servidor"

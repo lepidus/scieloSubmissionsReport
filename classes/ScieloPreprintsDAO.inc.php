@@ -87,16 +87,16 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), false);
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en_US'));
 
-            if ($currentUserGroupName == 'area moderator') {
+            if ($currentUserGroupAbbrev == 'am') {
                 array_push($sectionModeratorUsers, $user->getFullName());
             }
         }
         return $sectionModeratorUsers;
     }
 
-    public function getModerators($submissionId): array
+    public function getResponsibles($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
@@ -108,9 +108,9 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), false);
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en_US'));
 
-            if ($currentUserGroupName == 'moderator') {
+            if ($currentUserGroupAbbrev == 'resp') {
                 array_push($moderatorUsers, $user->getFullName());
             }
         }
