@@ -150,23 +150,23 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         return $userSubmitterId;
     }
 
-    private function createModeratorsUsers(): array
+    private function createResponsibleUsers(): array
     {
-        $userModerator = new User();
-        $userModerator->setUsername('f4ustao');
-        $userModerator->setEmail('faustosilva@noexists.com');
-        $userModerator->setPassword('oloco');
-        $userModerator->setGivenName("Fausto", $this->locale);
-        $userModerator->setFamilyName("Silva", $this->locale);
+        $userResponsible = new User();
+        $userResponsible->setUsername('f4ustao');
+        $userResponsible->setEmail('faustosilva@noexists.com');
+        $userResponsible->setPassword('oloco');
+        $userResponsible->setGivenName("Fausto", $this->locale);
+        $userResponsible->setFamilyName("Silva", $this->locale);
 
-        $secondUserModerator = new User();
-        $secondUserModerator->setUsername('silvinho122');
-        $secondUserModerator->setEmail('silvio@stb.com');
-        $secondUserModerator->setPassword('aviaozinho');
-        $secondUserModerator->setGivenName("Silvio", $this->locale);
-        $secondUserModerator->setFamilyName("Santos", $this->locale);
+        $secondUserResponsible = new User();
+        $secondUserResponsible->setUsername('silvinho122');
+        $secondUserResponsible->setEmail('silvio@stb.com');
+        $secondUserResponsible->setPassword('aviaozinho');
+        $secondUserResponsible->setGivenName("Silvio", $this->locale);
+        $secondUserResponsible->setFamilyName("Santos", $this->locale);
 
-        return [$userModerator, $secondUserModerator];
+        return [$userResponsible, $secondUserResponsible];
     }
 
     private function createStageAssignments(array $userIds, $groupId): void
@@ -183,34 +183,34 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         }
     }
 
-    private function createModeratorUserGroup(): int
+    private function createResponsiblesUserGroup(): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
-        $moderatorUserGroupLocalizedNames = [
-            'en_US'=>'moderator',
-            'pt_BR'=>'moderador',
-            'es_ES'=>'moderador'
+        $responsiblesUserGroupLocalizedAbbrev = [
+            'en_US'=>'resp',
+            'pt_BR'=>'resp',
+            'es_ES'=>'resp'
         ];
-        $moderatorUserGroup = new UserGroup();
-        $moderatorUserGroup->setData("name", $moderatorUserGroupLocalizedNames);
-        $moderatorUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
-        $moderatorUserGroup->setData('contextId', $this->contextId);
+        $responsiblesUserGroup = new UserGroup();
+        $responsiblesUserGroup->setData("abbrev", $responsiblesUserGroupLocalizedAbbrev);
+        $responsiblesUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
+        $responsiblesUserGroup->setData('contextId', $this->contextId);
 
-        return $userGroupDao->insertObject($moderatorUserGroup);
+        return $userGroupDao->insertObject($responsiblesUserGroup);
     }
 
     private function createSectionModeratorUserGroup(): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
-        $sectionModeratorUserGroupLocalizedNames = [
-            'en_US'=>'area moderator',
-            'pt_BR'=>'moderador de área',
-            'es_ES'=>'moderador de área'
+        $sectionModeratorUserGroupLocalizedAbbrev = [
+            'en_US'=>'am',
+            'pt_BR'=>'ma',
+            'es_ES'=>'ma'
         ];
         $sectionModeratorUserGroup = new UserGroup();
-        $sectionModeratorUserGroup->setData('name', $sectionModeratorUserGroupLocalizedNames);
+        $sectionModeratorUserGroup->setData('abbrev', $sectionModeratorUserGroupLocalizedAbbrev);
         $sectionModeratorUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
         $sectionModeratorUserGroup->setData('contextId', $this->contextId);
 
@@ -382,30 +382,30 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 	/**
 	 * @group OPS
 	 */
-    public function testSubmissionGetsModerators(): void
+    public function testSubmissionGetsResponsibles(): void
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
 
-        $moderatorGroupId = $this->createModeratorUserGroup();
+        $responsiblesGroupId = $this->createResponsiblesUserGroup();
 
-        $moderatorUsers = $this->createModeratorsUsers();
-        $firstModeratorId = $userDao->insertObject($moderatorUsers[0]);
-        $secondModeratorId = $userDao->insertObject($moderatorUsers[1]);
+        $responsibleUsers = $this->createResponsibleUsers();
+        $firstResponsibleId = $userDao->insertObject($responsibleUsers[0]);
+        $secondResponsibleId = $userDao->insertObject($responsibleUsers[1]);
 
-        $userGroupDao->assignUserToGroup($firstModeratorId, $moderatorGroupId);
-        $userGroupDao->assignUserToGroup($secondModeratorId, $moderatorGroupId);
+        $userGroupDao->assignUserToGroup($firstResponsibleId, $responsiblesGroupId);
+        $userGroupDao->assignUserToGroup($secondResponsibleId, $responsiblesGroupId);
 
-        $this->createStageAssignments([$firstModeratorId, $secondModeratorId], $moderatorGroupId);
+        $this->createStageAssignments([$firstResponsibleId, $secondResponsibleId], $responsiblesGroupId);
 
-        $userGroupDao->assignGroupToStage($this->contextId, $moderatorGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
+        $userGroupDao->assignGroupToStage($this->contextId, $responsiblesGroupId, self::WORKFLOW_STAGE_ID_SUBMISSION);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $expectedModerators = $moderatorUsers[0]->getFullName() . "," . $moderatorUsers[1]->getFullName();
+        $expectedResponsibles = $responsibleUsers[0]->getFullName() . "," . $responsibleUsers[1]->getFullName();
 
-        $this->assertEquals($expectedModerators, $scieloPreprint->getModerators());
+        $this->assertEquals($expectedResponsibles, $scieloPreprint->getResponsibles());
     }
 
     /**
@@ -416,7 +416,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
 
-        $userSectionModerator = $this->createModeratorsUsers()[0];
+        $userSectionModerator = $this->createResponsibleUsers()[0];
         $userSectionModeratorId = $userDao->insertObject($userSectionModerator);
         $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
 
