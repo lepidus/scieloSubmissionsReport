@@ -106,8 +106,8 @@ msgstr "Publication's DOI"
 msgid "plugins.reports.scieloSubmissionsReport.header.areaModerator"
 msgstr "Area moderator"
 
-msgid "plugins.reports.scieloSubmissionsReport.header.moderators"
-msgstr "Moderators"
+msgid "plugins.reports.scieloSubmissionsReport.header.responsibles"
+msgstr "Responsibles"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.journalEditors"
 msgstr "Journal editors"

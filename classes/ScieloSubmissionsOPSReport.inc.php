@@ -24,7 +24,7 @@ class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport
             __("plugins.reports.scieloSubmissionsReport.header.daysChangeStatus"),
             __("plugins.reports.scieloSubmissionsReport.header.submissionStatus"),
             __("plugins.reports.scieloSubmissionsReport.header.areaModerator"),
-            __("plugins.reports.scieloSubmissionsReport.header.moderators"),
+            __("plugins.reports.scieloSubmissionsReport.header.responsibles"),
             __("submission.authors"),
             __("plugins.reports.scieloSubmissionsReport.header.section"),
             __("common.language"),

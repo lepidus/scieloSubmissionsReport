@@ -103,8 +103,8 @@ msgstr "Publicación DOI"
 msgid "plugins.reports.scieloSubmissionsReport.header.areaModerator"
 msgstr "Moderador de área"
 
-msgid "plugins.reports.scieloSubmissionsReport.header.moderators"
-msgstr "Moderadores"
+msgid "plugins.reports.scieloSubmissionsReport.header.responsibles"
+msgstr "Responsables"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.context"
 msgstr "Periódico / Servidor"
