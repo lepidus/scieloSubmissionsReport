@@ -2,9 +2,10 @@
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 
-class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport {
-    
-    public function getHeaders() : array {
+class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport
+{
+    public function getHeaders(): array
+    {
         return [
             __("plugins.reports.scieloSubmissionsReport.header.submissionId"),
             __("submission.submissionTitle"),
@@ -27,9 +28,10 @@ class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport {
         ];
     }
 
-    protected function filterWithAverageReviewingTimeOnly() {
+    protected function filterWithAverageReviewingTimeOnly()
+    {
         $submissions = array();
-        
+
         foreach ($this->submissions as $submission) {
             if (!empty($submission->getFinalDecision()) && $submission->hasReviews()) {
                 $submissions[] = $submission;

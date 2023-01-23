@@ -78,7 +78,9 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($requestHandler->isPost($request)) {
             $reportParams = $requestHandler->getUserVars($request);
             $validationResult = $form->validateReportData($reportParams);
-            if($validationResult) $form->generateReport($request);
+            if ($validationResult) {
+                $form->generateReport($request);
+            }
         } else {
             $dateStart = date("Y-01-01");
             $dateEnd   = date("Y-m-d");

@@ -30,7 +30,7 @@ class ScieloSubmissionsReportFactory
         $this->finalDecisionDateInterval = $finalDecisionDateInterval;
         $this->includeViews = $includeViews;
     }
-    
+
     public function createReport(): ScieloSubmissionsReport
     {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
@@ -45,8 +45,7 @@ class ScieloSubmissionsReportFactory
             $submissionFactory = new ScieloPreprintFactory($this->includeViews);
             $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
             return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions, $this->includeViews);
-        }
-        elseif ($this->application == 'ojs') {
+        } elseif ($this->application == 'ojs') {
             $submissionsDao = new ScieloArticlesDAO();
             $submissionFactory = new ScieloArticleFactory();
             $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
@@ -54,16 +53,15 @@ class ScieloSubmissionsReportFactory
         }
     }
 
-    private function getScieloSubmissions($submissionsDao, $submissionFactory): array 
+    private function getScieloSubmissions($submissionsDao, $submissionFactory): array
     {
         $submissionsIds = $submissionsDao->getSubmissions($this->locale, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval);
         $scieloSubmissions = [];
 
-        foreach($submissionsIds as $submissionId) {
+        foreach ($submissionsIds as $submissionId) {
             $scieloSubmissions[] = $submissionFactory->createSubmission($submissionId, $this->locale);
         }
 
         return $scieloSubmissions;
     }
-
 }

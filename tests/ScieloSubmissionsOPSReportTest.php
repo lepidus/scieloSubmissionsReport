@@ -1,37 +1,44 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
-import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
-import ('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import ('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
-import ('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
 
-class ScieloSubmissionsOPSReportTest extends TestCase {
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
+import('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
 
+class ScieloSubmissionsOPSReportTest extends TestCase
+{
     private $report;
     private $sections = array("Biological Sciences", "Math", "Human Sciences");
     private $submissions;
     private $filePath = "/tmp/test.csv";
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->submissions = $this->createTestPreprints();
         $includeViews = true;
         $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
     }
 
-    public function tearDown() : void {
-        if (file_exists(($this->filePath))) 
+    public function tearDown(): void
+    {
+        if (file_exists(($this->filePath))) {
             unlink($this->filePath);
+        }
     }
 
-    private function generateCSV() : void {
+    private function generateCSV(): void
+    {
         $csvFile = fopen($this->filePath, 'wt');
         $this->report->buildCSV($csvFile);
         fclose($csvFile);
     }
 
-    private function createTestPreprints() : array {
+    private function createTestPreprints(): array
+    {
         $submittedDateForPreprint1 = "2021-04-21";
         $finalDecisionDateForPreprint1 = "2021-04-23";
         $submittedDateForPreprint2 = "2021-03-06";
@@ -46,8 +53,9 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
 
         return [$preprint1, $preprint2, $preprint3];
     }
-    
-    public function testGeneratedCSVHeadersFromOPSSubmissions() : void {
+
+    public function testGeneratedCSVHeadersFromOPSSubmissions(): void
+    {
         $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
         $csvFileUtils = new CSVFileUtils();
@@ -83,7 +91,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $this->assertEquals($expectedLine, $firstLine);
     }
 
-    public function testHeadersColumnsWhenReportNotIncludesViews() : void {
+    public function testHeadersColumnsWhenReportNotIncludesViews(): void
+    {
         $includeViews = false;
         $report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
 
@@ -94,33 +103,37 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"), $lastColumn);
     }
 
-    public function testAverageReviewingTime() : void {
+    public function testAverageReviewingTime(): void
+    {
         $testPreprints = $this->createTestPreprints();
         $report = new ScieloSubmissionsOPSReport($this->sections, [$testPreprints[0], $testPreprints[1]]);
-        
+
         $expectedReviewingTime = 2;
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
 
-    public function testAverageReviewingTimeRoundedUp() : void {
+    public function testAverageReviewingTimeRoundedUp(): void
+    {
         $testPreprints = $this->createTestPreprints();
         $report = new ScieloSubmissionsOPSReport($this->sections, $testPreprints);
-        
+
         $expectedReviewingTime = 4;
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
 
-    public function testAverageReviewingTimeEmptyPreprints() : void {
+    public function testAverageReviewingTimeEmptyPreprints(): void
+    {
         $report = new ScieloSubmissionsOPSReport($this->sections, []);
-        
+
         $expectedReviewingTime = 0;
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
 
-    public function testGeneratedCSVHasAverageReviewingTime() : void {
+    public function testGeneratedCSVHasAverageReviewingTime(): void
+    {
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
-        
+
         $lastRow = $csvRows[sizeof($csvRows)-1];
         $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
         $expectedAverageReviewingTime = 4;
@@ -128,7 +141,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase {
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
     }
 
-    public function testGeneratedCSVHasPreprintData() : void {
+    public function testGeneratedCSVHasPreprintData(): void
+    {
         $this->submissions = ($this->createTestPreprints())[0];
         $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');

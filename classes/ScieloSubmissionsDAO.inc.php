@@ -65,7 +65,7 @@ class ScieloSubmissionsDAO extends DAO
         ->where('submission_id', '=', $submissionId)
         ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale', 'context_id')
         ->first();
-        
+
         return get_object_vars($result);
     }
 
@@ -84,11 +84,13 @@ class ScieloSubmissionsDAO extends DAO
             $titles[$locale] = $title;
         }
 
-        if(array_key_exists($locale, $titles))
+        if (array_key_exists($locale, $titles)) {
             return $titles[$locale];
-        
-        if(array_key_exists($submissionLocale, $titles))
+        }
+
+        if (array_key_exists($submissionLocale, $titles)) {
             return $titles[$submissionLocale];
+        }
 
         return array_pop(array_reverse($titles));
     }
@@ -107,7 +109,7 @@ class ScieloSubmissionsDAO extends DAO
         ->where('locale', '=', $locale)
         ->select('setting_value as title')
         ->first();
-        
+
         $sectionTitle = get_object_vars($result)['title'];
         return $sectionTitle;
     }
@@ -120,7 +122,7 @@ class ScieloSubmissionsDAO extends DAO
         ->get();
 
         $authorsIds = [];
-        foreach($result->toArray() as $row) {
+        foreach ($result->toArray() as $row) {
             $authorsIds[] = get_object_vars($row)['author_id'];
         }
 

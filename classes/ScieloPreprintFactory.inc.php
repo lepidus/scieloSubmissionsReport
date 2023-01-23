@@ -40,7 +40,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $notes = $scieloPreprintsDAO->getSubmissionNotes($submissionId);
         $stats = null;
 
-        if($this->includeViews) {
+        if ($this->includeViews) {
             $abstractViews = $scieloPreprintsDAO->getAbstractViews($submissionId, $submission['context_id']);
             $pdfViews = $scieloPreprintsDAO->getPdfViews($submissionId, $submission['context_id']);
             $stats = new SubmissionStats($abstractViews, $pdfViews);

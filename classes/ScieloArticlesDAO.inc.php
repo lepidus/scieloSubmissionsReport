@@ -70,8 +70,9 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         return $journalEditors;
     }
 
-    public function getDecisionMessage($decision) {
-		import('classes.workflow.EditorDecisionActionsManager');
+    public function getDecisionMessage($decision)
+    {
+        import('classes.workflow.EditorDecisionActionsManager');
         switch($decision) {
             case SUBMISSION_EDITOR_DECISION_ACCEPT:
                 return __('editor.submission.decision.accept');
@@ -102,7 +103,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             default:
                 return '';
         }
-	}
+    }
 
     public function getLastDecision($submissionId): string
     {

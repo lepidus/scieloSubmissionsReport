@@ -29,7 +29,7 @@ class ScieloSubmissionFactory
             $submissionId,
             $submissionTitle,
             $submitter,
-            $submitterCountry, 
+            $submitterCountry,
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,

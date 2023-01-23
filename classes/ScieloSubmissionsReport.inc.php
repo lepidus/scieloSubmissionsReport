@@ -1,28 +1,32 @@
 <?php
 
-class ScieloSubmissionsReport {
-
+class ScieloSubmissionsReport
+{
     private $sections;
     protected $submissions;
     private $UTF8_BOM;
 
-    public function __construct(array $sections, array $submissions) {
+    public function __construct(array $sections, array $submissions)
+    {
         $this->sections = $sections;
         $this->submissions = $submissions;
         $this->UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
     }
 
-    public function getSections() : array {
+    public function getSections(): array
+    {
         return $this->sections;
     }
 
-    public function getSubmissions() : array {
+    public function getSubmissions(): array
+    {
         return $this->submissions;
     }
 
-    protected function filterWithAverageReviewingTimeOnly() {
+    protected function filterWithAverageReviewingTimeOnly()
+    {
         $submissions = array();
-        
+
         foreach ($this->submissions as $submission) {
             if (!empty($submission->getFinalDecision())) {
                 $submissions[] = $submission;
@@ -31,10 +35,13 @@ class ScieloSubmissionsReport {
         return $submissions;
     }
 
-    public function getAverageReviewingTime() : int {
+    public function getAverageReviewingTime(): int
+    {
         $submissionsToUse = $this->filterWithAverageReviewingTimeOnly();
-        if (empty($submissionsToUse)) return 0;
-        
+        if (empty($submissionsToUse)) {
+            return 0;
+        }
+
         $totalReviewingTime = 0;
 
         foreach ($submissionsToUse as $submission) {
@@ -44,7 +51,8 @@ class ScieloSubmissionsReport {
         return round($totalReviewingTime / count($submissionsToUse));
     }
 
-    public function getHeaders() : array {
+    public function getHeaders(): array
+    {
         return [
             "ID da submissão",
             "Título da Submissão",
@@ -66,18 +74,20 @@ class ScieloSubmissionsReport {
         ];
     }
 
-    private function getSecondHeaders() : array {
+    private function getSecondHeaders(): array
+    {
         return [
             __("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"),
             __("section.sections")
         ];
     }
 
-    public function buildCSV($fileDescriptor) : void {
+    public function buildCSV($fileDescriptor): void
+    {
         fprintf($fileDescriptor, $this->UTF8_BOM);
         fputcsv($fileDescriptor, $this->getHeaders());
 
-        foreach($this->submissions as $submission){
+        foreach ($this->submissions as $submission) {
             fputcsv($fileDescriptor, $submission->asRecord());
         }
 

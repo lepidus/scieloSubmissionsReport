@@ -150,7 +150,8 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->submitter, $scieloSubmission->getSubmitter());
     }
 
-    public function testSubmissionGetsSubmitterCountry() : void {
+    public function testSubmissionGetsSubmitterCountry(): void
+    {
         $this->createSubmitter();
 
         $submissionFactory = new ScieloSubmissionFactory();

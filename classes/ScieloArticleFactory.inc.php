@@ -50,5 +50,4 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
             $lastDecision
         );
     }
-
 }

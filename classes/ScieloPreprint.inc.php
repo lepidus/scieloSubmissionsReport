@@ -61,7 +61,7 @@ class ScieloPreprint extends ScieloSubmission {
         if(empty($this->notes))
             return __("plugins.reports.scieloSubmissionsReport.warning.noNotes");
         
-        return trim(preg_replace('/\s+/', ' ', "Note: " . implode(". Note: ", $this->notes)));
+        return trim(preg_replace('/\s+/', ' ', "Note: " . implode(" Note: ", $this->notes)));
     }
 
     public function getStats() : ?SubmissionStats {

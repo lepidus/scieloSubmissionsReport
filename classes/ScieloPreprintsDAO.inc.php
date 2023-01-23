@@ -29,7 +29,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
         return $abstractViews;
     }
-    
+
     public function getPdfViews($submissionId, $contextId): int
     {
         $statsService = \Services::get('stats');
@@ -40,7 +40,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             'contextIds' => [$contextId]
         ]);
         $pdfViews = array_reduce($galleyRecords, [$statsService, 'sumMetric'], 0);
-        
+
         return $pdfViews;
     }
 
@@ -66,10 +66,11 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $submitterUserGroups = $userGroupDao->getByUserId($submitterId);
-        while($userGroup = $submitterUserGroups->next()) {
+        while ($userGroup = $submitterUserGroups->next()) {
             $journalGroupAbbrev = "SciELO";
-            if($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev)
+            if ($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev) {
                 return true;
+            }
         }
 
         return false;
@@ -80,7 +81,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
-        
+
         $sectionModeratorUsers =  array();
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
@@ -125,8 +126,9 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         ->select('setting_value as relationStatus')
         ->first();
 
-        if(is_null($result))
+        if (is_null($result)) {
             return "";
+        }
 
         $relationStatus = get_object_vars($result)['relationStatus'];
         $relationsMap = [
@@ -145,10 +147,11 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         ->where('setting_name', '=', 'vorDoi')
         ->select('setting_value as vorDoi')
         ->first();
-        
-        if(is_null($result))
+
+        if (is_null($result)) {
             return "";
-        
+        }
+
         return $publicationDOI = get_object_vars($result)['vorDoi'];
     }
 

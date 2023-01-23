@@ -1,31 +1,37 @@
-<?php 
+<?php
 
-class SubmissionAuthor {
+
+class SubmissionAuthor
+{
     private $fullName;
     private $country;
     private $affiliation;
 
-    public function __construct(string $fullName, string $country, string $affiliation){
+    public function __construct(string $fullName, string $country, string $affiliation)
+    {
         $this->fullName = $fullName;
         $this->country = $country;
         $this->affiliation = $affiliation;
     }
 
-    public function getFullName() : string {
+    public function getFullName(): string
+    {
         return $this->fullName;
     }
-    
-    public function getCountry() : string {
+
+    public function getCountry(): string
+    {
         return $this->country;
     }
 
-    public function getAffiliation() : string {
+    public function getAffiliation(): string
+    {
         return $this->affiliation;
     }
 
-    public function asRecord() : string {
+    public function asRecord(): string
+    {
         $treatedAffiliation = preg_replace('/\s+/', ' ', $this->affiliation);
         return implode(", ", [$this->fullName, $this->country, $treatedAffiliation]);
     }
 }
-    

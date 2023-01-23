@@ -1,7 +1,7 @@
 <?php
 
-class ScieloSubmission {
-
+class ScieloSubmission
+{
     protected $id;
     protected $title;
     protected $submitter;
@@ -15,7 +15,8 @@ class ScieloSubmission {
     protected $finalDecision;
     protected $finalDecisionDate;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate) {
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate)
+    {
         $this->id = $id;
         $this->title = $title;
         $this->submitter = $submitter;
@@ -30,94 +31,115 @@ class ScieloSubmission {
         $this->finalDecisionDate = $finalDecisionDate;
     }
 
-    protected function fillEmptyFields($field, $messageIfEmpty) {
-        if (empty($field))
+    protected function fillEmptyFields($field, $messageIfEmpty)
+    {
+        if (empty($field)) {
             return $messageIfEmpty;
+        }
 
         return $field;
     }
 
-    protected function implodeEmptyFields($field, $messageIfEmpty) : string {
-        if(empty($field))
+    protected function implodeEmptyFields($field, $messageIfEmpty): string
+    {
+        if (empty($field)) {
             return $messageIfEmpty;
+        }
 
         return implode(",", $field);
     }
 
-    public function getId() : int {
+    public function getId(): int
+    {
         return $this->id;
     }
 
-    public function getTitle() : string {
+    public function getTitle(): string
+    {
         return preg_replace('/\s+/', ' ', $this->title);
     }
 
-    public function getSubmitter() : string {
+    public function getSubmitter(): string
+    {
         $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
         return $this->fillEmptyFields($this->submitter, $messageNoSubmitter);
     }
 
-    public function getSubmitterCountry() : string {
+    public function getSubmitterCountry(): string
+    {
         return $this->submitterCountry;
     }
 
-    public function getDateSubmitted() : string {
+    public function getDateSubmitted(): string
+    {
         return $this->dateSubmitted;
     }
 
-    public function getStatus() : string {
+    public function getStatus(): string
+    {
         return $this->status;
     }
 
-    public function getAuthors() : array {
+    public function getAuthors(): array
+    {
         return $this->authors;
     }
 
-    public function getSection() : string {
+    public function getSection(): string
+    {
         return $this->section;
     }
 
-    public function getLanguage() : string {
+    public function getLanguage(): string
+    {
         return $this->language;
     }
 
-    public function getFinalDecision() : string {
+    public function getFinalDecision(): string
+    {
         return $this->finalDecision;
     }
 
-    public function getDaysUntilStatusChange() : int {
+    public function getDaysUntilStatusChange(): int
+    {
         return $this->daysUntilStatusChange;
     }
 
-    public function getFinalDecisionDate() : string {
+    public function getFinalDecisionDate(): string
+    {
         return $this->finalDecisionDate;
     }
 
-    public function getTimeUnderReview() : int {
+    public function getTimeUnderReview(): int
+    {
         $dateFinal = new DateTime(trim($this->finalDecisionDate));
         $dateBegin = new DateTime(trim($this->dateSubmitted));
         $reviewingTime = $dateFinal->diff($dateBegin);
         return $reviewingTime->format('%a');
     }
-    
-    public function getTimeBetweenSubmissionAndFinalDecision() : string {
-        if(!empty($this->finalDecisionDate))
+
+    public function getTimeBetweenSubmissionAndFinalDecision(): string
+    {
+        if (!empty($this->finalDecisionDate)) {
             return $this->getTimeUnderReview();
+        }
 
         return "";
     }
 
-    protected function authorsAsRecord() : string {
+    protected function authorsAsRecord(): string
+    {
         $records = [];
 
-        foreach($this->authors as $author) {
+        foreach ($this->authors as $author) {
             $records[] = $author->asRecord();
         }
 
         return implode("; ", $records);
     }
 
-    public function asRecord(): array {
+    public function asRecord(): array
+    {
         return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
     }
 }
