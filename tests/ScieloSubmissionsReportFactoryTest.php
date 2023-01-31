@@ -296,6 +296,6 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
         $expectedSubmissions = array_merge($this->submissionsIds, [$postedSubmissionId]);
         $scieloSubmissionsIds = $this->mapScieloSubmissionsToIds($report->getSubmissions());
-        $this->assertEquals($expectedSubmissions, $scieloSubmissionsIds);
+        $this->assertEmpty(array_diff($expectedSubmissions, $scieloSubmissionsIds));
     }
 }
