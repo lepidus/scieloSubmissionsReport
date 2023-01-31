@@ -74,10 +74,10 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     private function createTestSubmissions(): array
     {
-        $firstSubmissionId = $this->createSubmission('2021-05-21 11:56:37', '2021-05-24 13:00:00');
-        $secondSubmissionId = $this->createSubmission('2021-05-29 12:58:29', '2021-06-01 23:41:09');
-        $thirdSubmissionId = $this->createSubmission('2021-06-14 04:30:08', '2021-06-17 12:00:00');
-        $fourthSubmissionId = $this->createSubmission('2021-07-08 18:37:12', '2021-07-10 15:49:00');
+        $firstSubmissionId = $this->createSubmission('1921-05-21 11:56:37', '1921-05-24 13:00:00');
+        $secondSubmissionId = $this->createSubmission('1921-05-29 12:58:29', '1921-06-01 23:41:09');
+        $thirdSubmissionId = $this->createSubmission('1921-06-14 04:30:08', '1921-06-17 12:00:00');
+        $fourthSubmissionId = $this->createSubmission('1921-07-08 18:37:12', '1921-07-10 15:49:00');
 
         return [$firstSubmissionId, $secondSubmissionId, $thirdSubmissionId, $fourthSubmissionId];
     }
@@ -191,7 +191,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterBySubmissionDate(): void
     {
-        $this->submissionDateInterval = new ClosedDateInterval('2021-05-23', '2021-07-01');
+        $this->submissionDateInterval = new ClosedDateInterval('1921-05-23', '1921-07-01');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -202,7 +202,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterBySubmissionDateSubmissionAtIntervalStart(): void
     {
-        $this->submissionDateInterval = new ClosedDateInterval('2021-05-29', '2021-06-02');
+        $this->submissionDateInterval = new ClosedDateInterval('1921-05-29', '1921-06-02');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -213,7 +213,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterBySubmissionDateSubmissionAtIntervalEnd(): void
     {
-        $this->submissionDateInterval = new ClosedDateInterval('2021-05-26', '2021-05-29');
+        $this->submissionDateInterval = new ClosedDateInterval('1921-05-26', '1921-05-29');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -224,7 +224,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterByFinalDecisionDate(): void
     {
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-06-15', '2021-07-12');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-06-15', '1921-07-12');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -235,7 +235,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterByFinalDecisionDateSubmissionAtIntervalStart(): void
     {
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-07-10', '2021-07-12');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-07-10', '1921-07-12');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -246,7 +246,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterByFinalDecisionDateSubmissionAtIntervalEnd(): void
     {
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-07-05', '2021-07-10');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-07-05', '1921-07-10');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -257,11 +257,11 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterByFinalDecisionDateExcludesSubmissionsWithoutFinalDecision(): void
     {
-        $submissionWithoutFinalDecisionId = $this->createSubmission('2021-06-14 04:30:08');
+        $submissionWithoutFinalDecisionId = $this->createSubmission('1921-06-14 04:30:08');
         $publicationId = $this->createPublication($submissionWithoutFinalDecisionId, $this->sectionsIds[0]);
         $this->addCurrentPublicationToSubmission($submissionWithoutFinalDecisionId, $publicationId);
 
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-05-20', '2021-07-12');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-05-20', '1921-07-12');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -271,8 +271,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     public function testReportFilterBySubmissionDateAndFinalDecisionDate(): void
     {
-        $this->submissionDateInterval = new ClosedDateInterval('2021-05-23', '2021-07-01');
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-06-15', '2021-07-12');
+        $this->submissionDateInterval = new ClosedDateInterval('1921-05-23', '1921-07-01');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-06-15', '1921-07-12');
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
 
@@ -285,11 +285,11 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
      */
     public function testReportFilterByFinalDecisionDateInOPSGetsPostedSubmissions(): void
     {
-        $postedSubmissionId = $this->createSubmission('2021-06-14 04:30:08');
-        $publicationId = $this->createPublication($postedSubmissionId, $this->sectionsIds[0], '2021-06-21 14:13:20');
+        $postedSubmissionId = $this->createSubmission('1921-06-14 04:30:08');
+        $publicationId = $this->createPublication($postedSubmissionId, $this->sectionsIds[0], '1921-06-21 14:13:20');
         $this->addCurrentPublicationToSubmission($postedSubmissionId, $publicationId);
 
-        $this->finalDecisionDateInterval = new ClosedDateInterval('2021-05-20', '2021-07-12');
+        $this->finalDecisionDateInterval = new ClosedDateInterval('1921-05-20', '1921-07-12');
         $this->application = 'ops';
         $this->reportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sectionsIds, $this->submissionDateInterval, $this->finalDecisionDateInterval, $this->locale, $this->includeViews);
         $report = $this->reportFactory->createReport();
