@@ -144,3 +144,12 @@ msgstr "Time between submission and final decision"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
 msgstr "PDF Views"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.title"
+msgstr "SciELO Submissions Report Settings"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail"
+msgstr "Recipient e-mail"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
+msgstr "The report of all submissions will be sent to this e-mail address"

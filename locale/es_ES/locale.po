@@ -135,3 +135,12 @@ msgstr "Tiempo entre la presentación y la decisión final"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
 msgstr "Consultas del PDF"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.title"
+msgstr "Configuración de Relatorio de Envíos de SciELO"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail"
+msgstr "Correo electrónico de destino"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
+msgstr "El informe completo de envíos será enviado a este correo electrónico"

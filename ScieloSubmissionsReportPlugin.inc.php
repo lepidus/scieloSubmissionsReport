@@ -34,14 +34,9 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         }
     }
 
-    /**
-     * Get the name of this plugin. The name must be unique within
-     * its category.
-     * @return String name of plugin
-     */
     public function getName()
     {
-        return 'ScieloSubmissionsReportPlugin';
+        return 'scielosubmissionsreportplugin';
     }
 
     /**
@@ -58,12 +53,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
     public function getDescription()
     {
         return __('plugins.reports.scieloSubmissionsReport.description');
-    }
-
-    public function getSettingsForm($context)
-    {
-        $this->import('ScieloSubmissionsReportForm');
-        return new ScieloSubmissionsReportForm($this);
     }
 
     /**
@@ -86,5 +75,46 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
             $dateEnd   = date("Y-m-d");
             $form->display($request, 'scieloSubmissionsReportPlugin.tpl', array($dateStart, $dateEnd));
         }
+    }
+
+    public function getActions($request, $actionArgs)
+    {
+        $router = $request->getRouter();
+        import('lib.pkp.classes.linkAction.request.AjaxModal');
+        $actions =  array_merge(
+            $this->getEnabled()?array(
+                new LinkAction(
+                    'pluginSettings',
+                    new AjaxModal(
+                        $router->url($request, null, null, 'manage', null, array('verb' => 'pluginSettings', 'plugin' => $this->getName(), 'category' => 'reports')),
+                        __('plugins.reports.scieloSubmissionsReport.settings.title')
+                    ),
+                    __('manager.plugins.settings'),
+                )
+            ):array(),
+            parent::getActions($request, $actionArgs)
+        );
+        return $actions;
+    }
+
+    public function manage($args, $request)
+    {
+        $context = $request->getContext();
+        $contextId = ($context == null) ? 0 : $context->getId();
+
+        switch ($request->getUserVar('verb')) {
+            case 'pluginSettings':
+                $this->import('classes.form.ScieloSubmissionsReportSettingsForm');
+                $form = new ScieloSubmissionsReportSettingsForm($this, $contextId);
+                if ($request->getUserVar('save')) {
+                    $form->readInputData();
+                    $form->execute();
+                    return new JSONMessage(true);
+                } else {
+                    $form->initData();
+                }
+                return new JSONMessage(true, $form->fetch($request));
+        }
+        return parent::manage($args, $request);
     }
 }
