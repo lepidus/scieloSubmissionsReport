@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE scheduled_tasks SYSTEM "../../../lib/pkp/dtd/scheduledTasks.dtd">
+
+<scheduled_tasks>
+	<task class="plugins.reports.scieloSubmissionsReport.classes.tasks.SendReportEmail">
+		<descr>Send a report of all submissions by e-mail. </descr>
+		<frequency day="10"/>
+	</task>
+</scheduled_tasks>

@@ -28,10 +28,11 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
         if ($success && Config::getVar('general', 'installed')) {
             $this->import('ScieloSubmissionsReportForm');
-
             $this->addLocaleData();
-            return $success;
+
+            HookRegistry::register('AcronPlugin::parseCronTab', array($this, 'addPluginTasksToCrontab'));
         }
+        return $success;
     }
 
     public function getName()
@@ -39,25 +40,22 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return 'scielosubmissionsreportplugin';
     }
 
-    /**
-     * @copydoc Plugin::getDisplayName()
-     */
     public function getDisplayName()
     {
         return __('plugins.reports.scieloSubmissionsReport.displayName');
     }
 
-    /**
-     * @copydoc Plugin::getDescriptionName()
-     */
     public function getDescription()
     {
         return __('plugins.reports.scieloSubmissionsReport.description');
     }
 
-    /**
-     * @copydoc ReportPlugin::display()
-     */
+    public function addPluginTasksToCrontab($hookName, $args) {
+        $taskFilesPath =& $args[0];
+        $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
+        return false;
+    }    
+
     public function display($args, $request)
     {
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);
