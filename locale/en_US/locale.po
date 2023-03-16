@@ -153,3 +153,10 @@ msgstr "Recipient e-mail"
 
 msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
 msgstr "The report of all submissions will be sent to this e-mail address"
+
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.subject"
+msgstr "{$contextName}'s submissions report"
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.body"
+msgstr "Attached is the complete report of submissions from {$contextName}"

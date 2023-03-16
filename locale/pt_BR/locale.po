@@ -154,3 +154,10 @@ msgstr "E-mail de destino"
 
 msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
 msgstr "O relatório completo das submissões será enviado para este e-mail"
+
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.subject"
+msgstr "Relatório de submissões da {$contextName}"
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.body"
+msgstr "Segue em anexo o relatório completo de submissões da {$contextName}"
