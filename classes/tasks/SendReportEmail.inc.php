@@ -18,9 +18,10 @@ class SendReportEmail extends ScheduledTask
 
         if($application == 'ops' && !is_null($recipientEmail)) {
             $sectionsIds = $this->getAllSectionsIds($context->getId());
-            $locale = 'pt_BR';
+            $locale = AppLocale::getLocale();
             $plugin->addLocaleData($locale);
-            AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+            AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION, $locale);
+            AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON, $locale);
             $includeViews = true;
 
             $beginningDate = '2020-04-01';
