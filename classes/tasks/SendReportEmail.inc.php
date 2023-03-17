@@ -16,31 +16,47 @@ class SendReportEmail extends ScheduledTask
 
         $recipientEmail = $plugin->getSetting($context->getId(), 'recipientEmail');
 
-        if($application == 'ops' && !is_null($recipientEmail)) {
-            $sectionsIds = $this->getAllSectionsIds($context->getId());
+        if ($application == 'ops' && !is_null($recipientEmail)) {
             $locale = AppLocale::getLocale();
-            $plugin->addLocaleData($locale);
-            AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION, $locale);
-            AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON, $locale);
-            $includeViews = true;
+            $this->loadLocalesForTask($plugin, $locale);
 
-            $beginningDate = '2020-04-01';
-            $endDate = date("Y-m-d");
-            $submissionDateInterval = new ClosedDateInterval($beginningDate, $endDate);
-            
-            $reportFactory = new ScieloSubmissionsReportFactory($application, $context->getId(), $sectionsIds, $submissionDateInterval, null, $locale, $includeViews);
-            $report = $reportFactory->createReport();
+            $report = $this->getReport($application, $context, $locale);
+            $reportFilePath = $this->writeReportFile($context, $report);
 
-            $acronym = $context->getLocalizedData('acronym', $locale);
-            $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
-            $csvFile = fopen($reportFilePath, 'wt');
-            $report->buildCSV($csvFile);
-
-            $email = $this->createReportEmail($context, $locale, $recipientEmail, $reportFilePath);
+            $email = $this->createReportEmail($context, $recipientEmail, $reportFilePath);
             $email->send();
         }
-        
+
         return true;
+    }
+
+    private function loadLocalesForTask($plugin, $locale)
+    {
+        $plugin->addLocaleData($locale);
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON);
+    }
+
+    private function getReport($application, $context, $locale)
+    {
+        $sectionsIds = $this->getAllSectionsIds($context->getId());
+        $includeViews = true;
+        $beginningDate = '2020-04-01';
+        $endDate = date("Y-m-d");
+        $submissionDateInterval = new ClosedDateInterval($beginningDate, $endDate);
+
+        $reportFactory = new ScieloSubmissionsReportFactory($application, $context->getId(), $sectionsIds, $submissionDateInterval, null, $locale, $includeViews);
+        return $reportFactory->createReport();
+    }
+
+    private function writeReportFile($context, $report): string
+    {
+        $acronym = $context->getLocalizedData('acronym');
+        $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
+        $csvFile = fopen($reportFilePath, 'wt');
+        $report->buildCSV($csvFile);
+        
+        return $reportFilePath;
     }
 
     private function getAllSectionsIds($contextId)
@@ -54,11 +70,11 @@ class SendReportEmail extends ScheduledTask
         return $sectionsIds;
     }
 
-    private function createReportEmail($context, $locale, $recipientEmail, $reportFilePath)
+    private function createReportEmail($context, $recipientEmail, $reportFilePath)
     {
         $email = new Mail();
 
-        $fromName = $context->getLocalizedData('name', $locale);
+        $fromName = $context->getLocalizedData('name');
         $fromEmail = $context->getData('contactEmail');
         $email->setFrom($fromEmail, $fromName);
 
@@ -68,21 +84,14 @@ class SendReportEmail extends ScheduledTask
                 'email' => $recipientEmail,
             ],
         ]);
-        
-        $subject = __('plugins.reports.scieloSubmissionsReport.reportEmail.subject', ['contextName' => $fromName], $locale);
-        $body = __('plugins.reports.scieloSubmissionsReport.reportEmail.body', ['contextName' => $fromName], $locale);
+
+        $subject = __('plugins.reports.scieloSubmissionsReport.reportEmail.subject', ['contextName' => $fromName]);
+        $body = __('plugins.reports.scieloSubmissionsReport.reportEmail.body', ['contextName' => $fromName]);
         $email->setSubject($subject);
         $email->setBody($body);
 
         $email->addAttachment($reportFilePath);
 
         return $email;
-    }
-
-    private function getEmailRecipient($context): ?string
-    {
-        PluginRegistry::loadCategory('reports');
-        $plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');
-        return $plugin->getSetting($context->getId(), 'recipientEmail');
     }
 }
