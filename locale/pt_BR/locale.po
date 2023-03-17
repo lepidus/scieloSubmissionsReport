@@ -144,3 +144,20 @@ msgstr "Tempo entre submissão e decisão final"
 
 msgid "plugins.reports.scieloSubmissionsReport.header.pdfViews"
 msgstr "Acessos ao PDF"
+
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.title"
+msgstr "Configurações do Relatório de Submissões SciELO"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail"
+msgstr "E-mail de destino"
+
+msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
+msgstr "O relatório completo das submissões será enviado para este e-mail"
+
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.subject"
+msgstr "Relatório de submissões da {$contextName}"
+
+msgid "plugins.reports.scieloSubmissionsReport.reportEmail.body"
+msgstr "Segue em anexo o relatório completo de submissões da {$contextName}"
