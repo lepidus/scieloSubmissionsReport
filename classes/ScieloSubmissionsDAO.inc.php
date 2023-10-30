@@ -9,12 +9,11 @@
  * Operations for retrieving submissions and other data
  */
 
-import('lib.pkp.classes.db.DAO');
-import('classes.workflow.EditorDecisionActionsManager');
-import('classes.log.SubmissionEventLogEntry');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
-
+use PKP\db\DAO;
+use APP\decision\Decision;
+use APP\log\event\SubmissionEventLogEntry;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 

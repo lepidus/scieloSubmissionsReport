@@ -1,9 +1,9 @@
 <?php
 
-import('lib.pkp.classes.mail.Mail');
-import('lib.pkp.classes.scheduledTask.ScheduledTask');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
+use PKP\mail\Mail;
+use PKP\scheduledTask\ScheduledTask;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 
 class SendReportEmail extends ScheduledTask
 {
@@ -55,7 +55,7 @@ class SendReportEmail extends ScheduledTask
         $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
         $csvFile = fopen($reportFilePath, 'wt');
         $report->buildCSV($csvFile);
-        
+
         return $reportFilePath;
     }
 

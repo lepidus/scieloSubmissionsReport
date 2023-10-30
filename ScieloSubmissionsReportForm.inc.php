@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file plugins/reports/scieloSubmissionsReport/ScieloSubmissionsReportForm.inc.php
  *
@@ -10,9 +11,10 @@
  *
  * @brief SciELO Submissions report Form
  */
-import('lib.pkp.classes.form.Form');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
+
+use PKP\form\Form;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 
 class ScieloSubmissionsReportForm extends Form
 {
@@ -131,7 +133,7 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
+        $templateManager->assign('years', array(0 => $args[0], 1 => $args[1]));
         $templateManager->assign([
             'breadcrumbs' => [
                 [

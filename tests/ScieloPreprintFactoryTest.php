@@ -1,14 +1,12 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('classes.journal.Section');
-import('classes.article.Author');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintFactory');
-import('classes.workflow.EditorDecisionActionsManager');
-import('classes.statistics.MetricsDAO');
-
+use PKP\tests\DatabaseTestCase;
+use APP\submission\Submission;
+use APP\publication\Publication;
+use APP\section\Section;
+use APP\author\Author;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
+use APP\decision\Decision;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
@@ -190,9 +188,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $responsiblesUserGroupLocalizedAbbrev = [
-            'en_US'=>'resp',
-            'pt_BR'=>'resp',
-            'es_ES'=>'resp'
+            'en_US' => 'resp',
+            'pt_BR' => 'resp',
+            'es_ES' => 'resp'
         ];
         $responsiblesUserGroup = new UserGroup();
         $responsiblesUserGroup->setData("abbrev", $responsiblesUserGroupLocalizedAbbrev);
@@ -207,9 +205,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $sectionModeratorUserGroupLocalizedAbbrev = [
-            'en_US'=>'am',
-            'pt_BR'=>'ma',
-            'es_ES'=>'ma'
+            'en_US' => 'am',
+            'pt_BR' => 'ma',
+            'es_ES' => 'ma'
         ];
         $sectionModeratorUserGroup = new UserGroup();
         $sectionModeratorUserGroup->setData('abbrev', $sectionModeratorUserGroupLocalizedAbbrev);
@@ -224,14 +222,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $scieloJournalUserGroupLocalizedNames = [
-            'en_US'=>'SciELO Journal',
-            'pt_BR'=>'Periódico SciELO',
-            'es_ES'=>'Revista SciELO'
+            'en_US' => 'SciELO Journal',
+            'pt_BR' => 'Periódico SciELO',
+            'es_ES' => 'Revista SciELO'
         ];
         $scieloJournalUserGroupLocalizedAbbrev = [
-            'en_US'=>'SciELO',
-            'pt_BR'=>'SciELO',
-            'es_ES'=>'SciELO'
+            'en_US' => 'SciELO',
+            'pt_BR' => 'SciELO',
+            'es_ES' => 'SciELO'
         ];
         $scieloJournalUserGroup = new UserGroup();
         $scieloJournalUserGroup->setData('name', $scieloJournalUserGroupLocalizedNames);

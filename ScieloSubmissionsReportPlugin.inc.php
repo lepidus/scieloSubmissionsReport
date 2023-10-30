@@ -13,9 +13,12 @@
  * @brief SciELO Submissions report plugin
  */
 
-import('lib.pkp.classes.plugins.ReportPlugin');
-import('classes.submission.Submission');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+use PKP\plugins\ReportPlugin;
+use APP\submission\Submission;
+use PKP\linkAction\request\AjaxModal;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportForm;
+use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
 
 class ScieloSubmissionsReportPlugin extends ReportPlugin
 {
@@ -27,7 +30,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         $success = parent::register($category, $path, $mainContextId);
 
         if ($success && Config::getVar('general', 'installed')) {
-            $this->import('ScieloSubmissionsReportForm');
             $this->addLocaleData();
 
             HookRegistry::register('AcronPlugin::parseCronTab', array($this, 'addPluginTasksToCrontab'));
@@ -50,11 +52,12 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return __('plugins.reports.scieloSubmissionsReport.description');
     }
 
-    public function addPluginTasksToCrontab($hookName, $args) {
-        $taskFilesPath =& $args[0];
+    public function addPluginTasksToCrontab($hookName, $args)
+    {
+        $taskFilesPath = & $args[0];
         $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
         return false;
-    }    
+    }
 
     public function display($args, $request)
     {
@@ -78,9 +81,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
     public function getActions($request, $actionArgs)
     {
         $router = $request->getRouter();
-        import('lib.pkp.classes.linkAction.request.AjaxModal');
         $actions =  array_merge(
-            $this->getEnabled()?array(
+            $this->getEnabled() ? array(
                 new LinkAction(
                     'pluginSettings',
                     new AjaxModal(
@@ -89,7 +91,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                     ),
                     __('manager.plugins.settings'),
                 )
-            ):array(),
+            ) : array(),
             parent::getActions($request, $actionArgs)
         );
         return $actions;
@@ -102,7 +104,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
         switch ($request->getUserVar('verb')) {
             case 'pluginSettings':
-                $this->import('classes.form.ScieloSubmissionsReportSettingsForm');
                 $form = new ScieloSubmissionsReportSettingsForm($this, $contextId);
                 if ($request->getUserVar('save')) {
                     $form->readInputData();

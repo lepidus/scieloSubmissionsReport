@@ -1,8 +1,8 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
+use APP\plugin\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {

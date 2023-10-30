@@ -1,9 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
 
 class ScieloSubmissionTest extends TestCase
 {

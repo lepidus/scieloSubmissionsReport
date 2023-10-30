@@ -1,12 +1,12 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('classes.journal.Section');
-import('classes.article.Author');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
-import('classes.workflow.EditorDecisionActionsManager');
+use PKP\tests\DatabaseTestCase;
+use APP\submission\Submission;
+use APP\publication\Publication;
+use APP\section\Section;
+use APP\author\Author;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\decision\Decision;
 
 class ScieloSubmissionFactoryTest extends DatabaseTestCase
 {

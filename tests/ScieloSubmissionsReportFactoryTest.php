@@ -1,13 +1,11 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('classes.journal.Section');
-import('classes.journal.SectionDAO');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('classes.submission.SubmissionDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+use PKP\tests\DatabaseTestCase;
+use APP\section\Section;
+use APP\submission\Submission;
+use APP\publication\Publication;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 
 class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {

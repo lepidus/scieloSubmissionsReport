@@ -1,6 +1,6 @@
 <?php
 
-import('lib.pkp.classes.form.Form');
+use PKP\form\Form;
 
 class ScieloSubmissionsReportSettingsForm extends Form
 {

@@ -1,11 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOJSReport');
-import('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 
 class ScieloSubmissionsOJSReportTest extends TestCase
 {
@@ -151,8 +150,8 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
-        $lastRow = $csvRows[sizeof($csvRows)-1];
-        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
+        $lastRow = $csvRows[sizeof($csvRows) - 1];
+        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow) - 2];
         $expectedAverageReviewingTime = 4;
 
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);

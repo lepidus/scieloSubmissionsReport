@@ -1,8 +1,8 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO');
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor');
 
 class ScieloSubmissionFactory
 {

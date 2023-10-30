@@ -1,14 +1,13 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOJSReport');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintFactory');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
-import('classes.journal.SectionDAO');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
 
 class ScieloSubmissionsReportFactory
 {

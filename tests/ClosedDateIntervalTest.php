@@ -1,8 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 
 class ClosedDateIntervalTest extends TestCase
 {

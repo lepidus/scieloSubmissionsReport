@@ -1,9 +1,9 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory
 {

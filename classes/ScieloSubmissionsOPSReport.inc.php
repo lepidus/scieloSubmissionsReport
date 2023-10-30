@@ -1,6 +1,6 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
 
 class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport
 {

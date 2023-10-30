@@ -1,13 +1,12 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOPSReport');
-import('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 
 class ScieloSubmissionsOPSReportTest extends TestCase
 {
@@ -97,8 +96,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
 
         $headers = $report->getHeaders();
-        $penultimateColumn = $headers[count($headers)-2];
-        $lastColumn = $headers[count($headers)-1];
+        $penultimateColumn = $headers[count($headers) - 2];
+        $lastColumn = $headers[count($headers) - 1];
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.header.ReviewingTime"), $penultimateColumn);
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval"), $lastColumn);
     }
@@ -134,8 +133,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
-        $lastRow = $csvRows[sizeof($csvRows)-1];
-        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
+        $lastRow = $csvRows[sizeof($csvRows) - 1];
+        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow) - 2];
         $expectedAverageReviewingTime = 4;
 
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);

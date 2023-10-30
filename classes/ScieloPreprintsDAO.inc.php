@@ -8,10 +8,9 @@
  * Operations for retrieving preprints and other data
  */
 
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
-
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 
