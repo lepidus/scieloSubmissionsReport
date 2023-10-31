@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 

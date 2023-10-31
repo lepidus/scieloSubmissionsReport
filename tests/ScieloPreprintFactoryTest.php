@@ -21,24 +21,29 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
     private $dateSubmitted = '2021-05-31 15:38:24';
-    private $statusCode = STATUS_PUBLISHED;
+    private $statusCode = Submission::STATUS_PUBLISHED;
     private $statusMessage;
     private $sectionName = "Biological Sciences";
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
     private $vorDoi = "10.666/949494";
-    private $relationStatus = PUBLICATION_RELATION_PUBLISHED;
+    private $relationStatus;
     private $abstractViews = 10;
     private $pdfViews = 21;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->markTestSkipped(
+            'Not OPS',
+        );
         $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission($this->statusCode);
         $this->publicationId = $this->createPublication($this->submissionId);
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en_US');
+        $this->relationStatus = Publication::PUBLICATION_RELATION_PUBLISHED;
         $this->addCurrentPublicationToSubmission($this->submissionId, $this->publicationId);
     }
 
@@ -273,7 +278,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-31';
 
-        $submissionId = $this->createSubmission(STATUS_PUBLISHED);
+        $submissionId = $this->createSubmission(Submission::STATUS_PUBLISHED);
         $publicationId = $this->createPublication($submissionId, $finalDecisionDate);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
 
@@ -314,9 +319,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
         $relationsMap = [
-            PUBLICATION_RELATION_NONE => 'publication.relation.none',
-            PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
-            PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
+            Publication::PUBLICATION_RELATION_NONE => 'publication.relation.none',
+            Publication::PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
+            Publication::PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
         ];
         $expectedPublicationStatus = __($relationsMap[$this->relationStatus]);
 

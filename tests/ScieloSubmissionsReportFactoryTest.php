@@ -56,7 +56,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $submission = new Submission();
         $submission->setData('contextId', $this->contextId);
         $submission->setData('locale', $this->locale);
-        $submission->setData('status', STATUS_PUBLISHED);
+        $submission->setData('status', Submission::STATUS_PUBLISHED);
 
         if (!is_null($dateSubmitted)) {
             $submission->setData('dateSubmitted', $dateSubmitted);

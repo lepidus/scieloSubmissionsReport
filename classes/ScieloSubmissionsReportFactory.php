@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;

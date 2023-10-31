@@ -1,8 +1,14 @@
 <?php
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission');
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO');
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor');
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use DateTime;
+use APP\submission\Submission;
+use PKP\db\DAORegistry;
+use APP\facades\Repo;
 
 class ScieloSubmissionFactory
 {
@@ -100,7 +106,7 @@ class ScieloSubmissionFactory
     {
         $statusMap = [
             STATUS_QUEUED => 'submissions.queued',
-            STATUS_PUBLISHED => 'submission.status.published',
+            Submission::STATUS_PUBLISHED => 'submission.status.published',
             STATUS_DECLINED => 'submission.status.declined',
             STATUS_SCHEDULED => 'submission.status.scheduled'
         ];
@@ -115,7 +121,7 @@ class ScieloSubmissionFactory
         $submissionAuthors = [];
 
         foreach ($authorsIds as $authorId) {
-            $author = DAORegistry::getDAO('AuthorDAO')->getById($authorId);
+            $author = Repo::author()->get($authorId);
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
             $affiliation = $author->getLocalizedData('affiliation', $locale);

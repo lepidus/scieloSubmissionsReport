@@ -9,13 +9,16 @@
  * Operations for retrieving submissions and other data
  */
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use PKP\db\DAO;
 use APP\decision\Decision;
 use APP\log\event\SubmissionEventLogEntry;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionsDAO extends DAO
 {
@@ -23,7 +26,7 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
-        $query = Capsule::table('submissions')
+        $query = DB::table('submissions')
         ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
         ->where('submissions.context_id', $contextId)
         ->whereNotNull('submissions.date_submitted')
@@ -60,7 +63,7 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getSubmission($submissionId)
     {
-        $result = Capsule::table('submissions')
+        $result = DB::table('submissions')
         ->where('submission_id', '=', $submissionId)
         ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale', 'context_id')
         ->first();
@@ -70,7 +73,7 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getPublicationTitle($publicationId, $locale, $submissionLocale)
     {
-        $result = Capsule::table('publication_settings')
+        $result = DB::table('publication_settings')
         ->where('publication_id', '=', $publicationId)
         ->where('setting_name', '=', 'title')
         ->select('locale', 'setting_value as title')
@@ -96,13 +99,13 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getPublicationSection($publicationId, $locale)
     {
-        $result = Capsule::table('publications')
+        $result = DB::table('publications')
         ->where('publication_id', '=', $publicationId)
         ->select('section_id')
         ->first();
         $sectionId = get_object_vars($result)['section_id'];
 
-        $result = Capsule::table('section_settings')
+        $result = DB::table('section_settings')
         ->where('section_id', '=', $sectionId)
         ->where('setting_name', '=', 'title')
         ->where('locale', '=', $locale)
@@ -115,7 +118,7 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getPublicationAuthors($publicationId)
     {
-        $result = Capsule::table('authors')
+        $result = DB::table('authors')
         ->where('publication_id', '=', $publicationId)
         ->select('author_id')
         ->get();
@@ -130,9 +133,13 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
-        $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+        $possibleFinalDecisions = [
+            Decision::ACCEPT,
+            Decision::DECLINE,
+            Decision::INITIAL_DECLINE
+        ];
 
-        $result = Capsule::table('edit_decisions')
+        $result = DB::table('edit_decisions')
         ->where('submission_id', $submissionId)
         ->whereIn('decision', $possibleFinalDecisions)
         ->orderBy('date_decided', 'asc')
@@ -149,8 +156,8 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getIdOfSubmitterUser($submissionId)
     {
-        $result = Capsule::table('event_log')
-        ->where('event_type', SUBMISSION_LOG_SUBMISSION_SUBMIT)
+        $result = DB::table('event_log')
+        ->where('event_type', PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT)
         ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
         ->where('assoc_id', $submissionId)
         ->select('user_id')

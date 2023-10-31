@@ -8,12 +8,17 @@
  * Operations for retrieving articles and other data
  */
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 use APP\decision\Decision;
+use PKP\db\DAORegistry;
+use PKP\security\Role;
+use APP\facades\Repo;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
@@ -35,14 +40,12 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getSectionEditor($submissionId): string
     {
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
-            $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
             if ($currentUserGroupName == 'section editor') {
                 return $user->getFullName();
@@ -53,15 +56,13 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getEditors($submissionId): array
     {
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
         $journalEditors = array();
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
-            $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
             if ($currentUserGroupName == 'editor') {
                 array_push($journalEditors, $user->getFullName());
@@ -106,10 +107,11 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getLastDecision($submissionId): string
     {
-        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
-        $decisionsSubmission = $editDecisionDao->getEditorDecisions($submissionId);
+        $decisionIterator = Repo::decision()->getCollector()
+            ->filterBySubmissionIds([$submissionId])
+            ->getMany();
         $lastDecision = '';
-        foreach ($decisionsSubmission as $decisions) {
+        foreach ($decisionIterator as $decisions) {
             $lastDecision = $decisions['decision'];
         }
 

@@ -18,7 +18,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
     private $submitter = "Don Vito Corleone";
     private $submitterCountry = "Brazil";
     private $dateSubmitted = '2021-05-31 15:38:24';
-    private $statusCode = STATUS_PUBLISHED;
+    private $statusCode = Submission::STATUS_PUBLISHED;
     private $statusMessage;
     private $sectionName = "Biological Sciences";
     private $dateLastActivity = '2021-06-03 16:00:00';

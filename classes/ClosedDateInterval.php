@@ -1,5 +1,9 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
+use DateTime;
+
 class ClosedDateInterval
 {
     private $beginningDate;

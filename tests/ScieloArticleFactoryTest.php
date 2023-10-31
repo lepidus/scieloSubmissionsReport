@@ -5,19 +5,24 @@ use APP\submission\Submission;
 use APP\publication\Publication;
 use APP\section\Section;
 use APP\author\Author;
+use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\decision\Decision;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
-    private $locale = 'en_US';
     private $contextId = 1;
     private $submissionId;
     private $publicationId;
+    private $sectionId;
+
+    private $locale = 'en_US';
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
     private $dateSubmitted = '2021-05-31 15:38:24';
-    private $statusCode = STATUS_PUBLISHED;
+    private $statusCode = Submission::STATUS_PUBLISHED;
     private $statusMessage;
     private $sectionName = "Biological Sciences";
     private $dateLastActivity = '2021-06-03 16:00:00';
@@ -35,6 +40,11 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->addCurrentPublicationToSubmission();
     }
 
+    private function clearDB()
+    {
+
+    }
+
     protected function getAffectedTables()
     {
         return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
@@ -44,21 +54,19 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createSubmission(): int
     {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $submission = new Submission();
+        $submission = Repo::submission()->newDataObject();
         $submission->setData('contextId', $this->contextId);
         $submission->setData('dateSubmitted', $this->dateSubmitted);
         $submission->setData('status', $this->statusCode);
         $submission->setData('locale', $this->locale);
         $submission->setData('dateLastActivity', $this->dateLastActivity);
 
-        return $submissionDao->insertObject($submission);
+        return Repo::submission()->dao->insert($submission);
     }
 
     private function createPublication($sectionId): int
     {
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-        $publication = new Publication();
+        $publication = Repo::publication()->newDataObject();
         $publication->setData('submissionId', $this->submissionId);
         $publication->setData('title', $this->title, $this->locale);
         $publication->setData('sectionId', $sectionId);
@@ -66,7 +74,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $publication->setData('vorDoi', $this->doi);
         $publication->setData('status', $this->statusCode);
 
-        return $publicationDao->insertObject($publication);
+        return Repo::publication()->dao->insert($publication);
     }
 
     private function createSectionEditorUserGroup(): int
@@ -99,19 +107,24 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createSection(): int
     {
-        $sectionDao = DAORegistry::getDAO('SectionDAO');
-        $section = new Section();
+        $section = Repo::section()->newDataObject();
         $section->setTitle($this->sectionName, $this->locale);
-        $sectionId = $sectionDao->insertObject($section);
+        $section->setAbbrev(__('section.default.abbrev'), $this->locale);
+        $section->setMetaIndexed(true);
+        $section->setMetaReviewed(true);
+        $section->setPolicy(__('section.default.policy'), $this->locale);
+        $section->setEditorRestricted(false);
+        $section->setHideTitle(false);
+        $section->setContextId($this->contextId);
+        $sectionId = Repo::section()->add($section);
 
         return $sectionId;
     }
 
     private function createAuthors(): array
     {
-        $authorDao = DAORegistry::getDAO('AuthorDAO');
-        $author1 = new Author();
-        $author2 = new Author();
+        $author1 = Repo::author()->newDataObject();
+        $author2 = Repo::author()->newDataObject();
         $author1->setData('publicationId', $this->publicationId);
         $author2->setData('publicationId', $this->publicationId);
         $author1->setData('email', "anaalice@harvard.com");
@@ -125,18 +138,16 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $author1->setData('country', 'US');
         $author2->setData('country', 'BR');
 
-        $authorDao->insertObject($author1);
-        $authorDao->insertObject($author2);
+        Repo::author()->dao->insert($author1);
+        Repo::author()->dao->insert($author2);
 
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
 
     private function addCurrentPublicationToSubmission(): void
     {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $submission = $submissionDao->getById($this->submissionId);
-        $submission->setData('currentPublicationId', $this->publicationId);
-        $submissionDao->updateObject($submission);
+        $submission = Repo::submission()->get($this->submissionId);
+        Repo::submission()->edit($submission, ['currentPublicationId' => $this->publicationId]);
     }
 
     private function createEditorUsers(bool $isSectionEditor = false)

@@ -8,6 +8,8 @@
  * Operations for retrieving preprints and other data
  */
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
@@ -131,9 +133,9 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
         $relationStatus = get_object_vars($result)['relationStatus'];
         $relationsMap = [
-            PUBLICATION_RELATION_NONE => 'publication.relation.none',
-            PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
-            PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
+            Publication::PUBLICATION_RELATION_NONE => 'publication.relation.none',
+            Publication::PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
+            Publication::PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
         ];
 
         return __($relationsMap[$relationStatus]);
@@ -168,7 +170,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         ->first();
         $publicationDatePublished = get_object_vars($result)['date_published'];
 
-        if (!is_null($publicationDatePublished) && $submissionStatus == STATUS_PUBLISHED) {
+        if (!is_null($publicationDatePublished) && $submissionStatus == Submission::STATUS_PUBLISHED) {
             return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 

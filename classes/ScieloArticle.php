@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
 
 class ScieloArticle extends ScieloSubmission

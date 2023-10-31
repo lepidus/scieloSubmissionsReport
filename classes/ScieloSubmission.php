@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 class ScieloSubmission
 {
     protected $id;

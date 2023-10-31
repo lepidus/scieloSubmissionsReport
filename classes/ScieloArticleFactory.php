@@ -1,8 +1,6 @@
 <?php
 
-use APP\plugin\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
@@ -10,8 +8,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
-        $scieloArticlesDAO = new ScieloArticlesDAO();
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
+        $scieloArticlesDAO = app(ScieloArticlesDAO::class);
         $submission = $scieloArticlesDAO->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
 
