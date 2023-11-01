@@ -18,7 +18,7 @@ class ScieloPreprintTest extends TestCase
     private $status = "Published";
     private $authors;
     private $section = "Biological Sciences";
-    private $language = "en_US";
+    private $language = "en";
     private $finalDecision = "Accepted";
     private $finalDecisionDate = "2013-09-14 22:00:00";
     private $expectedReviewingTime = 8;
@@ -122,21 +122,21 @@ class ScieloPreprintTest extends TestCase
     public function testGetRecord(): void
     {
         $stats = new SubmissionStats($this->abstractViews, $this->pdfViews);
-        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "", [""], $stats);
+        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en", "Accepted", "2021-04-23", ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "", [""], $stats);
         $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
         $messageSubmitterIsNotScieloJournal = __("common.no");
 
-        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", $messageSubmitterIsNotScieloJournal, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2", "10", "21"];
+        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", $messageSubmitterIsNotScieloJournal, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2", "10", "21"];
         $this->assertEquals($expectedRecord, $preprint->asRecord());
     }
 
     public function testRecordDoesntHaveStats(): void
     {
-        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "", [""]);
+        $preprint = new ScieloPreprint(1, "Title 1", "Paola Franchesca", "Brasil", false, "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en", "Accepted", "2021-04-23", ["Jean Paul Cardin"], ["Jean Paul Cardin"], "Sent to journal publication", "", [""]);
         $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
         $messageSubmitterIsNotScieloJournal = __("common.no");
 
-        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", $messageSubmitterIsNotScieloJournal, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2"];
+        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", $messageSubmitterIsNotScieloJournal, "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en", "Sent to journal publication", $messageNoPublicationDOI, "Note:", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedRecord, $preprint->asRecord());
     }
 }

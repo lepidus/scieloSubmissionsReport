@@ -89,7 +89,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), false);
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en_US'));
+            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 
             if ($currentUserGroupAbbrev == 'am') {
                 array_push($sectionModeratorUsers, $user->getFullName());
@@ -110,7 +110,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), false);
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en_US'));
+            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 
             if ($currentUserGroupAbbrev == 'resp') {
                 array_push($moderatorUsers, $user->getFullName());

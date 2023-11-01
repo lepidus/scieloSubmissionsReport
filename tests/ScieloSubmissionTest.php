@@ -16,7 +16,7 @@ class ScieloSubmissionTest extends TestCase
     private $status = "Published";
     private $authors;
     private $section = "Biological Sciences";
-    private $language = "en_US";
+    private $language = "en";
     private $finalDecision = "Accepted";
     private $finalDecisionDate = "2013-09-14 22:00:00";
     private $expectedReviewingTime = 8;

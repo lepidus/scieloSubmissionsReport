@@ -13,7 +13,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
     protected const WORKFLOW_STAGE_ID_SUBMISSION = 5;
 
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $contextId = 1;
     private $submissionId;
     private $publicationId;
@@ -42,7 +42,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->submissionId = $this->createSubmission($this->statusCode);
         $this->publicationId = $this->createPublication($this->submissionId);
         $this->submissionAuthors = $this->createAuthors();
-        $this->statusMessage = __('submission.status.published', [], 'en_US');
+        $this->statusMessage = __('submission.status.published', [], 'en');
         $this->relationStatus = Publication::PUBLICATION_RELATION_PUBLISHED;
         $this->addCurrentPublicationToSubmission($this->submissionId, $this->publicationId);
     }
@@ -193,7 +193,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $responsiblesUserGroupLocalizedAbbrev = [
-            'en_US' => 'resp',
+            'en' => 'resp',
             'pt_BR' => 'resp',
             'es_ES' => 'resp'
         ];
@@ -210,7 +210,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $sectionModeratorUserGroupLocalizedAbbrev = [
-            'en_US' => 'am',
+            'en' => 'am',
             'pt_BR' => 'ma',
             'es_ES' => 'ma'
         ];
@@ -227,12 +227,12 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $scieloJournalUserGroupLocalizedNames = [
-            'en_US' => 'SciELO Journal',
+            'en' => 'SciELO Journal',
             'pt_BR' => 'Periódico SciELO',
             'es_ES' => 'Revista SciELO'
         ];
         $scieloJournalUserGroupLocalizedAbbrev = [
-            'en_US' => 'SciELO',
+            'en' => 'SciELO',
             'pt_BR' => 'SciELO',
             'es_ES' => 'SciELO'
         ];

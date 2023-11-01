@@ -41,12 +41,12 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     public function getSectionEditor($submissionId): string
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), false);
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+            $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'section editor') {
                 return $user->getFullName();
             }
@@ -63,7 +63,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), false);
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
+            $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'editor') {
                 array_push($journalEditors, $user->getFullName());
             }

@@ -17,7 +17,7 @@ class ScieloArticleTest extends TestCase
     private $status = "Published";
     private $authors;
     private $section = "Biological Sciences";
-    private $language = "en_US";
+    private $language = "en";
     private $finalDecision = "Accepted";
     private $finalDecisionDate = "2013-09-14 22:00:00";
     private $expectedReviewingTime = 8;
@@ -85,9 +85,9 @@ class ScieloArticleTest extends TestCase
 
     public function testGetRecord(): void
     {
-        $article = new ScieloArticle(1, "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], "Jean Paul Cardin", ["Accept", "See comments"], "Accept");
+        $article = new ScieloArticle(1, "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en", "Accepted", "2021-04-23", ["Jean Paul Cardin"], "Jean Paul Cardin", ["Accept", "See comments"], "Accept");
 
-        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
+        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
         $this->assertEquals($expectedRecord, $article->asRecord());
     }
 }

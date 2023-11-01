@@ -10,7 +10,7 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {
     private $application = 'ojs';
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $contextId = 1;
     private $reportFactory;
     private $firstSectionName = "Biological Sciences";

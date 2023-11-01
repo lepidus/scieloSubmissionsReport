@@ -10,6 +10,8 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\decision\Decision;
+use PKP\userGroup\relationships\UserGroupStage;
+use PKP\security\Role;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -17,8 +19,15 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private $submissionId;
     private $publicationId;
     private $sectionId;
+    private $sectionEditorUserGroupId;
+    private $editorUserGroupId;
+    private $author1Id;
+    private $author2Id;
+    private $firstEditorUserId;
+    private $secondEditorUserId;
+    private $stageAssignmentIds = [];
 
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
     private $dateSubmitted = '2021-05-31 15:38:24';
@@ -32,25 +41,85 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $sectionId = $this->createSection();
+
+        $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication($sectionId);
+        $this->publicationId = $this->createPublication();
         $this->submissionAuthors = $this->createAuthors();
-        $this->statusMessage = __('submission.status.published', [], 'en_US');
+        $this->statusMessage = __('submission.status.published', [], 'en');
         $this->addCurrentPublicationToSubmission();
     }
 
-    private function clearDB()
+    protected function tearDown(): void
     {
-
+        $this->clearDB();
+        parent::tearDown();
     }
 
-    protected function getAffectedTables()
+    private function clearDB(): void
     {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
-        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'review_assignments'];
+        $publication = Repo::publication()->get($this->publicationId);
+        if ($publication) {
+            Repo::publication()->delete($publication);
+        }
+
+        $submission = Repo::submission()->get($this->submissionId);
+        if ($submission) {
+            Repo::submission()->delete($submission);
+        }
+
+        $section = Repo::section()->get($this->sectionId, $this->contextId);
+        if ($section) {
+            Repo::section()->delete($section);
+        }
+
+        $sectionEditorUserGroup = $this->sectionEditorUserGroupId ? Repo::userGroup()->get($this->sectionEditorUserGroupId) : null;
+        if ($sectionEditorUserGroup) {
+            Repo::userGroup()->delete($sectionEditorUserGroup);
+        }
+
+        $editorUserGroup = $this->editorUserGroupId ? Repo::userGroup()->get($this->editorUserGroupId) : null;
+        if ($editorUserGroup) {
+            Repo::userGroup()->delete($editorUserGroup);
+        }
+
+        $author1 = $this->author1Id ? Repo::author()->get($this->author1Id) : null;
+        if ($author1) {
+            Repo::author()->delete($author1);
+        }
+
+        $author2 = $this->author2Id ? Repo::author()->get($this->author2Id) : null;
+        if ($author2) {
+            Repo::author()->delete($author2);
+        }
+
+        $firstEditorUser = $this->firstEditorUserId ? Repo::user()->get($this->firstEditorUserId) : null;
+        if ($firstEditorUser) {
+            Repo::user()->delete($firstEditorUser);
+        }
+
+        $secondEditorUser = $this->secondEditorUserId ? Repo::user()->get($this->secondEditorUserId) : null;
+        if ($secondEditorUser) {
+            Repo::user()->delete($secondEditorUser);
+        }
+
+        if (empty($this->stageAssignmentIds)) {
+            return;
+        }
+
+        $stageAssignmentDAO = DAORegistry::getDAO('StageAssignmentDAO');
+        foreach ($this->stageAssignmentIds as $stageAssignmentId) {
+            $stageAssignmentDAO->getById($stageAssignmentId);
+            $stageAssignmentDAO->deleteObject($stageAssignment);
+        }
     }
+
+    // protected function getAffectedTables()
+    // {
+    //     return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
+    //     'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
+    //     'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'review_assignments'];
+    // }
 
     private function createSubmission(): int
     {
@@ -64,12 +133,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return Repo::submission()->dao->insert($submission);
     }
 
-    private function createPublication($sectionId): int
+    private function createPublication(): int
     {
         $publication = Repo::publication()->newDataObject();
         $publication->setData('submissionId', $this->submissionId);
         $publication->setData('title', $this->title, $this->locale);
-        $publication->setData('sectionId', $sectionId);
+        $publication->setData('sectionId', $this->sectionId);
         $publication->setData('relationStatus', '1');
         $publication->setData('vorDoi', $this->doi);
         $publication->setData('status', $this->statusCode);
@@ -79,30 +148,30 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createSectionEditorUserGroup(): int
     {
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $sectionEditorUserGroupLocalizedNames = [
-            'en_US' => 'section editor',
+            'en' => 'section editor',
             'pt_BR' => 'editor de seção',
-            'es_ES' => 'editor de sección'];
-        $sectionEditorsUserGroup = new UserGroup();
+            'es' => 'editor de sección'
+        ];
+        $sectionEditorsUserGroup = Repo::userGroup()->newDataObject();
         $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
-        $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
+        $sectionEditorsUserGroup->setData('roleId', Role::ROLE_ID_SUB_EDITOR);
         $sectionEditorsUserGroup->setData('contextId', $this->contextId);
-        return $userGroupDao->insertObject($sectionEditorsUserGroup);
+        return Repo::userGroup()->add($sectionEditorsUserGroup);
     }
 
     private function createEditorUserGroup(): int
     {
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $editorUserGroupLocalizedNames = [
-            'en_US' => 'editor',
+            'en' => 'editor',
             'pt_BR' => 'editor',
-            'es_ES' => 'editor'];
-        $editorsUserGroup = new UserGroup();
+            'es' => 'editor'
+        ];
+        $editorsUserGroup = Repo::userGroup()->newDataObject();
         $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
-        $editorsUserGroup->setData('roleId', ROLE_ID_MANAGER);
+        $editorsUserGroup->setData('roleId', Role::ROLE_ID_MANAGER);
         $editorsUserGroup->setData('contextId', $this->contextId);
-        return $userGroupDao->insertObject($editorsUserGroup);
+        return Repo::userGroup()->add($editorsUserGroup);
     }
 
     private function createSection(): int
@@ -138,8 +207,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $author1->setData('country', 'US');
         $author2->setData('country', 'BR');
 
-        Repo::author()->dao->insert($author1);
-        Repo::author()->dao->insert($author2);
+        $this->author1Id = Repo::author()->dao->insert($author1);
+        $this->author2Id = Repo::author()->dao->insert($author2);
 
         return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
     }
@@ -152,38 +221,46 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createEditorUsers(bool $isSectionEditor = false)
     {
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $userDao = DAORegistry::getDAO('UserDAO');
-
-        $firstEditorUser = new User();
+        $firstEditorUser = Repo::user()->newDataObject();
         $firstEditorUser->setUsername('examplePeter');
         $firstEditorUser->setEmail('peter@exemple.com');
         $firstEditorUser->setPassword('examplepass');
         $firstEditorUser->setGivenName("Peter", $this->locale);
         $firstEditorUser->setFamilyName("Parker", $this->locale);
+        $firstEditorUser->setDateRegistered(Core::getCurrentDate());
 
-        $secondEditorUser = new User();
+        $secondEditorUser = Repo::user()->newDataObject();
         $secondEditorUser->setUsername('exampleJhon');
         $secondEditorUser->setEmail('jhon@exemple.com');
         $secondEditorUser->setPassword('exemplepass');
         $secondEditorUser->setGivenName("Jhon", $this->locale);
         $secondEditorUser->setFamilyName("Carter", $this->locale);
+        $secondEditorUser->setDateRegistered(Core::getCurrentDate());
 
-        $firstEditorUserId = $userDao->insertObject($firstEditorUser);
-        $secondEditorUserId = $userDao->insertObject($secondEditorUser);
+        $this->firstEditorUserId = Repo::user()->add($firstEditorUser);
+        $this->secondEditorUserId = Repo::user()->add($secondEditorUser);
 
         if ($isSectionEditor) {
-            $sectionEditorGroupId = $this->createSectionEditorUserGroup();
-            $userGroupDao->assignUserToGroup($firstEditorUserId, $sectionEditorGroupId);
-            $this->createStageAssignments([$firstEditorUserId], $sectionEditorGroupId);
-            $userGroupDao->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
+            $this->sectionEditorGroupId = $this->createSectionEditorUserGroup();
+            $userGroup = Repo::userGroup()->get($this->sectionEditorGroupId);
+            Repo::userGroup()->assignUserToGroup($this->firstEditorUserId, $this->sectionEditorGroupId);
+            $this->createStageAssignments([$this->firstEditorUserId], $this->sectionEditorGroupId);
+            UserGroupStage::create([
+                'contextId' => $this->contextId,
+                'userGroupId' => $this->sectionEditorGroupId,
+                'stageId' => 5
+            ]);
             return $firstEditorUser;
         } else {
-            $editorGroupId = $this->createEditorUserGroup();
-            $userGroupDao->assignUserToGroup($firstEditorUserId, $editorGroupId);
-            $userGroupDao->assignUserToGroup($secondEditorUserId, $editorGroupId);
-            $this->createStageAssignments([$firstEditorUserId, $secondEditorUserId], $editorGroupId);
-            $userGroupDao->assignGroupToStage($this->contextId, $editorGroupId, 5);
+            $this->editorGroupId = $this->createEditorUserGroup();
+            Repo::userGroup()->assignUserToGroup($this->firstEditorUserId, $this->editorGroupId);
+            Repo::userGroup()->assignUserToGroup($this->secondEditorUserId, $this->editorGroupId);
+            $this->createStageAssignments([$this->firstEditorUserId, $this->secondEditorUserId], $this->editorGroupId);
+            UserGroupStage::create([
+                'contextId' => $this->contextId,
+                'userGroupId' => $this->editorGroupId,
+                'stageId' => 5
+            ]);
             return [$firstEditorUser, $secondEditorUser];
         }
     }
@@ -197,14 +274,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private function createStageAssignments(array $userIds, $groupId): void
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-
         foreach ($userIds as $userId) {
-            $stageAssignment = new StageAssignment();
+            $stageAssignment = $stageAssignmentDao->newDataObject();
             $stageAssignment->setSubmissionId($this->submissionId);
             $stageAssignment->setUserId($userId);
             $stageAssignment->setUserGroupId($groupId);
             $stageAssignment->setStageId(5);
-            $stageAssignmentDao->insertObject($stageAssignment);
+            $stageAssignmentIds[] = $stageAssignmentDao->insertObject($stageAssignment);
         }
     }
 
@@ -262,8 +338,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     */
     public function testSubmissionGetsNoSectionEditor(): void
     {
-        $sectionEditorGroupId = $this->createSectionEditorUserGroup();
-        DAORegistry::getDAO('UserGroupDAO')->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
+        $this->sectionEditorGroupId = $this->createSectionEditorUserGroup();
+        UserGroupStage::create([
+            'contextId' => $this->contextId,
+            'userGroupId' => $this->sectionEditorGroupId,
+            'stageId' => 5
+        ]);
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);

@@ -10,7 +10,7 @@ use APP\decision\Decision;
 
 class ScieloSubmissionFactoryTest extends DatabaseTestCase
 {
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $contextId = 1;
     private $submissionId;
     private $publicationId;
@@ -32,7 +32,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication($sectionId);
         $this->submissionAuthors = $this->createAuthors();
-        $this->statusMessage = __('submission.status.published', [], 'en_US');
+        $this->statusMessage = __('submission.status.published', [], 'en');
         $this->addCurrentPublicationToSubmission();
     }
 
