@@ -35,9 +35,15 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $this->markTestSkipped(
-            'Not OPS',
-        );
+        $application = Application::get();
+        $applicationName = $application->getName();
+
+        if ($applicationName != 'ops') {
+            $this->markTestSkipped(
+                'Not OPS',
+            );
+        }
+
         $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission($this->statusCode);
         $this->publicationId = $this->createPublication($this->submissionId);
@@ -51,7 +57,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
         'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'metrics'];
+        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
     private function createSubmission($statusCode): int

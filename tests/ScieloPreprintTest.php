@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 
 class ScieloPreprintTest extends TestCase
 {
