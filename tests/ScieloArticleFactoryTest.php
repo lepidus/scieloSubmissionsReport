@@ -6,12 +6,16 @@ use APP\publication\Publication;
 use APP\section\Section;
 use APP\author\Author;
 use APP\facades\Repo;
+use Mockery;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
 use APP\decision\Decision;
 use PKP\userGroup\relationships\UserGroupStage;
 use PKP\security\Role;
+use PKP\submission\reviewRound\ReviewRound;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -113,13 +117,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             $stageAssignmentDAO->deleteObject($stageAssignment);
         }
     }
-
-    // protected function getAffectedTables()
-    // {
-    //     return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
-    //     'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-    //     'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'review_assignments'];
-    // }
 
     private function createSubmission(): int
     {
@@ -265,10 +262,35 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         }
     }
 
-    private function createDecision($submissionId, $decision, $dateDecided): void
+    private function createReviewRound($submissionId)
     {
-        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
-        $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => $decision, 'dateDecided' => $dateDecided, 'editorId' => 1]);
+        $reviewRoundDao = DAORegistry::getDAO('ReviewRoundDAO');
+        $stageId = 2;
+        $round = 1;
+
+        $reviewRound = $reviewRoundDao->build(
+            $submissionId,
+            $stageId,
+            $round,
+            ReviewRound::REVIEW_ROUND_STATUS_PENDING_REVIEWERS
+        );
+
+        return $reviewRound;
+    }
+
+    private function createDecision($submissionId, $decision, $dateDecided, $reviewRoundId = null): void
+    {
+
+        $params = [
+            'decision' => $decision,
+            'submissionId' => $submissionId,
+            'dateDecided' => $dateDecided,
+            'editorId' => 1,
+            'reviewRoundId' => $reviewRoundId,
+        ];
+
+        $decision = Repo::decision()->newDataObject($params);
+        $decisionId = Repo::decision()->dao->insert($decision);
     }
 
     private function createStageAssignments(array $userIds, $groupId): void
@@ -372,8 +394,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     */
     public function testSubmissionGetsLastDecisionOfNewRound(): void
     {
+        $reviewRound = $this->createReviewRound($this->submissionId);
+
         $decision = SUBMISSION_EDITOR_DECISION_NEW_ROUND;
-        $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()));
+        $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()), $reviewRound->getId());
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -398,7 +422,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     */
     public function testSubmissionGetsReviews(): void
     {
-        $recommendation = SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
+        $recommendation = ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
 
         $reviewAssignment = new ReviewAssignment();
         $reviewAssignment->setRecommendation($recommendation);

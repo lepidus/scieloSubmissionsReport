@@ -18,6 +18,7 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use DateTime;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionsDAO extends DAO

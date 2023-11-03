@@ -107,14 +107,16 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getLastDecision($submissionId): string
     {
-        $decisionIterator = Repo::decision()->getCollector()
+        $decisions = Repo::decision()->getCollector()
             ->filterBySubmissionIds([$submissionId])
             ->getMany();
-        $lastDecision = '';
-        foreach ($decisionIterator as $decisions) {
-            $lastDecision = $decisions['decision'];
+
+        $decision = null;
+        if (!$decisions->isEmpty()) {
+            $lastDecision = $decisions->last();
+            $decision = $lastDecision->getData('decision');
         }
 
-        return $this->getDecisionMessage($lastDecision);
+        return $this->getDecisionMessage($decision);
     }
 }

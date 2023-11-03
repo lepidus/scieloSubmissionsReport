@@ -2,6 +2,8 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
+use DateTime;
+
 class ScieloSubmission
 {
     protected $id;
