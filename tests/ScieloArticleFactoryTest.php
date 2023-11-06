@@ -6,7 +6,6 @@ use APP\publication\Publication;
 use APP\section\Section;
 use APP\author\Author;
 use APP\facades\Repo;
-use Mockery;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;

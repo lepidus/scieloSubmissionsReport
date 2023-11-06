@@ -71,8 +71,7 @@ class ScieloSubmissionFactory
             return "";
         }
 
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $submitter = $userDao->getById($userId);
+        $submitter = Repo::user()->get($userId);
 
         return $submitter->getFullName();
     }
@@ -86,8 +85,7 @@ class ScieloSubmissionFactory
             return "";
         }
 
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $submitter = $userDao->getById($userId);
+        $submitter = Repo::user()->get($userId);
         $submitterCountry = $submitter->getCountryLocalized();
 
         return !is_null($submitterCountry) ? $submitterCountry : "";
@@ -105,10 +103,10 @@ class ScieloSubmissionFactory
     protected function getStatusMessage($statusKey)
     {
         $statusMap = [
-            STATUS_QUEUED => 'submissions.queued',
+            Submission::STATUS_QUEUED => 'submissions.queued',
             Submission::STATUS_PUBLISHED => 'submission.status.published',
-            STATUS_DECLINED => 'submission.status.declined',
-            STATUS_SCHEDULED => 'submission.status.scheduled'
+            Submission::STATUS_DECLINED => 'submission.status.declined',
+            Submission::STATUS_SCHEDULED => 'submission.status.scheduled'
         ];
 
         return __($statusMap[$statusKey]);
