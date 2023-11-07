@@ -73,32 +73,32 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getDecisionMessage($decision)
     {
-        switch($decision) {
-            case SUBMISSION_EDITOR_DECISION_ACCEPT:
+        switch ($decision) {
+            case Decision::ACCEPT:
                 return __('editor.submission.decision.accept');
-            case SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS:
+            case Decision::PENDING_REVISIONS:
                 return __('editor.submission.decision.requestRevisions');
-            case SUBMISSION_EDITOR_DECISION_RESUBMIT:
+            case Decision::RESUBMIT:
                 return __('editor.submission.decision.resubmit');
-            case SUBMISSION_EDITOR_DECISION_DECLINE:
+            case Decision::DECLINE:
                 return __('editor.submission.decision.decline');
-            case SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION:
+            case Decision::SEND_TO_PRODUCTION:
                 return __('editor.submission.decision.sendToProduction');
-            case SUBMISSION_EDITOR_DECISION_NEW_ROUND:
+            case Decision::NEW_EXTERNAL_ROUND:
                 return __('editor.submission.decision.newRound');
-            case SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW:
+            case Decision::EXTERNAL_REVIEW:
                 return __('editor.submission.decision.sendExternalReview');
-            case SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE:
+            case Decision::INITIAL_DECLINE:
                 return __('editor.submission.decision.decline');
-            case SUBMISSION_EDITOR_DECISION_REVERT_DECLINE:
+            case Decision::REVERT_DECLINE:
                 return __('editor.submission.decision.revertDecline');
-            case SUBMISSION_EDITOR_RECOMMEND_ACCEPT:
+            case Decision::RECOMMEND_ACCEPT:
                 return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept')));
-            case SUBMISSION_EDITOR_RECOMMEND_DECLINE:
+            case Decision::RECOMMEND_DECLINE:
                 return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline')));
-            case SUBMISSION_EDITOR_RECOMMEND_PENDING_REVISIONS:
+            case Decision::RECOMMEND_PENDING_REVISIONS:
                 return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions')));
-            case SUBMISSION_EDITOR_RECOMMEND_RESUBMIT:
+            case Decision::RECOMMEND_RESUBMIT:
                 return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit')));
             default:
                 return '';
