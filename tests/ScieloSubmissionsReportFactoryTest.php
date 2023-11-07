@@ -3,6 +3,7 @@
 use PKP\tests\DatabaseTestCase;
 use APP\section\Section;
 use APP\submission\Submission;
+use APP\facades\Repo;
 use APP\publication\Publication;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
@@ -11,7 +12,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {
     private $application = 'ojs';
     private $locale = 'en';
-    private $contextId = 1;
+    private $contextId;
     private $reportFactory;
     private $firstSectionName = "Biological Sciences";
     private $secondSectionName = "Math";
@@ -25,35 +26,66 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->createContext();
         $this->sectionsIds = $this->createTestSections();
         $this->submissionsIds = $this->createTestSubmissions();
         $this->publicationsIds = $this->createTestPublications();
         $this->addCurrentPublicationToTestSubmissions();
     }
 
-    protected function getAffectedTables()
+    protected function tearDown(): void
     {
-        return array("sections", "section_settings", "submissions", "submission_settings", "publications", "publication_settings", "edit_decisions");
+        parent::tearDown();
+
+        $contextDAO = \Application::getContextDAO();
+        $context = $contextDAO->getById($this->contextId);
+        $contextDAO->deleteObject($context);
+    }
+
+    private function createContext(): void
+    {
+        $contextDAO = \Application::getContextDAO();
+        $context = $contextDAO->newDataObject();
+        $context->setAllData([
+            'urlPath' => [$this->locale => 'test'],
+            'primaryLocale' => $this->locale
+        ]);
+        ;
+
+        $this->contextId = $contextDAO->insertObject($context);
     }
 
     private function createTestSections(): array
     {
-        $sectionDao = DAORegistry::getDAO('SectionDAO');
-        $section1 = new Section();
-        $section2 = new Section();
-        $section1->setTitle($this->firstSectionName, $this->locale);
-        $section2->setTitle($this->secondSectionName, $this->locale);
-        $firstSectionId = $sectionDao->insertObject($section1);
-        $secondSectionId = $sectionDao->insertObject($section2);
+        $section1 = Repo::section()->newDataObject([
+            'abbrev' => [$this->locale => __('section.default.abbrev')],
+            'policy' => [$this->locale => __('section.default.policy')],
+            'title' => [$this->locale => $this->firstSectionName],
+            'metaIndexed' => true,
+            'metaReviewed' => true,
+            'editorRestricted' => false,
+            'hideTitle' => false,
+            'contextId' => $this->contextId
+        ]);
+        $section2 = Repo::section()->newDataObject([
+            'abbrev' => [$this->locale => __('section.default.abbrev')],
+            'policy' => [$this->locale => __('section.default.policy')],
+            'title' => [$this->locale => $this->secondSectionName],
+            'metaIndexed' => true,
+            'metaReviewed' => true,
+            'editorRestricted' => false,
+            'hideTitle' => false,
+            'contextId' => $this->contextId
+        ]);
+        $firstSectionId = Repo::section()->dao->insert($section1);
+        $secondSectionId = Repo::section()->dao->insert($section2);
 
         return [$firstSectionId, $secondSectionId];
     }
 
     private function createSubmission($dateSubmitted = null, $dateFinalDecision = null): int
     {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-
-        $submission = new Submission();
+        $submission = Repo::submission()->newDataObject();
         $submission->setData('contextId', $this->contextId);
         $submission->setData('locale', $this->locale);
         $submission->setData('status', Submission::STATUS_PUBLISHED);
@@ -61,7 +93,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         if (!is_null($dateSubmitted)) {
             $submission->setData('dateSubmitted', $dateSubmitted);
         }
-        $submissionId = $submissionDao->insertObject($submission);
+        $submissionId = Repo::submission()->dao->insert($submission);
 
         if (!is_null($dateFinalDecision)) {
             $this->addFinalDecision($submissionId, $dateFinalDecision);
@@ -82,15 +114,20 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     private function addFinalDecision($submissionId, $dateDecided)
     {
-        $editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
-        $editDecisionDao->updateEditorDecision($submissionId, ['editDecisionId' => null, 'decision' => SUBMISSION_EDITOR_DECISION_DECLINE, 'dateDecided' => $dateDecided, 'editorId' => 1]);
+        $params = [
+            'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
+            'submissionId' => $submissionId,
+            'dateDecided' => $dateDecided,
+            'editorId' => 1,
+        ];
+
+        $decision = Repo::decision()->newDataObject($params);
+        $decisionId = Repo::decision()->dao->insert($decision);
     }
 
     private function createPublication($submissionId, $sectionId, $datePublished = null)
     {
-        $publicationDao = DAORegistry::getDAO('PublicationDAO');
-
-        $publication = new Publication();
+        $publication = Repo::publication()->newDataObject();
         $publication->setData('submissionId', $submissionId);
         $publication->setData('sectionId', $sectionId);
         $publication->setData('title', "Generic title", $this->locale);
@@ -98,7 +135,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
             $publication->setData('datePublished', $datePublished);
         }
 
-        return $publicationDao->insertObject($publication);
+        return Repo::publication()->dao->insert($publication);
     }
 
     private function createTestPublications(): array
@@ -113,10 +150,9 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
     private function addCurrentPublicationToSubmission($submissionId, $publicationId)
     {
-        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
-        $submission = $submissionDao->getById($submissionId);
+        $submission = Repo::submission()->get($submissionId);
         $submission->setData('currentPublicationId', $publicationId);
-        $submissionDao->updateObject($submission);
+        Repo::submission()->dao->update($submission);
     }
 
     private function addCurrentPublicationToTestSubmissions()

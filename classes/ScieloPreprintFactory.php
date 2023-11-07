@@ -20,7 +20,6 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
     public function createSubmission(int $submissionId, string $locale)
     {
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
         $submission = $scieloPreprintsDAO->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
 

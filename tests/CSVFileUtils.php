@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+
 class CSVFileUtils
 {
     public function getExpectedUTF8BOM(): string

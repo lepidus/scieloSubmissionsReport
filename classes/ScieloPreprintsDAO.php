@@ -13,41 +13,52 @@ namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use APP\submission\Submission;
+use APP\core\Services;
+use PKP\db\DAORegistry;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 {
     public function getAbstractViews($submissionId, $contextId): int
     {
-        $statsService = \Services::get('stats');
-        $abstractRecords = $statsService->getRecords([
-            'assocTypes' => ASSOC_TYPE_SUBMISSION,
-            'submissionIds' => [$submissionId],
-            'contextIds' => [$contextId]
-        ]);
-        $abstractViews = array_reduce($abstractRecords, [$statsService, 'sumMetric'], 0);
+        $statsService = Services::get('publicationStats');
+        $metricsByType = $statsService->getTotalsByType($submissionId, $contextId, null, null);
+        // $statsService = \Services::get('stats');
+        // $abstractRecords = $statsService->getRecords([
+        //     'assocTypes' => ASSOC_TYPE_SUBMISSION,
+        //     'submissionIds' => [$submissionId],
+        //     'contextIds' => [$contextId]
+        // ]);
+        // $abstractViews = array_reduce($abstractRecords, [$statsService, 'sumMetric'], 0);
 
-        return $abstractViews;
+        // return $abstractViews;
+
+        return $metricsByType['abstract'];
     }
 
     public function getPdfViews($submissionId, $contextId): int
     {
-        $statsService = \Services::get('stats');
-        $galleyRecords = $statsService->getRecords([
-            'assocTypes' => ASSOC_TYPE_SUBMISSION_FILE,
-            'fileType' => STATISTICS_FILE_TYPE_PDF,
-            'submissionIds' => [$submissionId],
-            'contextIds' => [$contextId]
-        ]);
-        $pdfViews = array_reduce($galleyRecords, [$statsService, 'sumMetric'], 0);
+        // $statsService = \Services::get('stats');
+        // $galleyRecords = $statsService->getRecords([
+        //     'assocTypes' => ASSOC_TYPE_SUBMISSION_FILE,
+        //     'fileType' => STATISTICS_FILE_TYPE_PDF,
+        //     'submissionIds' => [$submissionId],
+        //     'contextIds' => [$contextId]
+        // ]);
+        // $pdfViews = array_reduce($galleyRecords, [$statsService, 'sumMetric'], 0);
 
-        return $pdfViews;
+        // return $pdfViews;
+
+        $statsService = Services::get('publicationStats');
+        $metricsByType = $statsService->getTotalsByType($submissionId, $contextId, null, null);
+        return $metricsByType['pdf'];
     }
 
     public function getSubmissionNotes($submissionId): array
     {
-        $resultNotes = Capsule::table('notes')
+        $resultNotes = DB::table('notes')
         ->where('assoc_type', 1048585)
         ->where('assoc_id', $submissionId)
         ->select('contents')
@@ -80,15 +91,13 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getSectionModerators($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $userDao = DAORegistry::getDAO('UserDAO');
 
         $sectionModeratorUsers =  array();
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
-            $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 
             if ($currentUserGroupAbbrev == 'am') {
@@ -101,15 +110,13 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getResponsibles($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $userDao = DAORegistry::getDAO('UserDAO');
 
         $moderatorUsers =  array();
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
-            $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
+            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 
             if ($currentUserGroupAbbrev == 'resp') {
@@ -121,7 +128,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getPublicationStatus($publicationId): string
     {
-        $result = Capsule::table('publication_settings')
+        $result = DB::table('publication_settings')
         ->where('publication_id', '=', $publicationId)
         ->where('setting_name', '=', 'relationStatus')
         ->select('setting_value as relationStatus')
@@ -143,7 +150,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getPublicationDOI($publicationId): string
     {
-        $result = Capsule::table('publication_settings')
+        $result = DB::table('publication_settings')
         ->where('publication_id', '=', $publicationId)
         ->where('setting_name', '=', 'vorDoi')
         ->select('setting_value as vorDoi')
@@ -158,13 +165,13 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
-        $result = Capsule::table('submissions')
+        $result = DB::table('submissions')
         ->where('submission_id', $submissionId)
         ->select('status')
         ->first();
         $submissionStatus = get_object_vars($result)['status'];
 
-        $result = Capsule::table('publications')
+        $result = DB::table('publications')
         ->where('submission_id', '=', $submissionId)
         ->select('date_published')
         ->first();
@@ -176,7 +183,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
         $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
 
-        $result = Capsule::table('edit_decisions')
+        $result = DB::table('edit_decisions')
         ->where('submission_id', $submissionId)
         ->whereIn('decision', $possibleFinalDecisions)
         ->orderBy('date_decided', 'asc')

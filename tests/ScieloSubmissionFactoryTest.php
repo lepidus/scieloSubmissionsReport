@@ -171,9 +171,6 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
         $submissionFactory = new ScieloSubmissionFactory();
         $scieloSubmission = $submissionFactory->createSubmission($this->submission->getId(), $this->getLocale());
 
-        dump($this->authors);
-        dump($scieloSubmission->getAuthors());
-
         $this->assertEquals($this->authors, $scieloSubmission->getAuthors());
     }
 
