@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+
 use PKP\tests\DatabaseTestCase;
 use APP\section\Section;
 use APP\submission\Submission;
@@ -115,7 +117,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
     private function addFinalDecision($submissionId, $dateDecided)
     {
         $params = [
-            'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
+            'decision' => Decision::DECLINE,
             'submissionId' => $submissionId,
             'dateDecided' => $dateDecided,
             'editorId' => 1,

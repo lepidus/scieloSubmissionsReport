@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+
 use PKP\tests\DatabaseTestCase;
 use APP\submission\Submission;
 use APP\publication\Publication;
@@ -28,6 +30,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private $author2Id;
     private $firstEditorUserId;
     private $secondEditorUserId;
+    private $reviewAssignmentId;
     private $stageAssignmentIds = [];
 
     private $locale = 'en';
@@ -114,6 +117,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         foreach ($this->stageAssignmentIds as $stageAssignmentId) {
             $stageAssignmentDAO->getById($stageAssignmentId);
             $stageAssignmentDAO->deleteObject($stageAssignment);
+        }
+
+        if ($this->reviewAssignmentId) {
+            $reviewRoundDAO = DAORegistry::getDAO('ReviewAssignmentDAO');
+            $reviewAssignment = $reviewRoundDAO->getById($this->reviewAssignmentId);
+            $reviewRoundDAO->deleteObject($reviewAssignment);
         }
     }
 
@@ -422,6 +431,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     public function testSubmissionGetsReviews(): void
     {
         $recommendation = ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
+        $reviewRound = $this->createReviewRound($this->submissionId);
 
         $reviewAssignment = new ReviewAssignment();
         $reviewAssignment->setRecommendation($recommendation);
@@ -430,10 +440,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $reviewAssignment->setDateAssigned(Core::getCurrentDate());
         $reviewAssignment->setStageId(1);
         $reviewAssignment->setRound(1);
-        $reviewAssignment->setReviewRoundId(1);
+        $reviewAssignment->setReviewRoundId($reviewRound->getId());
         $reviewAssignment->setDateCompleted(Core::getCurrentDate());
 
-        DAORegistry::getDAO('ReviewAssignmentDAO')->insertObject($reviewAssignment);
+        $this->reviewAssignmentId = DAORegistry::getDAO('ReviewAssignmentDAO')->insertObject($reviewAssignment);
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -463,7 +473,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     */
     public function testSubmissionGetsFinalDecisionWithDateDecline(): void
     {
-        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_DECLINE;
+        $finalDecisionCode = Decision::DECLINE;
         $finalDecision = __('common.declined', [], $this->locale);
         $finalDecisionDate = '2021-04-21';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
@@ -480,7 +490,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     */
     public function testSubmissionGetsFinalDecisionWithDateAccept(): void
     {
-        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_ACCEPT;
+        $finalDecisionCode = Decision::ACCEPT;
         $finalDecision = __('common.accepted', [], $this->locale);
         $finalDecisionDate = '2021-07-07';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);

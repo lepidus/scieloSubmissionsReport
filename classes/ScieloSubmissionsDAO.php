@@ -183,9 +183,9 @@ class ScieloSubmissionsDAO extends DAO
         $dateDecided = new DateTime($row['date_decided']);
         $decision = "";
 
-        if ($row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
+        if ($row['decision'] == Decision::ACCEPT) {
             $decision = __('common.accepted', [], $locale);
-        } elseif ($row['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE) {
+        } elseif ($row['decision'] == Decision::DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE) {
             $decision = __('common.declined', [], $locale);
         }
 

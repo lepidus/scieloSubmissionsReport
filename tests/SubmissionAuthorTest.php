@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+
 use PHPUnit\Framework\TestCase;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 

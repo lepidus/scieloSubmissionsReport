@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+
 use PKP\tests\DatabaseTestCase;
 use APP\submission\Submission;
 use APP\publication\Publication;
@@ -307,7 +309,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $submissionId = $this->createSubmission(STATUS_DECLINED);
         $publicationId = $this->createPublication($submissionId, $datePosted);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
-        $this->createDecision($submissionId, SUBMISSION_EDITOR_DECISION_DECLINE, $finalDecisionDate);
+        $this->createDecision($submissionId, Decision::DECLINE, $finalDecisionDate);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($submissionId, $this->locale);
