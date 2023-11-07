@@ -25,32 +25,12 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     {
         $statsService = Services::get('publicationStats');
         $metricsByType = $statsService->getTotalsByType($submissionId, $contextId, null, null);
-        // $statsService = \Services::get('stats');
-        // $abstractRecords = $statsService->getRecords([
-        //     'assocTypes' => ASSOC_TYPE_SUBMISSION,
-        //     'submissionIds' => [$submissionId],
-        //     'contextIds' => [$contextId]
-        // ]);
-        // $abstractViews = array_reduce($abstractRecords, [$statsService, 'sumMetric'], 0);
-
-        // return $abstractViews;
 
         return $metricsByType['abstract'];
     }
 
     public function getPdfViews($submissionId, $contextId): int
     {
-        // $statsService = \Services::get('stats');
-        // $galleyRecords = $statsService->getRecords([
-        //     'assocTypes' => ASSOC_TYPE_SUBMISSION_FILE,
-        //     'fileType' => STATISTICS_FILE_TYPE_PDF,
-        //     'submissionIds' => [$submissionId],
-        //     'contextIds' => [$contextId]
-        // ]);
-        // $pdfViews = array_reduce($galleyRecords, [$statsService, 'sumMetric'], 0);
-
-        // return $pdfViews;
-
         $statsService = Services::get('publicationStats');
         $metricsByType = $statsService->getTotalsByType($submissionId, $contextId, null, null);
         return $metricsByType['pdf'];
@@ -181,7 +161,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 
-        $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+        $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
 
         $result = DB::table('edit_decisions')
         ->where('submission_id', $submissionId)
