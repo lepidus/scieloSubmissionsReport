@@ -16,6 +16,9 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use APP\submission\Submission;
+use APP\facades\Repo;
+use APP\publication\Publication;
+use APP\decision\Decision;
 use APP\core\Services;
 use PKP\db\DAORegistry;
 
@@ -55,10 +58,8 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getSubmitterIsScieloJournal($submitterId)
     {
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-
-        $submitterUserGroups = $userGroupDao->getByUserId($submitterId);
-        while ($userGroup = $submitterUserGroups->next()) {
+        $submitterUserGroups = Repo::userGroup()->userUserGroups($submitterId);
+        foreach ($submitterUserGroups as $userGroup) {
             $journalGroupAbbrev = "SciELO";
             if ($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev) {
                 return true;
@@ -121,7 +122,6 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $relationStatus = get_object_vars($result)['relationStatus'];
         $relationsMap = [
             Publication::PUBLICATION_RELATION_NONE => 'publication.relation.none',
-            Publication::PUBLICATION_RELATION_SUBMITTED => 'publication.relation.submitted',
             Publication::PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
         ];
 

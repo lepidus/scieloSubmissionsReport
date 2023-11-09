@@ -6,6 +6,7 @@ use PKP\tests\DatabaseTestCase;
 use APP\section\Section;
 use APP\submission\Submission;
 use APP\facades\Repo;
+use APP\decision\Decision;
 use APP\publication\Publication;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
