@@ -12,9 +12,18 @@
  * @brief SciELO Submissions report Form
  */
 
+namespace APP\plugins\reports\scieloSubmissionsReport;
+
+use APP\core\Application;
+use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\template\TemplateManager;
+use PKP\core\PKPString;
+use PKP\facades\Locale;
 use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
 
 class ScieloSubmissionsReportForm extends Form
 {
@@ -112,7 +121,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $this->emitHttpHeaders($request);
 
-        $locale = AppLocale::getLocale();
+        $locale = Locale::getLocale();
         $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale, $this->includeViews);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
@@ -155,7 +164,7 @@ class ScieloSubmissionsReportForm extends Form
 
     private function getAvailableSections($contextId)
     {
-        $sections = Services::get('section')->getSectionList($contextId);
+        $sections = Repo::section()->getSectionList($contextId);
 
         $listOfSections = [];
         foreach ($sections as $section) {
@@ -166,11 +175,10 @@ class ScieloSubmissionsReportForm extends Form
 
     public function getSectionsOptions($contextId, $sections)
     {
-        $sectionDao = DAORegistry::getDAO('SectionDAO');
         $sectionsOptions = [];
 
         foreach ($sections as $sectionId => $sectionName) {
-            $sectionObject = $sectionDao->getById($sectionId, $contextId);
+            $sectionObject = Repo::section()->get($sectionId, $contextId);
             if ($sectionObject->getMetaReviewed() == 1) {
                 $sectionsOptions[$sectionObject->getLocalizedTitle()] = $sectionObject->getLocalizedTitle();
             }

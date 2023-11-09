@@ -17,7 +17,7 @@
 
         <h2>{translate key="plugins.reports.scieloSubmissionsReport.period"}</h2>
         <div class="data">
-            <div id="filterTypeField">	
+            <div id="filterTypeField">
                 <p>{translate key="plugins.reports.scieloSubmissionsReport.filterMessage"}</p>
                 <select name="selectFilterTypeDate" id="selectFilterTypeDate">
                     <option value="filterBySubmission">{translate key="plugins.reports.scieloSubmissionsReport.filterSubmission"}</option>
@@ -35,19 +35,19 @@
                     <div class="date_range">
                         <div class="from">
                             <label class="label">
-                                {translate key="common.from"}
+                                {translate key="stats.dateRange.from"}
                             </label>
-                            <input type="date" id='startSubmissionDateInterval' name='startSubmissionDateInterval' from=$startSubmissionDateInterval defaultValue=$startSubmissionDateInterval value="{$years[0]}"/>		
+                            <input type="date" id='startSubmissionDateInterval' name='startSubmissionDateInterval' from=$startSubmissionDateInterval defaultValue=$startSubmissionDateInterval value="{$years[0]}"/>
                         </div>
                         <div class="to">
                             <label class="label">
-                                {translate key="common.until"}
+                                {translate key="plugins.reports.scieloSubmissionsReport.until"}
                             </label>
-                            <input type="date" id='endSubmissionDateInterval' name='endSubmissionDateInterval' from=$endSubmissionDateInterval defaultValue=$endSubmissionDateInterval value="{$years[1]}"/>		
+                            <input type="date" id='endSubmissionDateInterval' name='endSubmissionDateInterval' from=$endSubmissionDateInterval defaultValue=$endSubmissionDateInterval value="{$years[1]}"/>
                         </div>
                     </div>
                 </fieldset>
-                
+
                 <!-- Final Decision Date-->
                 <fieldset id="finalDecisionDateFields" class="search_advanced" hidden="true">
                     <legend>
@@ -56,13 +56,13 @@
                     <div class="date_range">
                         <div class="from">
                             <label class="label">
-                                {translate key="common.from"}
+                                {translate key="stats.dateRange.from"}
                             </label>
                             <input type="date" id='startFinalDecisionDateInterval' name='startFinalDecisionDateInterval' from=$startFinalDecisionDateInterval defaultValue=$startFinalDecisionDateInterval value="{$years[0]}"/>
                         </div>
                         <div class="to">
                             <label class="label">
-                                {translate key="common.until"}
+                                {translate key="plugins.reports.scieloSubmissionsReport.until"}
                             </label>
                             <input type="date" id='endFinalDecisionDateInterval' name='endFinalDecisionDateInterval' from=$endFinalDecisionDateInterval defaultValue=$endFinalDecisionDateInterval value="{$years[1]}"/>
                         </div>
@@ -73,15 +73,15 @@
 
         {if $sections|@count > 0}
             <h2>{translate key="plugins.reports.scieloSubmissionsReport.sections"}</h2>
-            <table> 
-                <div class= "pkpListPanel"> 
-                    <tr>	
+            <table>
+                <div class= "pkpListPanel">
+                    <tr>
                         <td class="value" colspan="2">
                             {fbvElement type="checkBoxGroup" name="sections" id="sections" from=$sections selected=$sections_options translate=false}
                         </td>
                     </tr>
                 </div>
-            </table> 
+            </table>
         {/if}
 
         {if $application eq "ops"}
@@ -97,7 +97,7 @@
 
         <div id="actionsButton">
             <input class="pkp_button submitFormButton" type="submit" value="{translate key="plugins.reports.scieloSubmissionsReport.generate"}" class="button defaultButton" />
-            <input type="button" class="pkp_button submitFormButton" value="{translate key="common.cancel"}" class="button" onclick="document.location.href='{url path="index" escape=false}'" /> 
+            <input type="button" class="pkp_button submitFormButton" value="{translate key="common.cancel"}" class="button" onclick="document.location.href='{url path="index" escape=false}'" />
         </div>
     </form>
 

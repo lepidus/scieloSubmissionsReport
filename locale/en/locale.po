@@ -35,6 +35,9 @@ msgstr "Submitted date range"
 msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
 msgstr "Final decision date range"
 
+msgid "plugins.reports.scieloSubmissionsReport.until"
+msgstr "Until"
+
 msgid "plugins.reports.scieloSubmissionsReport.type"
 msgstr "Report Type"
 

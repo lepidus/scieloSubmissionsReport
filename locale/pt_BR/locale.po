@@ -35,6 +35,9 @@ msgstr "Intervalo da data de submissão"
 msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
 msgstr "Intervalo da data de decisão final"
 
+msgid "plugins.reports.scieloSubmissionsReport.until"
+msgstr "Até"
+
 msgid "plugins.reports.scieloSubmissionsReport.generate"
 msgstr "Gerar Relatório"
 

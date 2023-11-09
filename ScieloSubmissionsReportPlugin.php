@@ -14,9 +14,14 @@
  * @brief SciELO Submissions report plugin
  */
 
+namespace APP\plugins\reports\scieloSubmissionsReport;
+
 use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
-use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportForm;
+use PKP\config\Config;
+use PKP\core\JSONMessage;
+use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\plugins\Hook;
 use PKP\plugins\ReportPlugin;
 
 class ScieloSubmissionsReportPlugin extends ReportPlugin
@@ -33,7 +38,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($success && Config::getVar('general', 'installed')) {
             $this->addLocaleData();
 
-            HookRegistry::register('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
+            Hook::add('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
         }
         return $success;
     }
@@ -62,12 +67,10 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
     public function display($args, $request)
     {
-        AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);
         $form = new ScieloSubmissionsReportForm($this);
         $form->initData();
-        $requestHandler = new PKPRequest();
-        if ($requestHandler->isPost($request)) {
-            $reportParams = $requestHandler->getUserVars($request);
+        if ($request->isPost($request)) {
+            $reportParams = $request->getUserVars();
             $validationResult = $form->validateReportData($reportParams);
             if ($validationResult) {
                 $form->generateReport($request);

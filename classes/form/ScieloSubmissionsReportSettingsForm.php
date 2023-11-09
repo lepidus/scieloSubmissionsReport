@@ -1,5 +1,9 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\form;
+
+use APP\core\Application;
+use APP\template\TemplateManager;
 use PKP\form\Form;
 
 class ScieloSubmissionsReportSettingsForm extends Form

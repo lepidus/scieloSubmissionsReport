@@ -12,10 +12,9 @@
  * Distributed under the GNU GPL v3. For full terms see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt
  *
  * @ingroup plugins_reports_scieloSubmissions
+ *
  * @brief Wrapper for SciELO Submissions report plugin.
  *
  */
 
-require_once('ScieloSubmissionsReportPlugin.inc.php');
-
-return new ScieloSubmissionsReportPlugin();
+return new \APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportPlugin();
