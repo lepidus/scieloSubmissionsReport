@@ -2,12 +2,12 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-use APP\submission\Submission;
-use PKP\core\PKPApplication;
-use PKP\core\Core;
-use DateTime;
 use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\submission\Submission;
+use DateTime;
+use PKP\core\Core;
+use PKP\core\PKPApplication;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase

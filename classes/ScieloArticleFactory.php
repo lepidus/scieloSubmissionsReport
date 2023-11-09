@@ -22,7 +22,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $sectionName = $scieloArticlesDAO->getPublicationSection($publicationId, $locale);
         $language = $submission['locale'];
 
-        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
+        [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
         $editors = $scieloArticlesDAO->getEditors($submissionId);
         $sectionEditor = $scieloArticlesDAO->getSectionEditor($submissionId);
         $reviews = $scieloArticlesDAO->getReviews($submissionId);

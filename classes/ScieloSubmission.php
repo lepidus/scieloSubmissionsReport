@@ -50,7 +50,7 @@ class ScieloSubmission
             return $messageIfEmpty;
         }
 
-        return implode(",", $field);
+        return implode(',', $field);
     }
 
     public function getId(): int
@@ -65,7 +65,7 @@ class ScieloSubmission
 
     public function getSubmitter(): string
     {
-        $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+        $messageNoSubmitter = __('plugins.reports.scieloSubmissionsReport.warning.noSubmitter');
         return $this->fillEmptyFields($this->submitter, $messageNoSubmitter);
     }
 
@@ -128,7 +128,7 @@ class ScieloSubmission
             return $this->getTimeUnderReview();
         }
 
-        return "";
+        return '';
     }
 
     protected function authorsAsRecord(): string
@@ -139,11 +139,11 @@ class ScieloSubmission
             $records[] = $author->asRecord();
         }
 
-        return implode("; ", $records);
+        return implode('; ', $records);
     }
 
     public function asRecord(): array
     {
-        return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+        return [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
     }
 }

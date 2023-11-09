@@ -3,6 +3,7 @@
  * @file plugins/reports/scieloSubmissionsReport/classes/ScieloArticlesDAO.inc.php
  *
  * @class ScieloArticlesDAO
+ *
  * @ingroup plugins_reports_scieloSubmissionsReport
  *
  * Operations for retrieving articles and other data
@@ -10,15 +11,10 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Collection;
 use APP\decision\Decision;
+use APP\facades\Repo;
 use PKP\db\DAORegistry;
 use PKP\security\Role;
-use APP\facades\Repo;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
@@ -27,7 +23,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $submissionReviews = $reviewAssignmentDao->getBySubmissionId($submissionId);
         $completeReviews = false;
-        $reviews = array();
+        $reviews = [];
 
         foreach ($submissionReviews as $review) {
             if ($review->getDateCompleted()) {
@@ -58,7 +54,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
-        $journalEditors = array();
+        $journalEditors = [];
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), false);
@@ -93,13 +89,13 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             case Decision::REVERT_DECLINE:
                 return __('editor.submission.decision.revertDecline');
             case Decision::RECOMMEND_ACCEPT:
-                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.accept')));
+                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.accept')]);
             case Decision::RECOMMEND_DECLINE:
-                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.decline')));
+                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.decline')]);
             case Decision::RECOMMEND_PENDING_REVISIONS:
-                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.requestRevisions')));
+                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.requestRevisions')]);
             case Decision::RECOMMEND_RESUBMIT:
-                return __('editor.submission.recommendation.display', array('recommendation' => __('editor.submission.decision.resubmit')));
+                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.resubmit')]);
             default:
                 return '';
         }

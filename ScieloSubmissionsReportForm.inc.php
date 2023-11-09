@@ -12,9 +12,9 @@
  * @brief SciELO Submissions report Form
  */
 
-use PKP\form\Form;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use PKP\form\Form;
 
 class ScieloSubmissionsReportForm extends Form
 {
@@ -32,6 +32,7 @@ class ScieloSubmissionsReportForm extends Form
 
     /**
      * Constructor
+     *
      * @param $plugin ReviewersReport Manual payment plugin
      */
     public function __construct($plugin)
@@ -40,7 +41,7 @@ class ScieloSubmissionsReportForm extends Form
         $this->application = substr(Application::getName(), 0, 3);
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
-        $this->sections = array();
+        $this->sections = [];
         $this->submissionDateInterval = null;
         $this->finalDecisionDateInterval = null;
         $this->includeViews = false;
@@ -103,7 +104,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $context = $request->getContext();
         header('content-type: text/comma-separated-values');
-        $acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $context->getLocalizedAcronym());
+        $acronym = PKPString::regexp_replace('/[^A-Za-z0-9 ]/', '', $context->getLocalizedAcronym());
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
     }
 
@@ -126,14 +127,14 @@ class ScieloSubmissionsReportForm extends Form
 
         $templateManager = TemplateManager::getManager();
         $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
-        $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, array(
+        $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, [
             'priority' => STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
-        ));
+        ]);
         $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', array(0 => $args[0], 1 => $args[1]));
+        $templateManager->assign('years', [0 => $args[0], 1 => $args[1]]);
         $templateManager->assign([
             'breadcrumbs' => [
                 [
@@ -156,7 +157,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $sections = Services::get('section')->getSectionList($contextId);
 
-        $listOfSections = array();
+        $listOfSections = [];
         foreach ($sections as $section) {
             $listOfSections[$section['id']] = $section['title'];
         }
@@ -166,7 +167,7 @@ class ScieloSubmissionsReportForm extends Form
     public function getSectionsOptions($contextId, $sections)
     {
         $sectionDao = DAORegistry::getDAO('SectionDAO');
-        $sectionsOptions = array();
+        $sectionsOptions = [];
 
         foreach ($sections as $sectionId => $sectionName) {
             $sectionObject = $sectionDao->getById($sectionId, $contextId);

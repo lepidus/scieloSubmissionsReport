@@ -2,14 +2,12 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-use PKP\tests\DatabaseTestCase;
-use APP\section\Section;
-use APP\submission\Submission;
-use APP\facades\Repo;
 use APP\decision\Decision;
-use APP\publication\Publication;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\submission\Submission;
+use PKP\tests\DatabaseTestCase;
 
 class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {
@@ -17,8 +15,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
     private $locale = 'en';
     private $contextId;
     private $reportFactory;
-    private $firstSectionName = "Biological Sciences";
-    private $secondSectionName = "Math";
+    private $firstSectionName = 'Biological Sciences';
+    private $secondSectionName = 'Math';
     private $sectionsIds;
     private $submissionsIds;
     private $publicationsIds;
@@ -133,7 +131,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $publication = Repo::publication()->newDataObject();
         $publication->setData('submissionId', $submissionId);
         $publication->setData('sectionId', $sectionId);
-        $publication->setData('title', "Generic title", $this->locale);
+        $publication->setData('title', 'Generic title', $this->locale);
         if (!is_null($datePublished)) {
             $publication->setData('datePublished', $datePublished);
         }

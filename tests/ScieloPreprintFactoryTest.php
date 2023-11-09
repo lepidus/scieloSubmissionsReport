@@ -2,24 +2,22 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-use PKP\tests\DatabaseTestCase;
-use APP\submission\Submission;
-use APP\publication\Publication;
-use APP\section\Section;
 use APP\core\Application;
+use APP\decision\Decision;
 use APP\facades\Repo;
-use PKP\db\DAORegistry;
-use PKP\core\Core;
-use PKP\userGroup\relationships\UserGroupStage;
-use APP\author\Author;
-use PKP\log\event\PKPSubmissionEventLogEntry;
-use PKP\statistics\PKPStatisticsHelper;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
-use APP\decision\Decision;
+use APP\publication\Publication;
+use APP\submission\Submission;
 use Illuminate\Support\Facades\DB;
+use PKP\core\Core;
+use PKP\db\DAORegistry;
+use PKP\log\event\PKPSubmissionEventLogEntry;
+use PKP\statistics\PKPStatisticsHelper;
+use PKP\tests\DatabaseTestCase;
+use PKP\userGroup\relationships\UserGroupStage;
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
@@ -30,15 +28,15 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $submissionId;
     private $publicationId;
     private $sectionId;
-    private $title = "eXtreme Programming: A practical guide";
-    private $submitter = "Don Vito Corleone";
+    private $title = 'eXtreme Programming: A practical guide';
+    private $submitter = 'Don Vito Corleone';
     private $dateSubmitted = '2021-05-31 15:38:24';
     private $statusCode = Submission::STATUS_PUBLISHED;
     private $statusMessage;
-    private $sectionName = "Biological Sciences";
+    private $sectionName = 'Biological Sciences';
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
-    private $vorDoi = "10.666/949494";
+    private $vorDoi = '10.666/949494';
     private $relationStatus;
     private $abstractViews = 10;
     private $pdfViews = 21;
@@ -68,8 +66,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     protected function getAffectedTables()
     {
         return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
-        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+            'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
+            'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
     }
 
     private function createSubmission($statusCode): int
@@ -135,14 +133,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $author2 = Repo::author()->newDataObject();
         $author1->setData('publicationId', $this->publicationId);
         $author2->setData('publicationId', $this->publicationId);
-        $author1->setData('email', "anaalice@harvard.com");
-        $author2->setData('email', "seizi.tagima@ufam.edu.br");
+        $author1->setData('email', 'anaalice@harvard.com');
+        $author2->setData('email', 'seizi.tagima@ufam.edu.br');
         $author1->setGivenName('Ana Alice', $this->locale);
         $author1->setFamilyName('Caldas Novas', $this->locale);
         $author2->setGivenName('Seizi', $this->locale);
         $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setAffiliation("Harvard University", $this->locale);
-        $author2->setAffiliation("Amazonas Federal University", $this->locale);
+        $author1->setAffiliation('Harvard University', $this->locale);
+        $author2->setAffiliation('Amazonas Federal University', $this->locale);
         $author1->setData('country', 'US');
         $author2->setData('country', 'BR');
 
@@ -150,8 +148,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         Repo::author()->dao->insert($author2);
 
         return [
-            new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"),
-            new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")
+            new SubmissionAuthor('Ana Alice Caldas Novas', 'United States', 'Harvard University'),
+            new SubmissionAuthor('Seizi Tagima', 'Brazil', 'Amazonas Federal University')
         ];
     }
 
@@ -169,8 +167,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userSubmitter->setEmail('donvito@corleone.com');
         $userSubmitter->setPassword('miaumiau');
         $userSubmitter->setCountry('BR');
-        $userSubmitter->setGivenName("Don", $this->locale);
-        $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
+        $userSubmitter->setGivenName('Don', $this->locale);
+        $userSubmitter->setFamilyName('Vito Corleone', $this->locale);
         $userSubmitter->setDateRegistered(Core::getCurrentDate());
         $userSubmitterId = Repo::user()->dao->insert($userSubmitter);
 
@@ -192,16 +190,16 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userResponsible->setUsername('f4ustao');
         $userResponsible->setEmail('faustosilva@noexists.com');
         $userResponsible->setPassword('oloco');
-        $userResponsible->setGivenName("Fausto", $this->locale);
-        $userResponsible->setFamilyName("Silva", $this->locale);
+        $userResponsible->setGivenName('Fausto', $this->locale);
+        $userResponsible->setFamilyName('Silva', $this->locale);
         $userResponsible->setDateRegistered(Core::getCurrentDate());
 
         $secondUserResponsible = Repo::user()->newDataObject();
         $secondUserResponsible->setUsername('silvinho122');
         $secondUserResponsible->setEmail('silvio@stb.com');
         $secondUserResponsible->setPassword('aviaozinho');
-        $secondUserResponsible->setGivenName("Silvio", $this->locale);
-        $secondUserResponsible->setFamilyName("Santos", $this->locale);
+        $secondUserResponsible->setGivenName('Silvio', $this->locale);
+        $secondUserResponsible->setFamilyName('Santos', $this->locale);
         $secondUserResponsible->setDateRegistered(Core::getCurrentDate());
 
         return [$userResponsible, $secondUserResponsible];
@@ -229,7 +227,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
             'es' => 'resp'
         ];
         $responsiblesUserGroup = Repo::userGroup()->newDataObject();
-        $responsiblesUserGroup->setData("abbrev", $responsiblesUserGroupLocalizedAbbrev);
+        $responsiblesUserGroup->setData('abbrev', $responsiblesUserGroupLocalizedAbbrev);
         $responsiblesUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
         $responsiblesUserGroup->setData('contextId', $this->contextId);
 
@@ -377,7 +375,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
-        $expectedResult = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+        $expectedResult = __('plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI');
 
         $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
@@ -408,7 +406,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals(__("common.yes"), $scieloPreprint->getSubmitterIsScieloJournal());
+        $this->assertEquals(__('common.yes'), $scieloPreprint->getSubmitterIsScieloJournal());
     }
 
     /**
@@ -436,7 +434,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
 
-        $expectedResponsibles = $responsibleUsers[0]->getFullName() . "," . $responsibleUsers[1]->getFullName();
+        $expectedResponsibles = $responsibleUsers[0]->getFullName() . ',' . $responsibleUsers[1]->getFullName();
 
         $this->assertEquals($expectedResponsibles, $scieloPreprint->getResponsibles());
     }
@@ -475,8 +473,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userSectionModeratorId = Repo::user()->add($userSectionModerator);
 
         $noteDao = DAORegistry::getDAO('NoteDAO');
-        $contentsForFirstNote = "Um breve resumo sobre a inteligência computacional";
-        $contentsForSecondNote = "Algoritmos Genéticos: Implementação no jogo do dino";
+        $contentsForFirstNote = 'Um breve resumo sobre a inteligência computacional';
+        $contentsForSecondNote = 'Algoritmos Genéticos: Implementação no jogo do dino';
 
         $note = $noteDao->newDataObject();
         $note->setUserId($userSectionModeratorId);
@@ -494,7 +492,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
-        $expectedResult = "Note: Um breve resumo sobre a inteligência computacional. Note: Algoritmos Genéticos: Implementação no jogo do dino";
+        $expectedResult = 'Note: Um breve resumo sobre a inteligência computacional. Note: Algoritmos Genéticos: Implementação no jogo do dino';
 
         $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
     }

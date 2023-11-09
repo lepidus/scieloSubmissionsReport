@@ -2,9 +2,6 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
-
 class ScieloPreprint extends ScieloSubmission
 {
     private $submitterIsScieloJournal;
@@ -29,7 +26,7 @@ class ScieloPreprint extends ScieloSubmission
 
     public function asRecord(): array
     {
-        $record = array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getResponsibles(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+        $record = [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getResponsibles(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
 
         if(!is_null($this->stats)) {
             $record = array_merge($record, $this->stats->asRecord());
@@ -40,40 +37,40 @@ class ScieloPreprint extends ScieloSubmission
 
     public function getSubmitterIsScieloJournal(): string
     {
-        return $this->submitterIsScieloJournal ? __("common.yes") : __("common.no");
+        return $this->submitterIsScieloJournal ? __('common.yes') : __('common.no');
     }
 
     public function getResponsibles(): string
     {
-        $messageNoResponsibles = __("plugins.reports.scieloSubmissionsReport.warning.noResponsibles");
+        $messageNoResponsibles = __('plugins.reports.scieloSubmissionsReport.warning.noResponsibles');
         return $this->implodeEmptyFields($this->responsibles, $messageNoResponsibles);
     }
 
     public function getSectionModerators(): string
     {
-        $messageNoModerators = __("plugins.reports.scieloSubmissionsReport.warning.noModerators");
+        $messageNoModerators = __('plugins.reports.scieloSubmissionsReport.warning.noModerators');
         return $this->implodeEmptyFields($this->sectionModerators, $messageNoModerators);
     }
 
     public function getPublicationStatus(): string
     {
-        $messageNoPublicationStatus = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus");
+        $messageNoPublicationStatus = __('plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus');
         return $this->fillEmptyFields($this->publicationStatus, $messageNoPublicationStatus);
     }
 
     public function getPublicationDOI(): string
     {
-        $messageNoPublicationDOI = __("plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI");
+        $messageNoPublicationDOI = __('plugins.reports.scieloSubmissionsReport.warning.noPublicationDOI');
         return $this->fillEmptyFields($this->publicationDOI, $messageNoPublicationDOI);
     }
 
     public function getNotes(): string
     {
         if(empty($this->notes)) {
-            return __("plugins.reports.scieloSubmissionsReport.warning.noNotes");
+            return __('plugins.reports.scieloSubmissionsReport.warning.noNotes');
         }
 
-        return trim(preg_replace('/\s+/', ' ', "Note: " . implode(". Note: ", $this->notes)));
+        return trim(preg_replace('/\s+/', ' ', 'Note: ' . implode('. Note: ', $this->notes)));
     }
 
     public function getStats(): ?SubmissionStats

@@ -3,6 +3,7 @@
  * @file plugins/reports/scieloSubmissionsReport/classes/ScieloPreprintDAO.inc.php
  *
  * @class ScieloPreprintDAO
+ *
  * @ingroup plugins_reports_scieloSubmissionsReport
  *
  * Operations for retrieving preprints and other data
@@ -10,16 +11,12 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use APP\submission\Submission;
+use APP\core\Services;
+use APP\decision\Decision;
 use APP\facades\Repo;
 use APP\publication\Publication;
-use APP\decision\Decision;
-use APP\core\Services;
+use APP\submission\Submission;
+use Illuminate\Support\Facades\DB;
 use PKP\db\DAORegistry;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
@@ -42,12 +39,12 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getSubmissionNotes($submissionId): array
     {
         $resultNotes = DB::table('notes')
-        ->where('assoc_type', 1048585)
-        ->where('assoc_id', $submissionId)
-        ->select('contents')
-        ->get();
+            ->where('assoc_type', 1048585)
+            ->where('assoc_id', $submissionId)
+            ->select('contents')
+            ->get();
 
-        $notes = array();
+        $notes = [];
 
         foreach ($resultNotes as $noteObject) {
             $note = get_object_vars($noteObject);
@@ -60,7 +57,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     {
         $submitterUserGroups = Repo::userGroup()->userUserGroups($submitterId);
         foreach ($submitterUserGroups as $userGroup) {
-            $journalGroupAbbrev = "SciELO";
+            $journalGroupAbbrev = 'SciELO';
             if ($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev) {
                 return true;
             }
@@ -73,7 +70,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
-        $sectionModeratorUsers =  array();
+        $sectionModeratorUsers = [];
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
@@ -92,7 +89,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
-        $moderatorUsers =  array();
+        $moderatorUsers = [];
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
@@ -110,13 +107,13 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getPublicationStatus($publicationId): string
     {
         $result = DB::table('publication_settings')
-        ->where('publication_id', '=', $publicationId)
-        ->where('setting_name', '=', 'relationStatus')
-        ->select('setting_value as relationStatus')
-        ->first();
+            ->where('publication_id', '=', $publicationId)
+            ->where('setting_name', '=', 'relationStatus')
+            ->select('setting_value as relationStatus')
+            ->first();
 
         if (is_null($result)) {
-            return "";
+            return '';
         }
 
         $relationStatus = get_object_vars($result)['relationStatus'];
@@ -131,13 +128,13 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getPublicationDOI($publicationId): string
     {
         $result = DB::table('publication_settings')
-        ->where('publication_id', '=', $publicationId)
-        ->where('setting_name', '=', 'vorDoi')
-        ->select('setting_value as vorDoi')
-        ->first();
+            ->where('publication_id', '=', $publicationId)
+            ->where('setting_name', '=', 'vorDoi')
+            ->select('setting_value as vorDoi')
+            ->first();
 
         if (is_null($result)) {
-            return "";
+            return '';
         }
 
         return $publicationDOI = get_object_vars($result)['vorDoi'];
@@ -146,15 +143,15 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
         $result = DB::table('submissions')
-        ->where('submission_id', $submissionId)
-        ->select('status')
-        ->first();
+            ->where('submission_id', $submissionId)
+            ->select('status')
+            ->first();
         $submissionStatus = get_object_vars($result)['status'];
 
         $result = DB::table('publications')
-        ->where('submission_id', '=', $submissionId)
-        ->select('date_published')
-        ->first();
+            ->where('submission_id', '=', $submissionId)
+            ->select('date_published')
+            ->first();
         $publicationDatePublished = get_object_vars($result)['date_published'];
 
         if (!is_null($publicationDatePublished) && $submissionStatus == Submission::STATUS_PUBLISHED) {
@@ -164,10 +161,10 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
 
         $result = DB::table('edit_decisions')
-        ->where('submission_id', $submissionId)
-        ->whereIn('decision', $possibleFinalDecisions)
-        ->orderBy('date_decided', 'asc')
-        ->first();
+            ->where('submission_id', $submissionId)
+            ->whereIn('decision', $possibleFinalDecisions)
+            ->orderBy('date_decided', 'asc')
+            ->first();
 
         if (is_null($result)) {
             return null;

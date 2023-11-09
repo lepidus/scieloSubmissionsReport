@@ -8,22 +8,23 @@
  * Distributed under the GNU GPL v3. For full terms see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt
  *
  * @class ScieloSubmissionsReportPlugin
+ *
  * @ingroup plugins_reports_scieloSubmissions
  *
  * @brief SciELO Submissions report plugin
  */
 
-use PKP\plugins\ReportPlugin;
-use APP\submission\Submission;
-use PKP\linkAction\request\AjaxModal;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportForm;
 use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
+use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportForm;
+use PKP\linkAction\request\AjaxModal;
+use PKP\plugins\ReportPlugin;
 
 class ScieloSubmissionsReportPlugin extends ReportPlugin
 {
     /**
      * @copydoc Plugin::register()
+     *
+     * @param null|mixed $mainContextId
      */
     public function register($category, $path, $mainContextId = null)
     {
@@ -32,7 +33,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($success && Config::getVar('general', 'installed')) {
             $this->addLocaleData();
 
-            HookRegistry::register('AcronPlugin::parseCronTab', array($this, 'addPluginTasksToCrontab'));
+            HookRegistry::register('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
         }
         return $success;
     }
@@ -54,7 +55,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
     public function addPluginTasksToCrontab($hookName, $args)
     {
-        $taskFilesPath = & $args[0];
+        $taskFilesPath = &$args[0];
         $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
         return false;
     }
@@ -72,26 +73,26 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 $form->generateReport($request);
             }
         } else {
-            $dateStart = date("Y-01-01");
-            $dateEnd   = date("Y-m-d");
-            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', array($dateStart, $dateEnd));
+            $dateStart = date('Y-01-01');
+            $dateEnd = date('Y-m-d');
+            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', [$dateStart, $dateEnd]);
         }
     }
 
     public function getActions($request, $actionArgs)
     {
         $router = $request->getRouter();
-        $actions =  array_merge(
-            $this->getEnabled() ? array(
+        $actions = array_merge(
+            $this->getEnabled() ? [
                 new LinkAction(
                     'pluginSettings',
                     new AjaxModal(
-                        $router->url($request, null, null, 'manage', null, array('verb' => 'pluginSettings', 'plugin' => $this->getName(), 'category' => 'reports')),
+                        $router->url($request, null, null, 'manage', null, ['verb' => 'pluginSettings', 'plugin' => $this->getName(), 'category' => 'reports']),
                         __('plugins.reports.scieloSubmissionsReport.settings.title')
                     ),
                     __('manager.plugins.settings'),
                 )
-            ) : array(),
+            ] : [],
             parent::getActions($request, $actionArgs)
         );
         return $actions;

@@ -4,6 +4,7 @@
  * @file plugins/reports/scieloSubmissionsReport/classes/ScieloSubmissionsDAO.inc.php
  *
  * @class ScieloSubmissionsDAO
+ *
  * @ingroup plugins_reports_scieloSubmissionsReport
  *
  * Operations for retrieving submissions and other data
@@ -11,14 +12,10 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use PKP\db\DAO;
 use APP\decision\Decision;
-use APP\log\event\SubmissionEventLogEntry;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use DateTime;
+use Illuminate\Support\Facades\DB;
+use PKP\db\DAO;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionsDAO extends DAO
@@ -28,20 +25,20 @@ class ScieloSubmissionsDAO extends DAO
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = DB::table('submissions')
-        ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
-        ->where('submissions.context_id', $contextId)
-        ->whereNotNull('submissions.date_submitted')
-        ->whereIn('publications.section_id', $sectionsIds)
-        ->select('submissions.submission_id');
+            ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
+            ->where('submissions.context_id', $contextId)
+            ->whereNotNull('submissions.date_submitted')
+            ->whereIn('publications.section_id', $sectionsIds)
+            ->select('submissions.submission_id');
 
         if (!is_null($submissionDateInterval)) {
             $query = $query->where('submissions.date_submitted', '>=', $submissionDateInterval->getBeginningDate())
-            ->where('submissions.date_submitted', '<=', $submissionDateInterval->getEndDate());
+                ->where('submissions.date_submitted', '<=', $submissionDateInterval->getEndDate());
         }
 
         $result = $query->get();
 
-        $submissions = array();
+        $submissions = [];
         foreach ($result->toArray() as $row) {
             $submissionId = $this->submissionFromRow(get_object_vars($row));
 
@@ -65,9 +62,9 @@ class ScieloSubmissionsDAO extends DAO
     public function getSubmission($submissionId)
     {
         $result = DB::table('submissions')
-        ->where('submission_id', '=', $submissionId)
-        ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale', 'context_id')
-        ->first();
+            ->where('submission_id', '=', $submissionId)
+            ->select('current_publication_id', 'date_submitted', 'date_last_activity', 'status', 'locale', 'context_id')
+            ->first();
 
         return get_object_vars($result);
     }
@@ -75,10 +72,10 @@ class ScieloSubmissionsDAO extends DAO
     public function getPublicationTitle($publicationId, $locale, $submissionLocale)
     {
         $result = DB::table('publication_settings')
-        ->where('publication_id', '=', $publicationId)
-        ->where('setting_name', '=', 'title')
-        ->select('locale', 'setting_value as title')
-        ->get();
+            ->where('publication_id', '=', $publicationId)
+            ->where('setting_name', '=', 'title')
+            ->select('locale', 'setting_value as title')
+            ->get();
 
         $titles = [];
         foreach ($result->toArray() as $row) {
@@ -101,17 +98,17 @@ class ScieloSubmissionsDAO extends DAO
     public function getPublicationSection($publicationId, $locale)
     {
         $result = DB::table('publications')
-        ->where('publication_id', '=', $publicationId)
-        ->select('section_id')
-        ->first();
+            ->where('publication_id', '=', $publicationId)
+            ->select('section_id')
+            ->first();
         $sectionId = get_object_vars($result)['section_id'];
 
         $result = DB::table('section_settings')
-        ->where('section_id', '=', $sectionId)
-        ->where('setting_name', '=', 'title')
-        ->where('locale', '=', $locale)
-        ->select('setting_value as title')
-        ->first();
+            ->where('section_id', '=', $sectionId)
+            ->where('setting_name', '=', 'title')
+            ->where('locale', '=', $locale)
+            ->select('setting_value as title')
+            ->first();
 
         $sectionTitle = get_object_vars($result)['title'];
         return $sectionTitle;
@@ -120,9 +117,9 @@ class ScieloSubmissionsDAO extends DAO
     public function getPublicationAuthors($publicationId)
     {
         $result = DB::table('authors')
-        ->where('publication_id', '=', $publicationId)
-        ->select('author_id')
-        ->get();
+            ->where('publication_id', '=', $publicationId)
+            ->select('author_id')
+            ->get();
 
         $authorsIds = [];
         foreach ($result->toArray() as $row) {
@@ -141,10 +138,10 @@ class ScieloSubmissionsDAO extends DAO
         ];
 
         $result = DB::table('edit_decisions')
-        ->where('submission_id', $submissionId)
-        ->whereIn('decision', $possibleFinalDecisions)
-        ->orderBy('date_decided', 'asc')
-        ->first();
+            ->where('submission_id', $submissionId)
+            ->whereIn('decision', $possibleFinalDecisions)
+            ->orderBy('date_decided', 'asc')
+            ->first();
 
         if (is_null($result)) {
             return null;
@@ -158,11 +155,11 @@ class ScieloSubmissionsDAO extends DAO
     public function getIdOfSubmitterUser($submissionId)
     {
         $result = DB::table('event_log')
-        ->where('event_type', PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT)
-        ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
-        ->where('assoc_id', $submissionId)
-        ->select('user_id')
-        ->get();
+            ->where('event_type', PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT)
+            ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+            ->where('assoc_id', $submissionId)
+            ->select('user_id')
+            ->get();
         $result = $result->toArray();
 
         if (empty($result)) {
@@ -181,7 +178,7 @@ class ScieloSubmissionsDAO extends DAO
     protected function finalDecisionFromRow($row, $locale)
     {
         $dateDecided = new DateTime($row['date_decided']);
-        $decision = "";
+        $decision = '';
 
         if ($row['decision'] == Decision::ACCEPT) {
             $decision = __('common.accepted', [], $locale);

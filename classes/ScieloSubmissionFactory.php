@@ -2,13 +2,10 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
-use DateTime;
-use APP\submission\Submission;
-use PKP\db\DAORegistry;
 use APP\facades\Repo;
+use APP\submission\Submission;
+use DateTime;
+use PKP\db\DAORegistry;
 
 class ScieloSubmissionFactory
 {
@@ -28,8 +25,8 @@ class ScieloSubmissionFactory
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $authors = $this->retrieveAuthors($publicationId, $locale);
 
-        $finalDecision = "";
-        $finalDecisionDate = "";
+        $finalDecision = '';
+        $finalDecisionDate = '';
 
         return new ScieloSubmission(
             $submissionId,
@@ -50,9 +47,9 @@ class ScieloSubmissionFactory
     protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array
     {
         $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($submissionId, $locale);
-        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
-        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
-        return array($finalDecision, $finalDecisionDate);
+        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : '';
+        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : '';
+        return [$finalDecision, $finalDecisionDate];
     }
 
     protected function retrieveSectionName($publication, $locale)
@@ -68,7 +65,7 @@ class ScieloSubmissionFactory
         $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
 
         if (is_null($userId)) {
-            return "";
+            return '';
         }
 
         $submitter = Repo::user()->get($userId);
@@ -82,13 +79,13 @@ class ScieloSubmissionFactory
         $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
 
         if (is_null($userId)) {
-            return "";
+            return '';
         }
 
         $submitter = Repo::user()->get($userId);
         $submitterCountry = $submitter->getCountryLocalized();
 
-        return !is_null($submitterCountry) ? $submitterCountry : "";
+        return !is_null($submitterCountry) ? $submitterCountry : '';
     }
 
     protected function calculateDaysUntilStatusChange($dateSubmitted, $dateLastActivity)
@@ -115,7 +112,7 @@ class ScieloSubmissionFactory
     protected function retrieveAuthors($publicationId, $locale)
     {
         $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $authorsIds =  $scieloSubmissionsDao->getPublicationAuthors($publicationId);
+        $authorsIds = $scieloSubmissionsDao->getPublicationAuthors($publicationId);
         $submissionAuthors = [];
 
         foreach ($authorsIds as $authorId) {
@@ -124,8 +121,8 @@ class ScieloSubmissionFactory
             $country = $author->getCountryLocalized();
             $affiliation = $author->getLocalizedData('affiliation', $locale);
 
-            $country = (!is_null($country)) ? ($country) : ("");
-            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ("");
+            $country = (!is_null($country)) ? ($country) : ('');
+            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ('');
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
 

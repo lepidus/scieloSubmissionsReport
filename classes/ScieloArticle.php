@@ -2,8 +2,6 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
-
 class ScieloArticle extends ScieloSubmission
 {
     private $editors;
@@ -20,13 +18,13 @@ class ScieloArticle extends ScieloSubmission
         $this->sectionEditor = $sectionEditor;
         $this->reviews = $reviews;
         $this->lastDecision = $lastDecision;
-        $this->noEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
-        $this->noDecision = __("plugins.reports.scieloSubmissionsReport.warning.noDecision");
+        $this->noEditors = __('plugins.reports.scieloSubmissionsReport.warning.noEditors');
+        $this->noDecision = __('plugins.reports.scieloSubmissionsReport.warning.noDecision');
     }
 
     public function asRecord(): array
     {
-        return array($this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getJournalEditors(), $this->getSectionEditor(), $this->authorsAsRecord(), $this->section, $this->language, $this->getReviews(), $this->lastDecision, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision());
+        return [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getJournalEditors(), $this->getSectionEditor(), $this->authorsAsRecord(), $this->section, $this->language, $this->getReviews(), $this->lastDecision, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
     }
 
     public function getJournalEditors(): string
@@ -41,7 +39,7 @@ class ScieloArticle extends ScieloSubmission
 
     public function getReviews(): string
     {
-        return $this->implodeEmptyFields($this->reviews, "");
+        return $this->implodeEmptyFields($this->reviews, '');
     }
 
     public function hasReviews(): bool

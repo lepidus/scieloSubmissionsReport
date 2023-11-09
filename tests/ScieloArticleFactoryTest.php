@@ -2,24 +2,20 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-use PKP\tests\DatabaseTestCase;
-use APP\submission\Submission;
-use APP\publication\Publication;
-use APP\section\Section;
-use APP\author\Author;
+use APP\decision\Decision;
 use APP\facades\Repo;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\submission\Submission;
 use PKP\core\Core;
 use PKP\db\DAORegistry;
-use APP\core\Application;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
-use APP\decision\Decision;
-use PKP\userGroup\relationships\UserGroupStage;
 use PKP\security\Role;
-use PKP\submission\reviewRound\ReviewRound;
 use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\submission\reviewRound\ReviewRound;
+use PKP\tests\DatabaseTestCase;
+use PKP\userGroup\relationships\UserGroupStage;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -37,15 +33,15 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private $stageAssignmentIds = [];
 
     private $locale = 'en';
-    private $title = "eXtreme Programming: A practical guide";
-    private $submitter = "Don Vito Corleone";
+    private $title = 'eXtreme Programming: A practical guide';
+    private $submitter = 'Don Vito Corleone';
     private $dateSubmitted = '2021-05-31 15:38:24';
     private $statusCode = Submission::STATUS_PUBLISHED;
     private $statusMessage;
-    private $sectionName = "Biological Sciences";
+    private $sectionName = 'Biological Sciences';
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
-    private $doi = "10.666/949494";
+    private $doi = '10.666/949494';
 
     public function setUp(): void
     {
@@ -204,21 +200,21 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $author2 = Repo::author()->newDataObject();
         $author1->setData('publicationId', $this->publicationId);
         $author2->setData('publicationId', $this->publicationId);
-        $author1->setData('email', "anaalice@harvard.com");
-        $author2->setData('email', "seizi.tagima@ufam.edu.br");
+        $author1->setData('email', 'anaalice@harvard.com');
+        $author2->setData('email', 'seizi.tagima@ufam.edu.br');
         $author1->setGivenName('Ana Alice', $this->locale);
         $author1->setFamilyName('Caldas Novas', $this->locale);
         $author2->setGivenName('Seizi', $this->locale);
         $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setAffiliation("Harvard University", $this->locale);
-        $author2->setAffiliation("Amazonas Federal University", $this->locale);
+        $author1->setAffiliation('Harvard University', $this->locale);
+        $author2->setAffiliation('Amazonas Federal University', $this->locale);
         $author1->setData('country', 'US');
         $author2->setData('country', 'BR');
 
         $this->author1Id = Repo::author()->dao->insert($author1);
         $this->author2Id = Repo::author()->dao->insert($author2);
 
-        return [new SubmissionAuthor("Ana Alice Caldas Novas", "United States", "Harvard University"), new SubmissionAuthor("Seizi Tagima", "Brazil", "Amazonas Federal University")];
+        return [new SubmissionAuthor('Ana Alice Caldas Novas', 'United States', 'Harvard University'), new SubmissionAuthor('Seizi Tagima', 'Brazil', 'Amazonas Federal University')];
     }
 
     private function addCurrentPublicationToSubmission(): void
@@ -233,16 +229,16 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $firstEditorUser->setUsername('examplePeter');
         $firstEditorUser->setEmail('peter@exemple.com');
         $firstEditorUser->setPassword('examplepass');
-        $firstEditorUser->setGivenName("Peter", $this->locale);
-        $firstEditorUser->setFamilyName("Parker", $this->locale);
+        $firstEditorUser->setGivenName('Peter', $this->locale);
+        $firstEditorUser->setFamilyName('Parker', $this->locale);
         $firstEditorUser->setDateRegistered(Core::getCurrentDate());
 
         $secondEditorUser = Repo::user()->newDataObject();
         $secondEditorUser->setUsername('exampleJhon');
         $secondEditorUser->setEmail('jhon@exemple.com');
         $secondEditorUser->setPassword('exemplepass');
-        $secondEditorUser->setGivenName("Jhon", $this->locale);
-        $secondEditorUser->setFamilyName("Carter", $this->locale);
+        $secondEditorUser->setGivenName('Jhon', $this->locale);
+        $secondEditorUser->setFamilyName('Carter', $this->locale);
         $secondEditorUser->setDateRegistered(Core::getCurrentDate());
 
         $this->firstEditorUserId = Repo::user()->add($firstEditorUser);
@@ -338,7 +334,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $expectedEditors = $editorsUsers[0]->getFullName() . "," . $editorsUsers[1]->getFullName();
+        $expectedEditors = $editorsUsers[0]->getFullName() . ',' . $editorsUsers[1]->getFullName();
         $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
     }
 
@@ -350,7 +346,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noEditors"), $scieloArticle->getJournalEditors());
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noEditors'), $scieloArticle->getJournalEditors());
     }
 
     /**
@@ -381,7 +377,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $noEditorMessage = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $noEditorMessage = __('plugins.reports.scieloSubmissionsReport.warning.noEditors');
         $this->assertEquals($noEditorMessage, $scieloArticle->getSectionEditor());
     }
 
@@ -425,7 +421,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $scieloArticle->getLastDecision());
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noDecision'), $scieloArticle->getLastDecision());
     }
 
     /**

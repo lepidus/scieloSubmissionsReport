@@ -2,15 +2,15 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-use PHPUnit\Framework\TestCase;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use PHPUnit\Framework\TestCase;
 
 final class SubmissionAuthorTest extends TestCase
 {
     private $author;
-    private $fullName = "Atila Iamarino";
-    private $country = "Brasil";
-    private $affiliation = "Universidade de São Paulo";
+    private $fullName = 'Atila Iamarino';
+    private $country = 'Brasil';
+    private $affiliation = 'Universidade de São Paulo';
 
     public function setUp(): void
     {
@@ -34,6 +34,6 @@ final class SubmissionAuthorTest extends TestCase
 
     public function testAsRecord(): void
     {
-        $this->assertEquals("Atila Iamarino, Brasil, Universidade de São Paulo", $this->author->asRecord());
+        $this->assertEquals('Atila Iamarino, Brasil, Universidade de São Paulo', $this->author->asRecord());
     }
 }

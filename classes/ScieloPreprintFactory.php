@@ -2,11 +2,6 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintsDAO;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
-
 class ScieloPreprintFactory extends ScieloSubmissionFactory
 {
     protected $application = 'ops';
@@ -33,7 +28,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $authors = $this->retrieveAuthors($publicationId, $locale);
         $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
         $language = $submission['locale'];
-        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
+        [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerators = $scieloPreprintsDAO->getSectionModerators($submissionId);
         $responsibles = $scieloPreprintsDAO->getResponsibles($submissionId);
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);
