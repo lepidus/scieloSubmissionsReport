@@ -1,47 +1,47 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use PHPUnit\Framework\TestCase;
 
 class ScieloArticleTest extends TestCase
 {
     private $submission;
     private $submissionId = 1233;
-    private $title = "Rethinking linguistic relativity";
-    private $submitter = "Atila Iamarino";
-    private $submitterCountry = "Brasil";
-    private $dateSubmitted = "2013-09-06 19:07:02";
+    private $title = 'Rethinking linguistic relativity';
+    private $submitter = 'Atila Iamarino';
+    private $submitterCountry = 'Brasil';
+    private $dateSubmitted = '2013-09-06 19:07:02';
     private $daysUntilStatusChange = 3;
-    private $status = "Published";
+    private $status = 'Published';
     private $authors;
-    private $section = "Biological Sciences";
-    private $language = "en_US";
-    private $finalDecision = "Accepted";
-    private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $section = 'Biological Sciences';
+    private $language = 'en';
+    private $finalDecision = 'Accepted';
+    private $finalDecisionDate = '2013-09-14 22:00:00';
     private $expectedReviewingTime = 8;
-    private $editors = array("Albert Einstein", "Richard Feynman");
-    private $sectionEditor = "Carl Sagan";
-    private $reviews = array("Aceitar", "Ver comentários");
-    private $lastDecision = "Enviar para avaliação";
+    private $editors = ['Albert Einstein', 'Richard Feynman'];
+    private $sectionEditor = 'Carl Sagan';
+    private $reviews = ['Aceitar', 'Ver comentários'];
+    private $lastDecision = 'Enviar para avaliação';
 
     public function setUp(): void
     {
-        $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
+        $this->authors = [new SubmissionAuthor('Atila', 'Brasil', 'USP')];
         $this->submission = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, $this->lastDecision);
     }
 
     public function testJournalEditors(): void
     {
-        $this->assertEquals(implode(",", $this->editors), $this->submission->getJournalEditors());
+        $this->assertEquals(implode(',', $this->editors), $this->submission->getJournalEditors());
     }
 
     public function testWhenJournalEditorsIsEmpty(): void
     {
         $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, [], $this->sectionEditor, $this->reviews, $this->lastDecision);
-        $messageNoEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $messageNoEditors = __('plugins.reports.scieloSubmissionsReport.warning.noEditors');
         $this->assertEquals($messageNoEditors, $article->getJournalEditors());
     }
 
@@ -52,20 +52,20 @@ class ScieloArticleTest extends TestCase
 
     public function testWhenSectionEditorIsEmpty(): void
     {
-        $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, "", $this->reviews, $this->lastDecision);
-        $messageNoEditors = __("plugins.reports.scieloSubmissionsReport.warning.noEditors");
+        $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, '', $this->reviews, $this->lastDecision);
+        $messageNoEditors = __('plugins.reports.scieloSubmissionsReport.warning.noEditors');
         $this->assertEquals($messageNoEditors, $article->getSectionEditor());
     }
 
     public function testHasReviews(): void
     {
-        $this->assertEquals(implode(",", $this->reviews), $this->submission->getReviews());
+        $this->assertEquals(implode(',', $this->reviews), $this->submission->getReviews());
     }
 
     public function testHasNoReviews(): void
     {
         $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, [], $this->lastDecision);
-        $this->assertEquals("", $article->getReviews());
+        $this->assertEquals('', $article->getReviews());
     }
 
     public function testHasLastDecision(): void
@@ -75,8 +75,8 @@ class ScieloArticleTest extends TestCase
 
     public function testHasNoLastDecision(): void
     {
-        $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, "");
-        $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $article->getLastDecision());
+        $article = new ScieloArticle($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->editors, $this->sectionEditor, $this->reviews, '');
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noDecision'), $article->getLastDecision());
     }
 
     public function testHasReviewsWhenHasAtLeastOneReview(): void
@@ -86,9 +86,9 @@ class ScieloArticleTest extends TestCase
 
     public function testGetRecord(): void
     {
-        $article = new ScieloArticle(1, "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", 1, "Posted", array(new SubmissionAuthor("Paola Franchesca", "Italy", "University of Milan")), "Fashion Design", "en_US", "Accepted", "2021-04-23", ["Jean Paul Cardin"], "Jean Paul Cardin", ["Accept", "See comments"], "Accept");
+        $article = new ScieloArticle(1, 'Title 1', 'Paola Franchesca', 'Brasil', '2021-04-21', 1, 'Posted', [new SubmissionAuthor('Paola Franchesca', 'Italy', 'University of Milan')], 'Fashion Design', 'en', 'Accepted', '2021-04-23', ['Jean Paul Cardin'], 'Jean Paul Cardin', ['Accept', 'See comments'], 'Accept');
 
-        $expectedRecord = ["1", "Title 1", "Paola Franchesca", "Brasil", "2021-04-21", "1", "Posted", "Jean Paul Cardin", "Jean Paul Cardin", "Paola Franchesca, Italy, University of Milan", "Fashion Design", "en_US", "Accept,See comments", "Accept", "Accepted", "2021-04-23", "2", "2"];
+        $expectedRecord = ['1', 'Title 1', 'Paola Franchesca', 'Brasil', '2021-04-21', '1', 'Posted', 'Jean Paul Cardin', 'Jean Paul Cardin', 'Paola Franchesca, Italy, University of Milan', 'Fashion Design', 'en', 'Accept,See comments', 'Accept', 'Accepted', '2021-04-23', '2', '2'];
         $this->assertEquals($expectedRecord, $article->asRecord());
     }
 }

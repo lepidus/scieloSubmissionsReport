@@ -1,9 +1,6 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprint');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloPreprintsDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionStats');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory
 {
@@ -18,7 +15,6 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
     public function createSubmission(int $submissionId, string $locale)
     {
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
         $submission = $scieloPreprintsDAO->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
 
@@ -32,7 +28,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $authors = $this->retrieveAuthors($publicationId, $locale);
         $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
         $language = $submission['locale'];
-        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
+        [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerators = $scieloPreprintsDAO->getSectionModerators($submissionId);
         $responsibles = $scieloPreprintsDAO->getResponsibles($submissionId);
         $publicationStatus = $scieloPreprintsDAO->getPublicationStatus($publicationId);

@@ -1,8 +1,11 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
+use APP\facades\Repo;
+use APP\submission\Submission;
+use DateTime;
+use PKP\db\DAORegistry;
 
 class ScieloSubmissionFactory
 {
@@ -22,8 +25,8 @@ class ScieloSubmissionFactory
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $authors = $this->retrieveAuthors($publicationId, $locale);
 
-        $finalDecision = "";
-        $finalDecisionDate = "";
+        $finalDecision = '';
+        $finalDecisionDate = '';
 
         return new ScieloSubmission(
             $submissionId,
@@ -44,9 +47,9 @@ class ScieloSubmissionFactory
     protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array
     {
         $finalDecisionWithDate = $scieloSubmissionDAO->getFinalDecisionWithDate($submissionId, $locale);
-        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : "";
-        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : "";
-        return array($finalDecision, $finalDecisionDate);
+        $finalDecision = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDecision()) : '';
+        $finalDecisionDate = (!is_null($finalDecisionWithDate)) ? ($finalDecisionWithDate->getDateDecided()) : '';
+        return [$finalDecision, $finalDecisionDate];
     }
 
     protected function retrieveSectionName($publication, $locale)
@@ -62,11 +65,10 @@ class ScieloSubmissionFactory
         $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
 
         if (is_null($userId)) {
-            return "";
+            return '';
         }
 
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $submitter = $userDao->getById($userId);
+        $submitter = Repo::user()->get($userId);
 
         return $submitter->getFullName();
     }
@@ -77,14 +79,13 @@ class ScieloSubmissionFactory
         $userId = $scieloSubmissionsDao->getIdOfSubmitterUser($submissionId);
 
         if (is_null($userId)) {
-            return "";
+            return '';
         }
 
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $submitter = $userDao->getById($userId);
+        $submitter = Repo::user()->get($userId);
         $submitterCountry = $submitter->getCountryLocalized();
 
-        return !is_null($submitterCountry) ? $submitterCountry : "";
+        return !is_null($submitterCountry) ? $submitterCountry : '';
     }
 
     protected function calculateDaysUntilStatusChange($dateSubmitted, $dateLastActivity)
@@ -99,10 +100,10 @@ class ScieloSubmissionFactory
     protected function getStatusMessage($statusKey)
     {
         $statusMap = [
-            STATUS_QUEUED => 'submissions.queued',
-            STATUS_PUBLISHED => 'submission.status.published',
-            STATUS_DECLINED => 'submission.status.declined',
-            STATUS_SCHEDULED => 'submission.status.scheduled'
+            Submission::STATUS_QUEUED => 'submissions.queued',
+            Submission::STATUS_PUBLISHED => 'submission.status.published',
+            Submission::STATUS_DECLINED => 'submission.status.declined',
+            Submission::STATUS_SCHEDULED => 'submission.status.scheduled'
         ];
 
         return __($statusMap[$statusKey]);
@@ -111,17 +112,17 @@ class ScieloSubmissionFactory
     protected function retrieveAuthors($publicationId, $locale)
     {
         $scieloSubmissionsDao = new ScieloSubmissionsDAO();
-        $authorsIds =  $scieloSubmissionsDao->getPublicationAuthors($publicationId);
+        $authorsIds = $scieloSubmissionsDao->getPublicationAuthors($publicationId);
         $submissionAuthors = [];
 
         foreach ($authorsIds as $authorId) {
-            $author = DAORegistry::getDAO('AuthorDAO')->getById($authorId);
+            $author = Repo::author()->get($authorId);
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
             $affiliation = $author->getLocalizedData('affiliation', $locale);
 
-            $country = (!is_null($country)) ? ($country) : ("");
-            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ("");
+            $country = (!is_null($country)) ? ($country) : ('');
+            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ('');
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
 

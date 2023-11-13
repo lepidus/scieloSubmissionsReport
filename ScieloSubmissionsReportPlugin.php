@@ -8,29 +8,37 @@
  * Distributed under the GNU GPL v3. For full terms see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt
  *
  * @class ScieloSubmissionsReportPlugin
+ *
  * @ingroup plugins_reports_scieloSubmissions
  *
  * @brief SciELO Submissions report plugin
  */
 
-import('lib.pkp.classes.plugins.ReportPlugin');
-import('classes.submission.Submission');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
+namespace APP\plugins\reports\scieloSubmissionsReport;
+
+use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
+use PKP\config\Config;
+use PKP\core\JSONMessage;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
+use PKP\plugins\Hook;
+use PKP\plugins\ReportPlugin;
 
 class ScieloSubmissionsReportPlugin extends ReportPlugin
 {
     /**
      * @copydoc Plugin::register()
+     *
+     * @param null|mixed $mainContextId
      */
     public function register($category, $path, $mainContextId = null)
     {
         $success = parent::register($category, $path, $mainContextId);
 
         if ($success && Config::getVar('general', 'installed')) {
-            $this->import('ScieloSubmissionsReportForm');
             $this->addLocaleData();
 
-            HookRegistry::register('AcronPlugin::parseCronTab', array($this, 'addPluginTasksToCrontab'));
+            Hook::add('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
         }
         return $success;
     }
@@ -50,46 +58,44 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return __('plugins.reports.scieloSubmissionsReport.description');
     }
 
-    public function addPluginTasksToCrontab($hookName, $args) {
-        $taskFilesPath =& $args[0];
+    public function addPluginTasksToCrontab($hookName, $args)
+    {
+        $taskFilesPath = &$args[0];
         $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
         return false;
-    }    
+    }
 
     public function display($args, $request)
     {
-        AppLocale::requireComponents(LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_READER);
         $form = new ScieloSubmissionsReportForm($this);
         $form->initData();
-        $requestHandler = new PKPRequest();
-        if ($requestHandler->isPost($request)) {
-            $reportParams = $requestHandler->getUserVars($request);
+        if ($request->isPost($request)) {
+            $reportParams = $request->getUserVars();
             $validationResult = $form->validateReportData($reportParams);
             if ($validationResult) {
                 $form->generateReport($request);
             }
         } else {
-            $dateStart = date("Y-01-01");
-            $dateEnd   = date("Y-m-d");
-            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', array($dateStart, $dateEnd));
+            $dateStart = date('Y-01-01');
+            $dateEnd = date('Y-m-d');
+            $form->display($request, 'scieloSubmissionsReportPlugin.tpl', [$dateStart, $dateEnd]);
         }
     }
 
     public function getActions($request, $actionArgs)
     {
         $router = $request->getRouter();
-        import('lib.pkp.classes.linkAction.request.AjaxModal');
-        $actions =  array_merge(
-            $this->getEnabled()?array(
+        $actions = array_merge(
+            $this->getEnabled() ? [
                 new LinkAction(
                     'pluginSettings',
                     new AjaxModal(
-                        $router->url($request, null, null, 'manage', null, array('verb' => 'pluginSettings', 'plugin' => $this->getName(), 'category' => 'reports')),
+                        $router->url($request, null, null, 'manage', null, ['verb' => 'pluginSettings', 'plugin' => $this->getName(), 'category' => 'reports']),
                         __('plugins.reports.scieloSubmissionsReport.settings.title')
                     ),
                     __('manager.plugins.settings'),
                 )
-            ):array(),
+            ] : [],
             parent::getActions($request, $actionArgs)
         );
         return $actions;
@@ -102,7 +108,6 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
         switch ($request->getUserVar('verb')) {
             case 'pluginSettings':
-                $this->import('classes.form.ScieloSubmissionsReportSettingsForm');
                 $form = new ScieloSubmissionsReportSettingsForm($this, $contextId);
                 if ($request->getUserVar('save')) {
                     $form->readInputData();

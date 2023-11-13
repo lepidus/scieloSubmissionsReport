@@ -1,5 +1,6 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 class SubmissionAuthor
 {
@@ -32,6 +33,6 @@ class SubmissionAuthor
     public function asRecord(): string
     {
         $treatedAffiliation = preg_replace('/\s+/', ' ', $this->affiliation);
-        return implode(", ", [$this->fullName, $this->country, $treatedAffiliation]);
+        return implode(', ', [$this->fullName, $this->country, $treatedAffiliation]);
     }
 }

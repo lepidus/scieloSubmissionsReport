@@ -1,8 +1,6 @@
 <?php
 
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionFactory');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
@@ -10,8 +8,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
-        $scieloArticlesDAO = new ScieloArticlesDAO();
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $locale);
+        $scieloArticlesDAO = app(ScieloArticlesDAO::class);
         $submission = $scieloArticlesDAO->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
 
@@ -25,7 +22,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $sectionName = $scieloArticlesDAO->getPublicationSection($publicationId, $locale);
         $language = $submission['locale'];
 
-        list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
+        [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
         $editors = $scieloArticlesDAO->getEditors($submissionId);
         $sectionEditor = $scieloArticlesDAO->getSectionEditor($submissionId);
         $reviews = $scieloArticlesDAO->getReviews($submissionId);

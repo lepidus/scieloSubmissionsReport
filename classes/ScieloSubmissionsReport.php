@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
 class ScieloSubmissionsReport
 {
     private $sections;
@@ -10,7 +12,7 @@ class ScieloSubmissionsReport
     {
         $this->sections = $sections;
         $this->submissions = $submissions;
-        $this->UTF8_BOM = chr(0xEF).chr(0xBB).chr(0xBF);
+        $this->UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
     }
 
     public function getSections(): array
@@ -25,7 +27,7 @@ class ScieloSubmissionsReport
 
     protected function filterWithAverageReviewingTimeOnly()
     {
-        $submissions = array();
+        $submissions = [];
 
         foreach ($this->submissions as $submission) {
             if (!empty($submission->getFinalDecision())) {
@@ -54,31 +56,31 @@ class ScieloSubmissionsReport
     public function getHeaders(): array
     {
         return [
-            "ID da submissão",
-            "Título da Submissão",
-            "Submetido por",
-            "Data de submissão",
-            "Dias até mudança de status",
-            "Estado da submissão",
-            "Editores da Revista",
-            "Editor de Seção",
-            "Autores",
-            "Seção",
-            "Idioma",
-            "Avaliações",
-            "Última decisão",
-            "Decisão final",
-            "Data da decisão final",
-            "Tempo em avaliação",
-            "Tempo entre submissão e decisão final"
+            'ID da submissão',
+            'Título da Submissão',
+            'Submetido por',
+            'Data de submissão',
+            'Dias até mudança de status',
+            'Estado da submissão',
+            'Editores da Revista',
+            'Editor de Seção',
+            'Autores',
+            'Seção',
+            'Idioma',
+            'Avaliações',
+            'Última decisão',
+            'Decisão final',
+            'Data da decisão final',
+            'Tempo em avaliação',
+            'Tempo entre submissão e decisão final'
         ];
     }
 
     private function getSecondHeaders(): array
     {
         return [
-            __("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"),
-            __("section.sections")
+            __('plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime'),
+            __('section.sections')
         ];
     }
 
@@ -91,10 +93,10 @@ class ScieloSubmissionsReport
             fputcsv($fileDescriptor, $submission->asRecord());
         }
 
-        $blankLine = ["", "", ""];
+        $blankLine = ['', '', ''];
         fputcsv($fileDescriptor, $blankLine);
         fputcsv($fileDescriptor, $this->getSecondHeaders());
-        $sections = implode(",", $this->getSections());
+        $sections = implode(',', $this->getSections());
         fputcsv($fileDescriptor, [$this->getAverageReviewingTime(), $sections]);
     }
 }

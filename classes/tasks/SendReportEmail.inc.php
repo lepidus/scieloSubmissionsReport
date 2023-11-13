@@ -1,9 +1,9 @@
 <?php
 
-import('lib.pkp.classes.mail.Mail');
-import('lib.pkp.classes.scheduledTask.ScheduledTask');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use PKP\mail\Mail;
+use PKP\scheduledTask\ScheduledTask;
 
 class SendReportEmail extends ScheduledTask
 {
@@ -42,7 +42,7 @@ class SendReportEmail extends ScheduledTask
         $sectionsIds = $this->getAllSectionsIds($context->getId());
         $includeViews = true;
         $beginningDate = '2020-04-01';
-        $endDate = date("Y-m-d");
+        $endDate = date('Y-m-d');
         $submissionDateInterval = new ClosedDateInterval($beginningDate, $endDate);
 
         $reportFactory = new ScieloSubmissionsReportFactory($application, $context->getId(), $sectionsIds, $submissionDateInterval, null, $locale, $includeViews);
@@ -52,10 +52,10 @@ class SendReportEmail extends ScheduledTask
     private function writeReportFile($context, $report): string
     {
         $acronym = $context->getLocalizedData('acronym');
-        $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
+        $reportFilePath = DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
         $csvFile = fopen($reportFilePath, 'wt');
         $report->buildCSV($csvFile);
-        
+
         return $reportFilePath;
     }
 
@@ -63,7 +63,7 @@ class SendReportEmail extends ScheduledTask
     {
         $sections = Services::get('section')->getSectionList($contextId);
 
-        $sectionsIds = array();
+        $sectionsIds = [];
         foreach ($sections as $section) {
             $sectionsIds[] = $section['id'];
         }

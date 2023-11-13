@@ -1,12 +1,16 @@
 <?php
 
-import('lib.pkp.classes.form.Form');
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\form;
+
+use APP\core\Application;
+use APP\template\TemplateManager;
+use PKP\form\Form;
 
 class ScieloSubmissionsReportSettingsForm extends Form
 {
-    public const CONFIG_VARS = array(
+    public const CONFIG_VARS = [
         'recipientEmail' => 'string',
-    );
+    ];
     private $plugin;
     private $coontextId;
 
@@ -19,7 +23,7 @@ class ScieloSubmissionsReportSettingsForm extends Form
 
     public function initData()
     {
-        $this->_data = array();
+        $this->_data = [];
         foreach (self::CONFIG_VARS as $configVar => $type) {
             $this->_data[$configVar] = $this->plugin->getSetting($this->contextId, $configVar);
         }

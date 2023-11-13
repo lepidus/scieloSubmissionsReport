@@ -1,42 +1,44 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 
-import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmission');
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionTest extends TestCase
 {
     private $submission;
     private $submissionId = 1233;
-    private $title = "Rethinking linguistic relativity";
-    private $submitter = "Atila Iamarino";
-    private $submitterCountry = "Brasil";
-    private $dateSubmitted = "2013-09-06 19:07:02";
+    private $title = 'Rethinking linguistic relativity';
+    private $submitter = 'Atila Iamarino';
+    private $submitterCountry = 'Brasil';
+    private $dateSubmitted = '2013-09-06 19:07:02';
     private $daysUntilStatusChange = 3;
-    private $status = "Published";
+    private $status = 'Published';
     private $authors;
-    private $section = "Biological Sciences";
-    private $language = "en_US";
-    private $finalDecision = "Accepted";
-    private $finalDecisionDate = "2013-09-14 22:00:00";
+    private $section = 'Biological Sciences';
+    private $language = 'en';
+    private $finalDecision = 'Accepted';
+    private $finalDecisionDate = '2013-09-14 22:00:00';
     private $expectedReviewingTime = 8;
 
     private function createScieloSubmission(): ScieloSubmission
     {
-        $this->authors = array(new SubmissionAuthor("Atila", "Brasil", "USP"));
+        $this->authors = [new SubmissionAuthor('Atila', 'Brasil', 'USP')];
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
     }
 
     private function createSubmissionWithoutFinalDecision(): ScieloSubmission
     {
-        $emptyFinalDecisionDate = "";
+        $emptyFinalDecisionDate = '';
         return new ScieloSubmission($this->submissionId, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $emptyFinalDecisionDate);
     }
 
     private function getTestSubmissions(): array
     {
-        return array($this->createScieloSubmission(), $this->createScieloSubmission());
+        return [$this->createScieloSubmission(), $this->createScieloSubmission()];
     }
 
     public function setUp(): void
@@ -66,8 +68,8 @@ class ScieloSubmissionTest extends TestCase
 
     public function testWhenEmptySubmitter(): void
     {
-        $submission = new ScieloSubmission($this->submissionId, $this->title, "", $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
-        $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+        $submission = new ScieloSubmission($this->submissionId, $this->title, '', $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authors, $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate);
+        $messageNoSubmitter = __('plugins.reports.scieloSubmissionsReport.warning.noSubmitter');
         $this->assertEquals($messageNoSubmitter, $submission->getSubmitter());
     }
 
@@ -134,7 +136,7 @@ class ScieloSubmissionTest extends TestCase
     public function testTimeBetweenSubmissionAndFinalDecisionWithoutFinalDecision(): void
     {
         $submission = $this->createSubmissionWithoutFinalDecision();
-        $expectedTimeBetweenSubmissionAndFinalDecision = "";
+        $expectedTimeBetweenSubmissionAndFinalDecision = '';
         $this->assertEquals($expectedTimeBetweenSubmissionAndFinalDecision, $submission->getTimeBetweenSubmissionAndFinalDecision());
     }
 }

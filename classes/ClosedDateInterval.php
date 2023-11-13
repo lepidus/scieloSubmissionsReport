@@ -1,11 +1,15 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+
+use DateTime;
+
 class ClosedDateInterval
 {
     private $beginningDate;
     private $endDate;
-    private const DAY_BEGINNING = " 00:00:00";
-    private const DAY_ENDING = " 23:59:59";
+    private const DAY_BEGINNING = ' 00:00:00';
+    private const DAY_ENDING = ' 23:59:59';
 
     public function __construct(string $beginningDate, string $endDate)
     {

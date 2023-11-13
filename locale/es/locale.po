@@ -35,6 +35,9 @@ msgstr "Intervalo de fecha de envío"
 msgid "plugins.reports.scieloSubmissionsReport.finalDecisionDateInterval"
 msgstr "Intervalo de fecha de decisión final"
 
+msgid "plugins.reports.scieloSubmissionsReport.until"
+msgstr "Hasta"
+
 msgid "plugins.reports.scieloSubmissionsReport.generate"
 msgstr "Generar Informe"
 
@@ -144,7 +147,6 @@ msgstr "Correo electrónico de destino"
 
 msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
 msgstr "El informe completo de envíos será enviado a este correo electrónico"
-
 
 msgid "plugins.reports.scieloSubmissionsReport.reportEmail.subject"
 msgstr "Informe de envíos de {$contextName}"

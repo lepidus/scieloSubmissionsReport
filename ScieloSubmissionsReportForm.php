@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file plugins/reports/scieloSubmissionsReport/ScieloSubmissionsReportForm.inc.php
  *
@@ -10,9 +11,19 @@
  *
  * @brief SciELO Submissions report Form
  */
-import('lib.pkp.classes.form.Form');
-import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
+
+namespace APP\plugins\reports\scieloSubmissionsReport;
+
+use APP\core\Application;
+use APP\facades\Repo;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\template\TemplateManager;
+use PKP\core\PKPString;
+use PKP\facades\Locale;
+use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
 
 class ScieloSubmissionsReportForm extends Form
 {
@@ -30,6 +41,7 @@ class ScieloSubmissionsReportForm extends Form
 
     /**
      * Constructor
+     *
      * @param $plugin ReviewersReport Manual payment plugin
      */
     public function __construct($plugin)
@@ -38,7 +50,7 @@ class ScieloSubmissionsReportForm extends Form
         $this->application = substr(Application::getName(), 0, 3);
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
-        $this->sections = array();
+        $this->sections = [];
         $this->submissionDateInterval = null;
         $this->finalDecisionDateInterval = null;
         $this->includeViews = false;
@@ -101,7 +113,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $context = $request->getContext();
         header('content-type: text/comma-separated-values');
-        $acronym = PKPString::regexp_replace("/[^A-Za-z0-9 ]/", '', $context->getLocalizedAcronym());
+        $acronym = PKPString::regexp_replace('/[^A-Za-z0-9 ]/', '', $context->getLocalizedAcronym());
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
     }
 
@@ -109,7 +121,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $this->emitHttpHeaders($request);
 
-        $locale = AppLocale::getLocale();
+        $locale = Locale::getLocale();
         $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale, $this->includeViews);
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
@@ -124,14 +136,14 @@ class ScieloSubmissionsReportForm extends Form
 
         $templateManager = TemplateManager::getManager();
         $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
-        $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, array(
+        $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, [
             'priority' => STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
-        ));
+        ]);
         $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
+        $templateManager->assign('years', [0 => $args[0], 1 => $args[1]]);
         $templateManager->assign([
             'breadcrumbs' => [
                 [
@@ -152,9 +164,9 @@ class ScieloSubmissionsReportForm extends Form
 
     private function getAvailableSections($contextId)
     {
-        $sections = Services::get('section')->getSectionList($contextId);
+        $sections = Repo::section()->getSectionList($contextId);
 
-        $listOfSections = array();
+        $listOfSections = [];
         foreach ($sections as $section) {
             $listOfSections[$section['id']] = $section['title'];
         }
@@ -163,11 +175,10 @@ class ScieloSubmissionsReportForm extends Form
 
     public function getSectionsOptions($contextId, $sections)
     {
-        $sectionDao = DAORegistry::getDAO('SectionDAO');
-        $sectionsOptions = array();
+        $sectionsOptions = [];
 
         foreach ($sections as $sectionId => $sectionName) {
-            $sectionObject = $sectionDao->getById($sectionId, $contextId);
+            $sectionObject = Repo::section()->get($sectionId, $contextId);
             if ($sectionObject->getMetaReviewed() == 1) {
                 $sectionsOptions[$sectionObject->getLocalizedTitle()] = $sectionObject->getLocalizedTitle();
             }
