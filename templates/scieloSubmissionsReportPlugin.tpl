@@ -37,13 +37,13 @@
                             <label class="label">
                                 {translate key="stats.dateRange.from"}
                             </label>
-                            <input type="date" id='startSubmissionDateInterval' name='startSubmissionDateInterval' from=$startSubmissionDateInterval defaultValue=$startSubmissionDateInterval value="{$years[0]}"/>
+                            <input type="date" id='startSubmissionDateInterval' name='startSubmissionDateInterval' from=$startSubmissionDateInterval defaultValue=$startSubmissionDateInterval value="{$years[0]|escape}"/>
                         </div>
                         <div class="to">
                             <label class="label">
                                 {translate key="plugins.reports.scieloSubmissionsReport.until"}
                             </label>
-                            <input type="date" id='endSubmissionDateInterval' name='endSubmissionDateInterval' from=$endSubmissionDateInterval defaultValue=$endSubmissionDateInterval value="{$years[1]}"/>
+                            <input type="date" id='endSubmissionDateInterval' name='endSubmissionDateInterval' from=$endSubmissionDateInterval defaultValue=$endSubmissionDateInterval value="{$years[1]|escape}"/>
                         </div>
                     </div>
                 </fieldset>
@@ -58,13 +58,13 @@
                             <label class="label">
                                 {translate key="stats.dateRange.from"}
                             </label>
-                            <input type="date" id='startFinalDecisionDateInterval' name='startFinalDecisionDateInterval' from=$startFinalDecisionDateInterval defaultValue=$startFinalDecisionDateInterval value="{$years[0]}"/>
+                            <input type="date" id='startFinalDecisionDateInterval' name='startFinalDecisionDateInterval' from=$startFinalDecisionDateInterval defaultValue=$startFinalDecisionDateInterval value="{$years[0]|escape}"/>
                         </div>
                         <div class="to">
                             <label class="label">
                                 {translate key="plugins.reports.scieloSubmissionsReport.until"}
                             </label>
-                            <input type="date" id='endFinalDecisionDateInterval' name='endFinalDecisionDateInterval' from=$endFinalDecisionDateInterval defaultValue=$endFinalDecisionDateInterval value="{$years[1]}"/>
+                            <input type="date" id='endFinalDecisionDateInterval' name='endFinalDecisionDateInterval' from=$endFinalDecisionDateInterval defaultValue=$endFinalDecisionDateInterval value="{$years[1]|escape}"/>
                         </div>
                     </div>
                 </fieldset>
