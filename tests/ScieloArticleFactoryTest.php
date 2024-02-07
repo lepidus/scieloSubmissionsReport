@@ -73,9 +73,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $sectionEditorUserGroupLocalizedNames = [
-            'en_US'=>'section editor',
-            'pt_BR'=>'editor de seção',
-            'es_ES'=> 'editor de sección'];
+            'en_US' => 'section editor',
+            'pt_BR' => 'editor de seção',
+            'es_ES' => 'editor de sección'];
         $sectionEditorsUserGroup = new UserGroup();
         $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
         $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
@@ -87,9 +87,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $editorUserGroupLocalizedNames = [
-            'en_US'=>'editor',
-            'pt_BR'=>'editor',
-            'es_ES'=>'editor'];
+            'en_US' => 'editor',
+            'pt_BR' => 'editor',
+            'es_ES' => 'editor'];
         $editorsUserGroup = new UserGroup();
         $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
         $editorsUserGroup->setData('roleId', ROLE_ID_MANAGER);
