@@ -52,8 +52,8 @@ class ScieloSubmissionsReportTest extends TestCase
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
         $expectedSections = implode(",", $this->sections);
-        $lastRow = $csvRows[sizeof($csvRows)-1];
-        $lastCellFromLastRow = $lastRow[sizeof($lastRow)-1];
+        $lastRow = $csvRows[sizeof($csvRows) - 1];
+        $lastCellFromLastRow = $lastRow[sizeof($lastRow) - 1];
 
         $this->assertEquals($expectedSections, $lastCellFromLastRow);
     }
@@ -63,7 +63,7 @@ class ScieloSubmissionsReportTest extends TestCase
         $this->createCSVReport();
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
-        $penultimateRow = $csvRows[sizeof($csvRows)-2];
+        $penultimateRow = $csvRows[sizeof($csvRows) - 2];
         $expectedPenultimateRow = [__("plugins.reports.scieloSubmissionsReport.header.AverageReviewingTime"), __("section.sections")];
 
         $this->assertEquals($expectedPenultimateRow, $penultimateRow);

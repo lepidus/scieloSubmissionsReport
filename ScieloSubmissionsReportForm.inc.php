@@ -131,7 +131,7 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', array(0=>$args[0], 1=>$args[1]));
+        $templateManager->assign('years', array(0 => $args[0], 1 => $args[1]));
         $templateManager->assign([
             'breadcrumbs' => [
                 [

@@ -55,7 +55,7 @@ class SendReportEmail extends ScheduledTask
         $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
         $csvFile = fopen($reportFilePath, 'wt');
         $report->buildCSV($csvFile);
-        
+
         return $reportFilePath;
     }
 
