@@ -63,7 +63,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             $user = $userDao->getById($stageAssignment->getUserId(), false);
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
-            if ($currentUserGroupName == 'editor') {
+            if ($currentUserGroupName == 'journal editor') {
                 array_push($journalEditors, $user->getFullName());
             }
         }
