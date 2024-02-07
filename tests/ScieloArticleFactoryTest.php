@@ -88,9 +88,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $editorUserGroupLocalizedNames = [
-            'en_US' => 'editor',
-            'pt_BR' => 'editor',
-            'es_ES' => 'editor'];
+            'en_US' => 'Journal editor',
+            'pt_BR' => 'Editor da revista',
+            'es_ES' => 'Editor/a de la revista'
+        ];
         $editorsUserGroup = new UserGroup();
         $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
         $editorsUserGroup->setData('roleId', ROLE_ID_MANAGER);
