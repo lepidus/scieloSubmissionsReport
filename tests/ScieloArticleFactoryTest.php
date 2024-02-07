@@ -164,12 +164,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return Repo::userGroup()->add($sectionEditorsUserGroup);
     }
 
-    private function createEditorUserGroup(): int
+    private function createJournalEditorUserGroup(): int
     {
         $editorUserGroupLocalizedNames = [
-            'en' => 'editor',
-            'pt_BR' => 'editor',
-            'es' => 'editor'
+            'en' => 'Journal editor',
+            'pt_BR' => 'Editor da revista',
+            'es' => 'Editor/a de la revista'
         ];
         $editorsUserGroup = Repo::userGroup()->newDataObject();
         $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
@@ -256,7 +256,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             ]);
             return $firstEditorUser;
         } else {
-            $this->editorGroupId = $this->createEditorUserGroup();
+            $this->editorGroupId = $this->createJournalEditorUserGroup();
             Repo::userGroup()->assignUserToGroup($this->firstEditorUserId, $this->editorGroupId);
             Repo::userGroup()->assignUserToGroup($this->secondEditorUserId, $this->editorGroupId);
             $this->createStageAssignments([$this->firstEditorUserId, $this->secondEditorUserId], $this->editorGroupId);
@@ -327,7 +327,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
     */
-    public function testSubmissionGetsEditors(): void
+    public function testSubmissionGetsJournalEditors(): void
     {
         $editorsUsers = $this->createEditorUsers();
 
@@ -341,7 +341,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
     */
-    public function testSubmissionGetsNoEditors(): void
+    public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
