@@ -50,7 +50,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         return '';
     }
 
-    public function getEditors($submissionId): array
+    public function getJournalEditors($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
@@ -60,7 +60,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             $user = Repo::user()->get($stageAssignment->getUserId(), false);
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en'));
-            if ($currentUserGroupName == 'editor') {
+            if ($currentUserGroupName == 'journal editor') {
                 array_push($journalEditors, $user->getFullName());
             }
         }
