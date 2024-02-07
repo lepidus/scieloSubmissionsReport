@@ -51,7 +51,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         return '';
     }
 
-    public function getEditors($submissionId): array
+    public function getJournalEditors($submissionId): array
     {
         $userDao = DAORegistry::getDAO('UserDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
