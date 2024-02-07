@@ -151,8 +151,8 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
 
-        $lastRow = $csvRows[sizeof($csvRows)-1];
-        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow)-2];
+        $lastRow = $csvRows[sizeof($csvRows) - 1];
+        $penultimateCellFromLastRow = $lastRow[sizeof($lastRow) - 2];
         $expectedAverageReviewingTime = 4;
 
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);

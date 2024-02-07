@@ -190,9 +190,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $responsiblesUserGroupLocalizedAbbrev = [
-            'en_US'=>'resp',
-            'pt_BR'=>'resp',
-            'es_ES'=>'resp'
+            'en_US' => 'resp',
+            'pt_BR' => 'resp',
+            'es_ES' => 'resp'
         ];
         $responsiblesUserGroup = new UserGroup();
         $responsiblesUserGroup->setData("abbrev", $responsiblesUserGroupLocalizedAbbrev);
@@ -207,9 +207,9 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $sectionModeratorUserGroupLocalizedAbbrev = [
-            'en_US'=>'am',
-            'pt_BR'=>'ma',
-            'es_ES'=>'ma'
+            'en_US' => 'am',
+            'pt_BR' => 'ma',
+            'es_ES' => 'ma'
         ];
         $sectionModeratorUserGroup = new UserGroup();
         $sectionModeratorUserGroup->setData('abbrev', $sectionModeratorUserGroupLocalizedAbbrev);
@@ -224,14 +224,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
         $scieloJournalUserGroupLocalizedNames = [
-            'en_US'=>'SciELO Journal',
-            'pt_BR'=>'Periódico SciELO',
-            'es_ES'=>'Revista SciELO'
+            'en_US' => 'SciELO Journal',
+            'pt_BR' => 'Periódico SciELO',
+            'es_ES' => 'Revista SciELO'
         ];
         $scieloJournalUserGroupLocalizedAbbrev = [
-            'en_US'=>'SciELO',
-            'pt_BR'=>'SciELO',
-            'es_ES'=>'SciELO'
+            'en_US' => 'SciELO',
+            'pt_BR' => 'SciELO',
+            'es_ES' => 'SciELO'
         ];
         $scieloJournalUserGroup = new UserGroup();
         $scieloJournalUserGroup->setData('name', $scieloJournalUserGroupLocalizedNames);

@@ -50,11 +50,12 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return __('plugins.reports.scieloSubmissionsReport.description');
     }
 
-    public function addPluginTasksToCrontab($hookName, $args) {
-        $taskFilesPath =& $args[0];
+    public function addPluginTasksToCrontab($hookName, $args)
+    {
+        $taskFilesPath = & $args[0];
         $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
         return false;
-    }    
+    }
 
     public function display($args, $request)
     {
@@ -80,7 +81,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         $router = $request->getRouter();
         import('lib.pkp.classes.linkAction.request.AjaxModal');
         $actions =  array_merge(
-            $this->getEnabled()?array(
+            $this->getEnabled() ? array(
                 new LinkAction(
                     'pluginSettings',
                     new AjaxModal(
@@ -89,7 +90,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                     ),
                     __('manager.plugins.settings'),
                 )
-            ):array(),
+            ) : array(),
             parent::getActions($request, $actionArgs)
         );
         return $actions;
