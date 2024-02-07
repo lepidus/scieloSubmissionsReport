@@ -75,7 +75,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $sectionEditorUserGroupLocalizedNames = [
             'en_US' => 'section editor',
             'pt_BR' => 'editor de seção',
-            'es_ES' => 'editor de sección'];
+            'es_ES' => 'editor de sección'
+        ];
         $sectionEditorsUserGroup = new UserGroup();
         $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
         $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
@@ -83,7 +84,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return $userGroupDao->insertObject($sectionEditorsUserGroup);
     }
 
-    private function createEditorUserGroup(): int
+    private function createJournalEditorUserGroup(): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $editorUserGroupLocalizedNames = [
@@ -168,7 +169,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             $userGroupDao->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
             return $firstEditorUser;
         } else {
-            $editorGroupId = $this->createEditorUserGroup();
+            $editorGroupId = $this->createJournalEditorUserGroup();
             $userGroupDao->assignUserToGroup($firstEditorUserId, $editorGroupId);
             $userGroupDao->assignUserToGroup($secondEditorUserId, $editorGroupId);
             $this->createStageAssignments([$firstEditorUserId, $secondEditorUserId], $editorGroupId);
@@ -211,7 +212,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
     */
-    public function testSubmissionGetsEditors(): void
+    public function testSubmissionGetsJournalEditors(): void
     {
         $editorsUsers = $this->createEditorUsers();
 
@@ -225,7 +226,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
     */
-    public function testSubmissionGetsNoEditors(): void
+    public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);

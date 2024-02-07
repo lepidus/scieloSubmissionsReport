@@ -26,7 +26,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $language = $submission['locale'];
 
         list($finalDecision, $finalDecisionDate) = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
-        $editors = $scieloArticlesDAO->getEditors($submissionId);
+        $journalEditors = $scieloArticlesDAO->getJournalEditors($submissionId);
         $sectionEditor = $scieloArticlesDAO->getSectionEditor($submissionId);
         $reviews = $scieloArticlesDAO->getReviews($submissionId);
         $lastDecision = $scieloArticlesDAO->getLastDecision($submissionId);
@@ -44,7 +44,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
             $language,
             $finalDecision,
             $finalDecisionDate,
-            $editors,
+            $journalEditors,
             $sectionEditor,
             $reviews,
             $lastDecision
