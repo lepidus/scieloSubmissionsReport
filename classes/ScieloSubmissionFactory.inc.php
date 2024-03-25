@@ -68,6 +68,10 @@ class ScieloSubmissionFactory
         $userDao = DAORegistry::getDAO('UserDAO');
         $submitter = $userDao->getById($userId);
 
+        if (is_null($submitter)) {
+            return "";
+        }
+
         return $submitter->getFullName();
     }
 
@@ -82,6 +86,11 @@ class ScieloSubmissionFactory
 
         $userDao = DAORegistry::getDAO('UserDAO');
         $submitter = $userDao->getById($userId);
+
+        if (is_null($submitter)) {
+            return "";
+        }
+
         $submitterCountry = $submitter->getCountryLocalized();
 
         return !is_null($submitterCountry) ? $submitterCountry : "";

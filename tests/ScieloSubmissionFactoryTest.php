@@ -172,7 +172,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
 
         $this->assertEquals($messageNoSubmitter, $scieloSubmission->getSubmitter());
-        $this->assertEquals($messageNoSubmitter, $scieloSubmission->getSubmitterCountry());
+        $this->assertEquals('', $scieloSubmission->getSubmitterCountry());
     }
 
     public function testSubmissionGetsDateSubmitted(): void
