@@ -14,6 +14,7 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
     private $contextId = 1;
     private $submissionId;
     private $publicationId;
+    private $userSubmitterId;
     private $title = "eXtreme Programming: A practical guide";
     private $submitter = "Don Vito Corleone";
     private $submitterCountry = "Brazil";
@@ -80,12 +81,12 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $userSubmitter->setCountry('BR');
         $userSubmitter->setGivenName("Don", $this->locale);
         $userSubmitter->setFamilyName("Vito Corleone", $this->locale);
-        $userSubmitterId = $userDao->insertObject($userSubmitter);
+        $this->userSubmitterId = $userDao->insertObject($userSubmitter);
 
         $submissionEvent = $submissionEventLogDao->newDataObject();
         $submissionEvent->setSubmissionId($this->submissionId);
         $submissionEvent->setEventType(SUBMISSION_LOG_SUBMISSION_SUBMIT);
-        $submissionEvent->setUserId($userSubmitterId);
+        $submissionEvent->setUserId($this->userSubmitterId);
         $submissionEvent->setDateLogged('2021-05-28 15:19:24');
         $submissionEventLogDao->insertObject($submissionEvent);
     }
@@ -158,6 +159,20 @@ class ScieloSubmissionFactoryTest extends DatabaseTestCase
         $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals($this->submitterCountry, $scieloSubmission->getSubmitterCountry());
+    }
+
+    public function testSubmitterDataWhenUserHasBeenDeleted(): void
+    {
+        $this->createSubmitter();
+        $userDao = DAORegistry::getDAO('UserDAO');
+        $userDao->deleteUserById($this->userSubmitterId);
+
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submissionId, $this->locale);
+        $messageNoSubmitter = __("plugins.reports.scieloSubmissionsReport.warning.noSubmitter");
+
+        $this->assertEquals($messageNoSubmitter, $scieloSubmission->getSubmitter());
+        $this->assertEquals($messageNoSubmitter, $scieloSubmission->getSubmitterCountry());
     }
 
     public function testSubmissionGetsDateSubmitted(): void
