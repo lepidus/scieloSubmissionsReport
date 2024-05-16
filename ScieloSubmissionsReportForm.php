@@ -131,6 +131,8 @@ class ScieloSubmissionsReportForm extends Form
 
     public function display($request = null, $template = null, $args = null)
     {
+        $yearFirstDate = $args[0];
+        $todayDate = $args[1];
         $sections = $this->getAvailableSections($this->contextId);
         $sections_options = $this->getSectionsOptions($this->contextId, $sections);
 
@@ -143,7 +145,7 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager->assign('application', $this->application);
         $templateManager->assign('sections', $sections);
         $templateManager->assign('sections_options', $sections_options);
-        $templateManager->assign('years', [0 => $args[0], 1 => $args[1]]);
+        $templateManager->assign('years', [$yearFirstDate, $todayDate]);
         $templateManager->assign([
             'breadcrumbs' => [
                 [
