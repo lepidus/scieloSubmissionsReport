@@ -77,6 +77,15 @@
                 <div class= "pkpListPanel">
                     <tr>
                         <td class="value" colspan="2">
+                        {fbvElement type="checkBox" name="selectAllSections" id="selectAllSections" label="plugins.reports.scieloSubmissionsReport.selectAllSections"}
+                        </td>
+                    </tr>
+                </div>
+            </table>
+            <table>
+                <div class= "pkpListPanel">
+                    <tr>
+                        <td class="value" colspan="2">
                             {fbvElement type="checkBoxGroup" name="sections" id="sections" from=$sections selected=$sections_options translate=false}
                         </td>
                     </tr>
@@ -103,12 +112,14 @@
 
     <script>
         $(function() {ldelim}
-            var filterTypeSelection = document.getElementById('selectFilterTypeDate');
-            var submissionDiv = document.getElementById('submittedDateFields');
-            var decisionDiv = document.getElementById('finalDecisionDateFields');
+            let filterTypeSelection = document.getElementById('selectFilterTypeDate');
+            let submissionDiv = document.getElementById('submittedDateFields');
+            let decisionDiv = document.getElementById('finalDecisionDateFields');
+            let selectAllSections = document.getElementById('selectAllSections');
+            let sectionCheckboxes = document.querySelectorAll('input[name="sections[]"]');
 
             filterTypeSelection.addEventListener("change", function(){ldelim}
-                var selectedValue = filterTypeSelection.value;
+                let selectedValue = filterTypeSelection.value;
                 if(selectedValue == "filterBySubmission"){ldelim}
                     submissionDiv.hidden = false;
                     decisionDiv.hidden = true;
@@ -122,6 +133,22 @@
                     decisionDiv.hidden = false;
                 {rdelim}
             {rdelim});
+
+            selectAllSections.addEventListener("change", function() {ldelim}
+                let isChecked = selectAllSections.checked;
+
+                for (let sectionCheckbox of sectionCheckboxes) {ldelim}
+                    sectionCheckbox.checked = isChecked;
+                {rdelim}
+            {rdelim});
+
+            for (let sectionCheckbox of sectionCheckboxes) {ldelim}
+                sectionCheckbox.addEventListener("change", function() {ldelim}
+                    if (!sectionCheckbox.checked && selectAllSections.checked) {ldelim}
+                        selectAllSections.checked = false;
+                    {rdelim}
+                {rdelim});
+            {rdelim}
         {rdelim});
     </script>
 

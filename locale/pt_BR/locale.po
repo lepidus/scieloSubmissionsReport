@@ -50,6 +50,9 @@ msgstr "Período"
 msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Seções"
 
+msgid "plugins.reports.scieloSubmissionsReport.selectAllSections"
+msgstr "Selecionar todas as seções"
+
 msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
 msgstr "Incluir no relatório os números de acessos das submissões"
 
