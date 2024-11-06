@@ -51,7 +51,7 @@ msgid "plugins.reports.scieloSubmissionsReport.sections"
 msgstr "Sections"
 
 msgid "plugins.reports.scieloSubmissionsReport.selectAllSections"
-msgstr "Sellect all sections"
+msgstr "Select all sections"
 
 msgid "plugins.reports.scieloSubmissionsReport.checkboxIncludeViews"
 msgstr "Include in the report the numbers of views of submissions"
