@@ -73,7 +73,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     public function getDecisionMessage($decision)
     {
         import('classes.workflow.EditorDecisionActionsManager');
-        switch($decision) {
+        switch ($decision) {
             case SUBMISSION_EDITOR_DECISION_ACCEPT:
                 return __('editor.submission.decision.accept');
             case SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS:
