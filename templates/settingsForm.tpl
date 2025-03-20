@@ -20,7 +20,7 @@
         {include file="controllers/notification/inPlaceNotification.tpl" notificationId="scieloSubmissionsReportSettingsFormNotification"}
 
         {fbvFormSection title="plugins.reports.scieloSubmissionsReport.settings.recipientEmail"}
-            {fbvElement id="recipientEmail" class="recipientEmail" type="email" value="{$recipientEmail|escape}" required="true" label="plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description" size=$fbvStyles.size.MEDIUM}
+            {fbvElement id="recipientEmail" class="recipientEmail" type="text" value="{$recipientEmail|escape}" required="true" label="plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description" size=$fbvStyles.size.MEDIUM}
         {/fbvFormSection}
         {fbvFormButtons submitText="common.save"}
     </form>
