@@ -14,16 +14,16 @@ class SendReportEmail extends ScheduledTask
         PluginRegistry::loadCategory('reports');
         $plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');
 
-        $recipientEmail = $plugin->getSetting($context->getId(), 'recipientEmail');
+        $recipientEmails = $this->getRecipientEmails($plugin, $context->getId());
 
-        if ($application == 'ops' && !is_null($recipientEmail)) {
+        if ($application == 'ops' && !empty($recipientEmails)) {
             $locale = AppLocale::getLocale();
             $this->loadLocalesForTask($plugin, $locale);
 
             $report = $this->getReport($application, $context, $locale);
             $reportFilePath = $this->writeReportFile($context, $report);
 
-            $email = $this->createReportEmail($context, $recipientEmail, $reportFilePath);
+            $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
             $email->send();
         }
 
@@ -70,7 +70,21 @@ class SendReportEmail extends ScheduledTask
         return $sectionsIds;
     }
 
-    private function createReportEmail($context, $recipientEmail, $reportFilePath)
+    private function getRecipientEmails($plugin, $contextId)
+    {
+        $recipientEmailSetting = $plugin->getSetting($contextId, 'recipientEmail');
+        if (is_null($recipientEmailSetting)) {
+            return [];
+        }
+
+        $recipientEmails = array_map(function ($email) {
+            return ['name' => '', 'email' => trim($email)];
+        }, explode(',', $recipientEmailSetting));
+
+        return $recipientEmails;
+    }
+
+    private function createReportEmail($context, $recipientEmails, $reportFilePath)
     {
         $email = new Mail();
 
@@ -78,12 +92,7 @@ class SendReportEmail extends ScheduledTask
         $fromEmail = $context->getData('contactEmail');
         $email->setFrom($fromEmail, $fromName);
 
-        $email->setRecipients([
-            [
-                'name' => '',
-                'email' => $recipientEmail,
-            ],
-        ]);
+        $email->setRecipients($recipientEmails);
 
         $subject = __('plugins.reports.scieloSubmissionsReport.reportEmail.subject', ['contextName' => $fromName]);
         $body = __('plugins.reports.scieloSubmissionsReport.reportEmail.body', ['contextName' => $fromName]);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file plugins/reports/scieloSubmissionsReport/classes/ScieloArticlesDAO.inc.php
  *
