@@ -149,7 +149,8 @@ msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail"
 msgstr "Correo electrónico de destino"
 
 msgid "plugins.reports.scieloSubmissionsReport.settings.recipientEmail.description"
-msgstr "El informe completo de envíos será enviado a este correo electrónico"
+msgstr "El informe completo de envíos será enviado a esta dirección de correo electrónico."
+" Para añadir más de una dirección, introdúzcalas separadas por comas."
 
 msgid "plugins.reports.scieloSubmissionsReport.reportEmail.subject"
 msgstr "Informe de envíos de {$contextName}"

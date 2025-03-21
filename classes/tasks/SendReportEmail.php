@@ -1,9 +1,16 @@
 <?php
 
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\tasks;
+
+use APP\core\Application;
+use APP\facades\Repo;
+use PKP\facades\Locale;
+use PKP\mail\Mailable;
+use Illuminate\Support\Facades\Mail;
+use PKP\plugins\PluginRegistry;
+use PKP\scheduledTask\ScheduledTask;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
-use PKP\mail\Mail;
-use PKP\scheduledTask\ScheduledTask;
 
 class SendReportEmail extends ScheduledTask
 {
@@ -14,27 +21,20 @@ class SendReportEmail extends ScheduledTask
         PluginRegistry::loadCategory('reports');
         $plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');
 
-        $recipientEmail = $plugin->getSetting($context->getId(), 'recipientEmail');
+        $recipientEmails = $this->getRecipientEmails($plugin, $context->getId());
 
-        if ($application == 'ops' && !is_null($recipientEmail)) {
-            $locale = AppLocale::getLocale();
-            $this->loadLocalesForTask($plugin, $locale);
+        if ($application == 'ops' && !empty($recipientEmails)) {
+            $locale = Locale::getLocale();
+            $plugin->addLocaleData($locale);
 
             $report = $this->getReport($application, $context, $locale);
             $reportFilePath = $this->writeReportFile($context, $report);
 
-            $email = $this->createReportEmail($context, $recipientEmail, $reportFilePath);
-            $email->send();
+            $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
+            Mail::send($email);
         }
 
         return true;
-    }
-
-    private function loadLocalesForTask($plugin, $locale)
-    {
-        $plugin->addLocaleData($locale);
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON);
     }
 
     private function getReport($application, $context, $locale)
@@ -61,7 +61,7 @@ class SendReportEmail extends ScheduledTask
 
     private function getAllSectionsIds($contextId)
     {
-        $sections = Services::get('section')->getSectionList($contextId);
+        $sections = Repo::section()->getSectionList($contextId);
 
         $sectionsIds = [];
         foreach ($sections as $section) {
@@ -70,27 +70,36 @@ class SendReportEmail extends ScheduledTask
         return $sectionsIds;
     }
 
-    private function createReportEmail($context, $recipientEmail, $reportFilePath)
+    private function getRecipientEmails($plugin, $contextId)
     {
-        $email = new Mail();
+        $recipientEmailSetting = $plugin->getSetting($contextId, 'recipientEmail');
+        if (is_null($recipientEmailSetting)) {
+            return [];
+        }
+
+        $recipientEmails = array_map(function ($email) {
+            return ['name' => '', 'email' => trim($email)];
+        }, explode(',', $recipientEmailSetting));
+
+        return $recipientEmails;
+    }
+
+    private function createReportEmail($context, $recipientEmails, $reportFilePath)
+    {
+        $email = new Mailable();
 
         $fromName = $context->getLocalizedData('name');
         $fromEmail = $context->getData('contactEmail');
-        $email->setFrom($fromEmail, $fromName);
 
-        $email->setRecipients([
-            [
-                'name' => '',
-                'email' => $recipientEmail,
-            ],
-        ]);
+        $email->from($fromEmail, $fromName);
+        $email->to($recipientEmails);
 
         $subject = __('plugins.reports.scieloSubmissionsReport.reportEmail.subject', ['contextName' => $fromName]);
         $body = __('plugins.reports.scieloSubmissionsReport.reportEmail.body', ['contextName' => $fromName]);
-        $email->setSubject($subject);
-        $email->setBody($body);
+        $email->subject($subject);
+        $email->body($body);
 
-        $email->addAttachment($reportFilePath);
+        $email->attach($reportFilePath);
 
         return $email;
     }
