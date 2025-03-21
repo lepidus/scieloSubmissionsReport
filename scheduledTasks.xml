@@ -3,7 +3,7 @@
 <!DOCTYPE scheduled_tasks SYSTEM "../../../lib/pkp/dtd/scheduledTasks.dtd">
 
 <scheduled_tasks>
-	<task class="plugins.reports.scieloSubmissionsReport.classes.tasks.SendReportEmail">
+	<task class="APP\plugins\reports\scieloSubmissionsReport\classes\tasks\SendReportEmail">
 		<descr>Send a report of all submissions by e-mail. </descr>
 		<frequency day="10"/>
 	</task>

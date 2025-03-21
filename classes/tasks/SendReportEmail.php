@@ -1,10 +1,16 @@
 <?php
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\tasks;
+
+use APP\core\Application;
+use APP\facades\Repo;
+use PKP\facades\Locale;
 use PKP\mail\Mailable;
 use Illuminate\Support\Facades\Mail;
+use PKP\plugins\PluginRegistry;
 use PKP\scheduledTask\ScheduledTask;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 
 class SendReportEmail extends ScheduledTask
 {
@@ -18,8 +24,8 @@ class SendReportEmail extends ScheduledTask
         $recipientEmails = $this->getRecipientEmails($plugin, $context->getId());
 
         if ($application == 'ops' && !empty($recipientEmails)) {
-            $locale = AppLocale::getLocale();
-            $this->loadLocalesForTask($plugin, $locale);
+            $locale = Locale::getLocale();
+            $plugin->addLocaleData($locale);
 
             $report = $this->getReport($application, $context, $locale);
             $reportFilePath = $this->writeReportFile($context, $report);
@@ -29,13 +35,6 @@ class SendReportEmail extends ScheduledTask
         }
 
         return true;
-    }
-
-    private function loadLocalesForTask($plugin, $locale)
-    {
-        $plugin->addLocaleData($locale);
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON);
     }
 
     private function getReport($application, $context, $locale)
@@ -62,7 +61,7 @@ class SendReportEmail extends ScheduledTask
 
     private function getAllSectionsIds($contextId)
     {
-        $sections = Services::get('section')->getSectionList($contextId);
+        $sections = Repo::section()->getSectionList($contextId);
 
         $sectionsIds = [];
         foreach ($sections as $section) {
@@ -87,7 +86,7 @@ class SendReportEmail extends ScheduledTask
 
     private function createReportEmail($context, $recipientEmails, $reportFilePath)
     {
-        $email = new Mail();
+        $email = new Mailable();
 
         $fromName = $context->getLocalizedData('name');
         $fromEmail = $context->getData('contactEmail');
