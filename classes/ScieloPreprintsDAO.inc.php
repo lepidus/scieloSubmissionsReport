@@ -179,7 +179,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $result = Capsule::table('edit_decisions')
         ->where('submission_id', $submissionId)
         ->whereIn('decision', $possibleFinalDecisions)
-        ->orderBy('date_decided', 'asc')
+        ->orderBy('date_decided', 'desc')
         ->first();
 
         if (is_null($result)) {
