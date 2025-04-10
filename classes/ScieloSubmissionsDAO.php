@@ -129,13 +129,15 @@ class ScieloSubmissionsDAO extends DAO
         return $authorsIds;
     }
 
-    public function getFinalDecisionWithDate($submissionId, $locale)
+    public function getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions = [])
     {
-        $possibleFinalDecisions = [
-            Decision::ACCEPT,
-            Decision::DECLINE,
-            Decision::INITIAL_DECLINE
-        ];
+        if (empty($possibleFinalDecisions)) {
+            $possibleFinalDecisions = [
+                Decision::ACCEPT,
+                Decision::DECLINE,
+                Decision::INITIAL_DECLINE
+            ];
+        }
 
         $result = DB::table('edit_decisions')
             ->where('submission_id', $submissionId)

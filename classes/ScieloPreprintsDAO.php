@@ -161,18 +161,6 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
         $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
 
-        $result = DB::table('edit_decisions')
-            ->where('submission_id', $submissionId)
-            ->whereIn('decision', $possibleFinalDecisions)
-            ->orderBy('date_decided', 'desc')
-            ->first();
-
-        if (is_null($result)) {
-            return null;
-        }
-
-        $finalDecisionWithDate = $this->finalDecisionFromRow(get_object_vars($result), $locale);
-
-        return $finalDecisionWithDate;
+        return parent::getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions);
     }
 }
