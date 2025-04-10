@@ -141,7 +141,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         return $publicationDOI = get_object_vars($result)['vorDoi'];
     }
 
-    public function getFinalDecisionWithDate($submissionId, $locale)
+    public function getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions = [])
     {
         $result = DB::table('submissions')
             ->where('submission_id', $submissionId)
