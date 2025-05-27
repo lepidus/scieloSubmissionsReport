@@ -93,3 +93,7 @@
     font-style: italic;
     line-height: 22px;
 }
+
+.scieloSubmissionsReportTable {
+    list-style: none;
+}
