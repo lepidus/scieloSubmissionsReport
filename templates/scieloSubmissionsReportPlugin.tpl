@@ -73,7 +73,7 @@
 
         {if $sections|@count > 0}
             <h2>{translate key="plugins.reports.scieloSubmissionsReport.sections"}</h2>
-            <table>
+            <table class="scieloSubmissionsReportTable">
                 <div class= "pkpListPanel">
                     <tr>
                         <td class="value" colspan="2">
@@ -82,7 +82,7 @@
                     </tr>
                 </div>
             </table>
-            <table>
+            <table class="scieloSubmissionsReportTable">
                 <div class= "pkpListPanel">
                     <tr>
                         <td class="value" colspan="2">
