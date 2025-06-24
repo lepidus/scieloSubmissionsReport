@@ -330,6 +330,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     public function testArticleCreationWhenItHasNoTitles(): void
     {
         $this->clearDB();
+        $this->title = null;
         $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication();
