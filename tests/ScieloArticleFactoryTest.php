@@ -226,7 +226,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
-        $this->assertEquals("", $scieloArticle->getTitle());
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noTitles'), $scieloArticle->getTitle());
     }
 
     /**

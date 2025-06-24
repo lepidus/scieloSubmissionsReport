@@ -58,6 +58,9 @@ msgstr ""
 "O processo de geração do relatório pode demorar poucos minutos, dependendo do parâmetros selecionados e do número de submissões presentes no sistema. "
 "Caso a demora se estenda por mais tempo, contate a equipe de suporte."
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noTitles"
+msgstr "Sem títulos"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noResponsibles"
 msgstr "Sem responsáveis designados"
 
