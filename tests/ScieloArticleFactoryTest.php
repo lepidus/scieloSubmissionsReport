@@ -327,6 +327,25 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
     */
+    public function testArticleCreationWhenItHasNoTitles(): void
+    {
+        $this->clearDB();
+        $this->sectionId = $this->createSection();
+        $this->submissionId = $this->createSubmission();
+        $this->publicationId = $this->createPublication();
+        $this->submissionAuthors = $this->createAuthors();
+        $this->addCurrentPublicationToSubmission();
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertTrue($scieloArticle instanceof ScieloArticle);
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noTitles'), $scieloArticle->getTitle());
+    }
+
+    /**
+     * @group OJS
+    */
     public function testSubmissionGetsJournalEditors(): void
     {
         $editorsUsers = $this->createEditorUsers();
