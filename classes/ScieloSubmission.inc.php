@@ -59,7 +59,7 @@ class ScieloSubmission
         $this->title = preg_replace('/\s+/', ' ', $this->title);
         $messageNoTitles = __("plugins.reports.scieloSubmissionsReport.warning.noTitles");
 
-        return fillEmptyFields($this->title, $messageNoTitles);
+        return $this->fillEmptyFields($this->title, $messageNoTitles);
     }
 
     public function getSubmitter(): string
