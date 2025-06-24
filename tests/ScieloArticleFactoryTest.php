@@ -12,6 +12,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 {
     private $locale = 'en_US';
     private $contextId = 1;
+    private $sectionId;
     private $submissionId;
     private $publicationId;
     private $title = "eXtreme Programming: A practical guide";
@@ -27,9 +28,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $sectionId = $this->createSection();
+        $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication($sectionId);
+        $this->publicationId = $this->createPublication($this->sectionId);
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en_US');
         $this->addCurrentPublicationToSubmission();
@@ -208,6 +209,24 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
+    }
+
+    /**
+     * @group OJS
+    */
+    public function testArticleCreationWhenItHasNoTitles(): void
+    {
+        $this->title = null;
+        $this->submissionId = $this->createSubmission();
+        $this->publicationId = $this->createPublication($this->sectionId);
+        $this->submissionAuthors = $this->createAuthors();
+        $this->addCurrentPublicationToSubmission();
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertTrue($scieloArticle instanceof ScieloArticle);
+        $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noTitles'), $scieloArticle->getTitle());
     }
 
     /**

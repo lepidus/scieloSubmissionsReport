@@ -84,6 +84,10 @@ class ScieloSubmissionsDAO extends DAO
             $titles[$locale] = $title;
         }
 
+        if (empty($titles)) {
+            return '';
+        }
+
         if (array_key_exists($locale, $titles)) {
             return $titles[$locale];
         }
