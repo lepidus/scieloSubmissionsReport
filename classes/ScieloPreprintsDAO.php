@@ -123,7 +123,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             Publication::PUBLICATION_RELATION_PUBLISHED => 'publication.relation.published'
         ];
 
-        return __($relationsMap[$relationStatus]);
+        return __($relationsMap[$relationStatus]) ?? '';
     }
 
     public function getPublicationDOI($publicationId): string
