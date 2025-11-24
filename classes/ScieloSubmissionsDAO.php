@@ -24,16 +24,17 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
-        $query = DB::table('submissions')
-            ->join('publications', 'submissions.current_publication_id', '=', 'publications.publication_id')
-            ->where('submissions.context_id', $contextId)
-            ->whereNotNull('submissions.date_submitted')
-            ->whereIn('publications.section_id', $sectionsIds)
-            ->select('submissions.submission_id');
+        $query = DB::table('submissions AS s')
+            ->join('publications AS p', 's.current_publication_id', '=', 'p.publication_id')
+            ->where('s.context_id', $contextId)
+            ->where('s.submission_progress', '=', '')
+            ->whereNotNull('s.date_submitted')
+            ->whereIn('p.section_id', $sectionsIds)
+            ->select('s.submission_id');
 
         if (!is_null($submissionDateInterval)) {
-            $query = $query->where('submissions.date_submitted', '>=', $submissionDateInterval->getBeginningDate())
-                ->where('submissions.date_submitted', '<=', $submissionDateInterval->getEndDate());
+            $query = $query->where('s.date_submitted', '>=', $submissionDateInterval->getBeginningDate())
+                ->where('s.date_submitted', '<=', $submissionDateInterval->getEndDate());
         }
 
         $result = $query->get();
