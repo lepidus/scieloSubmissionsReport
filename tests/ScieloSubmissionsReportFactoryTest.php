@@ -93,7 +93,11 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 
         if (!is_null($dateSubmitted)) {
             $submission->setData('dateSubmitted', $dateSubmitted);
+            $submission->setData('submissionProgress', '');
+        } else {
+            $submission->setData('submissionProgress', 'start');
         }
+
         $submissionId = Repo::submission()->dao->insert($submission);
 
         if (!empty($finalDecisions)) {
