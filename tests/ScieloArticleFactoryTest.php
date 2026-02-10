@@ -38,9 +38,27 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     protected function getAffectedTables()
     {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
-        'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-        'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage', 'review_assignments'];
+        return [
+            'notes',
+            'submissions',
+            'submission_settings',
+            'publications',
+            'publication_settings',
+            'users',
+            'user_groups',
+            'user_settings',
+            'user_group_settings',
+            'user_user_groups',
+            'event_log',
+            'sections',
+            'section_settings',
+            'authors',
+            'author_settings',
+            'edit_decisions',
+            'stage_assignments',
+            'user_group_stage',
+            'review_assignments'
+        ];
     }
 
     private function createSubmission(): int
@@ -142,10 +160,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $submissionDao->updateObject($submission);
     }
 
-    private function createEditorUsers(bool $isSectionEditor = false)
+    private function createEditorUsers(bool $asSectionEditors = false, bool $withDisabledUser = false)
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
+
+        $editorsUsers = [];
 
         $firstEditorUser = new User();
         $firstEditorUser->setUsername('examplePeter');
@@ -153,31 +173,31 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $firstEditorUser->setPassword('examplepass');
         $firstEditorUser->setGivenName("Peter", $this->locale);
         $firstEditorUser->setFamilyName("Parker", $this->locale);
+        $editorsUsers[] = $firstEditorUser;
 
-        $secondEditorUser = new User();
-        $secondEditorUser->setUsername('exampleJhon');
-        $secondEditorUser->setEmail('jhon@exemple.com');
-        $secondEditorUser->setPassword('exemplepass');
-        $secondEditorUser->setGivenName("Jhon", $this->locale);
-        $secondEditorUser->setFamilyName("Carter", $this->locale);
-
-        $firstEditorUserId = $userDao->insertObject($firstEditorUser);
-        $secondEditorUserId = $userDao->insertObject($secondEditorUser);
-
-        if ($isSectionEditor) {
-            $sectionEditorGroupId = $this->createSectionEditorUserGroup();
-            $userGroupDao->assignUserToGroup($firstEditorUserId, $sectionEditorGroupId);
-            $this->createStageAssignments([$firstEditorUserId], $sectionEditorGroupId);
-            $userGroupDao->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
-            return $firstEditorUser;
-        } else {
-            $editorGroupId = $this->createJournalEditorUserGroup();
-            $userGroupDao->assignUserToGroup($firstEditorUserId, $editorGroupId);
-            $userGroupDao->assignUserToGroup($secondEditorUserId, $editorGroupId);
-            $this->createStageAssignments([$firstEditorUserId, $secondEditorUserId], $editorGroupId);
-            $userGroupDao->assignGroupToStage($this->contextId, $editorGroupId, 5);
-            return [$firstEditorUser, $secondEditorUser];
+        if ($asSectionEditors) {
+            $secondEditorUser = new User();
+            $secondEditorUser->setUsername('exampleJhon');
+            $secondEditorUser->setEmail('jhon@exemple.com');
+            $secondEditorUser->setPassword('exemplepass');
+            $secondEditorUser->setGivenName("Jhon", $this->locale);
+            $secondEditorUser->setFamilyName("Carter", $this->locale);
+            $editorsUsers[] = $secondEditorUser;
         }
+
+        $editorUserGroupId = $asSectionEditors
+            ? $this->createSectionEditorUserGroup()
+            : $this->createJournalEditorUserGroup();
+
+        foreach ($editorsUsers as $editorUser) {
+            $editorUserId = $userDao->insertObject($editorUser);
+
+            $userGroupDao->assignUserToGroup($editorUserId, $editorUserGroupId);
+            $this->createStageAssignments([$editorUserId], $editorUserGroupId);
+            $userGroupDao->assignGroupToStage($this->contextId, $editorUserGroupId, 5);
+        }
+
+        return $editorsUsers;
     }
 
     private function createDecision($submissionId, $decision, $dateDecided): void
@@ -202,7 +222,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionIsArticle(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -213,7 +233,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testArticleCreationWhenItHasNoTitles(): void
     {
         $this->title = null;
@@ -231,7 +251,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsJournalEditors(): void
     {
         $editorsUsers = $this->createEditorUsers();
@@ -245,7 +265,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -256,7 +276,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsSectionEditor(): void
     {
         $sectionEditorsUser = $this->createEditorUsers(true);
@@ -269,7 +289,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsNoSectionEditor(): void
     {
         $sectionEditorGroupId = $this->createSectionEditorUserGroup();
@@ -284,7 +304,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsLastDecision(): void
     {
         $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -299,7 +319,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsLastDecisionOfNewRound(): void
     {
         $decision = SUBMISSION_EDITOR_DECISION_NEW_ROUND;
@@ -314,7 +334,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsNoLastDecision(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -325,7 +345,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsReviews(): void
     {
         $recommendation = SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
@@ -350,7 +370,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateInitialDecline(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -367,7 +387,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateDecline(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_DECLINE;
@@ -384,7 +404,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateAccept(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_ACCEPT;
