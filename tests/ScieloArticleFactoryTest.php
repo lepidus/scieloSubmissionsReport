@@ -175,7 +175,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $firstEditorUser->setFamilyName("Parker", $this->locale);
         $editorsUsers[] = $firstEditorUser;
 
-        if ($asSectionEditors) {
+        if (!$asSectionEditors) {
             $secondEditorUser = new User();
             $secondEditorUser->setUsername('exampleJhon');
             $secondEditorUser->setEmail('jhon@exemple.com');
@@ -194,8 +194,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
             $userGroupDao->assignUserToGroup($editorUserId, $editorUserGroupId);
             $this->createStageAssignments([$editorUserId], $editorUserGroupId);
-            $userGroupDao->assignGroupToStage($this->contextId, $editorUserGroupId, 5);
         }
+
+        $userGroupDao->assignGroupToStage($this->contextId, $editorUserGroupId, 5);
 
         return $editorsUsers;
     }
@@ -279,7 +280,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsSectionEditor(): void
     {
-        $sectionEditorsUser = $this->createEditorUsers(true);
+        $sectionEditorsUser = $this->createEditorUsers(true)[0];
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
