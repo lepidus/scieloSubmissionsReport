@@ -42,7 +42,11 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
+            $user = $userDao->getById($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
             if ($currentUserGroupName == 'section editor') {
@@ -61,7 +65,11 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $journalEditors = array();
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
-            $user = $userDao->getById($stageAssignment->getUserId(), false);
+            $user = $userDao->getById($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en_US'));
             if ($currentUserGroupName == 'journal editor') {

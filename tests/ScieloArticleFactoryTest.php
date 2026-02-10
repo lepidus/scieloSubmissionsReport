@@ -160,29 +160,16 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $submissionDao->updateObject($submission);
     }
 
-    private function createEditorUsers(bool $asSectionEditors = false, bool $withDisabledUser = false)
+    private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false)
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
 
         $editorsUsers = [];
-
-        $firstEditorUser = new User();
-        $firstEditorUser->setUsername('examplePeter');
-        $firstEditorUser->setEmail('peter@exemple.com');
-        $firstEditorUser->setPassword('examplepass');
-        $firstEditorUser->setGivenName("Peter", $this->locale);
-        $firstEditorUser->setFamilyName("Parker", $this->locale);
-        $editorsUsers[] = $firstEditorUser;
-
-        if (!$asSectionEditors) {
-            $secondEditorUser = new User();
-            $secondEditorUser->setUsername('exampleJhon');
-            $secondEditorUser->setEmail('jhon@exemple.com');
-            $secondEditorUser->setPassword('exemplepass');
-            $secondEditorUser->setGivenName("Jhon", $this->locale);
-            $secondEditorUser->setFamilyName("Carter", $this->locale);
-            $editorsUsers[] = $secondEditorUser;
+        foreach ($editorsUsersData as $editorUserData) {
+            $editorUser = new User();
+            $editorUser->setAllData($editorUserData);
+            $editorsUsers[] = $editorUser;
         }
 
         $editorUserGroupId = $asSectionEditors
@@ -255,12 +242,60 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsJournalEditors(): void
     {
-        $editorsUsers = $this->createEditorUsers();
+        $journalEditorsData = [
+            [
+                'username' => 'examplePeter',
+                'email' => 'peter@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Peter"],
+                'familyName' => [$this->locale => "Parker"]
+            ],
+            [
+                'username' => 'exampleJhon',
+                'email' => 'jhon@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Jhon"],
+                'familyName' => [$this->locale => "Carter"]
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData);
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $expectedEditors = $editorsUsers[0]->getFullName() . "," . $editorsUsers[1]->getFullName();
+        $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testSubmissionGetsDisabledJournalEditors(): void
+    {
+        $journalEditorsData = [
+            [
+                'username' => 'examplePeter',
+                'email' => 'peter@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Peter"],
+                'familyName' => [$this->locale => "Parker"]
+            ],
+            [
+                'username' => 'exampleCharles',
+                'email' => 'charles@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Charles"],
+                'familyName' => [$this->locale => "Xavier"],
+                'disabled' => true
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $expectedEditors = $editorsUsers[0]->getFullName()
+            . "," . $editorsUsers[1]->getFullName();
         $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
     }
 
@@ -280,12 +315,40 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsSectionEditor(): void
     {
-        $sectionEditorsUser = $this->createEditorUsers(true)[0];
+        $sectionEditorData = [
+            'username' => 'exampleJhon',
+            'email' => 'jhon@example.com',
+            'password' => 'examplepass',
+            'givenName' => [$this->locale => "Jhon"],
+            'familyName' => [$this->locale => "Carter"]
+        ];
+        $sectionEditorUser = $this->createEditorUsers([$sectionEditorData], true)[0];
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
-        $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
+        $this->assertEquals($sectionEditorUser->getFullName(), $scieloArticle->getSectionEditor());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testSubmissionGetsDisabledSectionEditor(): void
+    {
+        $sectionEditorData = [
+            'username' => 'exampleCharles',
+            'email' => 'charles@example.com',
+            'password' => 'examplepass',
+            'givenName' => [$this->locale => "Charles"],
+            'familyName' => [$this->locale => "Xavier"],
+            'disabled' => true
+        ];
+        $sectionEditorUser = $this->createEditorUsers([$sectionEditorData], true)[0];
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($sectionEditorUser->getFullName(), $scieloArticle->getSectionEditor());
     }
 
     /**
