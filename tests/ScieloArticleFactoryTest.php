@@ -94,7 +94,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
         if (!empty($this->editorsUsersIds)) {
             foreach ($this->editorsUsersIds as $editorUserId) {
-                $editorUser = Repo::user()->get($editorUserId);
+                $editorUser = Repo::user()->get($editorUserId, true);
                 if ($editorUser) {
                     Repo::user()->delete($editorUser);
                 }
@@ -356,6 +356,40 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
      */
+    public function testSubmissionGetsDisabledJournalEditors(): void
+    {
+        $journalEditorsData = [
+            [
+                'userName' => 'examplePeter',
+                'email' => 'peter@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Peter"],
+                'familyName' => [$this->locale => "Parker"],
+                'dateRegistered' => Core::getCurrentDate()
+            ],
+            [
+                'userName' => 'exampleCharles',
+                'email' => 'charles@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Charles"],
+                'familyName' => [$this->locale => "Xavier"],
+                'dateRegistered' => Core::getCurrentDate(),
+                'disabled' => true
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $expectedEditors = $editorsUsers[0]->getFullName()
+            . "," . $editorsUsers[1]->getFullName();
+        $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
+    }
+
+    /**
+     * @group OJS
+     */
     public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -376,6 +410,28 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'givenName' => [$this->locale => "Jhon"],
             'familyName' => [$this->locale => "Carter"],
             'dateRegistered' => Core::getCurrentDate()
+        ];
+        $sectionEditorsUser = $this->createEditorUsers([$sectionEditorData], true)[0];
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testSubmissionGetsDisabledSectionEditor(): void
+    {
+        $sectionEditorData = [
+            'userName' => 'exampleCharles',
+            'email' => 'charles@example.com',
+            'password' => 'examplepass',
+            'givenName' => [$this->locale => "Charles"],
+            'familyName' => [$this->locale => "Xavier"],
+            'dateRegistered' => Core::getCurrentDate(),
+            'disabled' => true
         ];
         $sectionEditorsUser = $this->createEditorUsers([$sectionEditorData], true)[0];
 
