@@ -23,12 +23,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private $submissionId;
     private $publicationId;
     private $sectionId;
-    private $sectionEditorUserGroupId;
     private $editorUserGroupId;
     private $author1Id;
     private $author2Id;
-    private $firstEditorUserId;
-    private $secondEditorUserId;
+    private $editorsUsersIds;
     private $reviewAssignmentId;
     private $stageAssignmentIds = [];
 
@@ -47,6 +45,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
+        $this->editorsUsersIds = [];
         $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication();
@@ -78,11 +77,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             Repo::section()->delete($section);
         }
 
-        $sectionEditorUserGroup = $this->sectionEditorUserGroupId ? Repo::userGroup()->get($this->sectionEditorUserGroupId) : null;
-        if ($sectionEditorUserGroup) {
-            Repo::userGroup()->delete($sectionEditorUserGroup);
-        }
-
         $editorUserGroup = $this->editorUserGroupId ? Repo::userGroup()->get($this->editorUserGroupId) : null;
         if ($editorUserGroup) {
             Repo::userGroup()->delete($editorUserGroup);
@@ -98,14 +92,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             Repo::author()->delete($author2);
         }
 
-        $firstEditorUser = $this->firstEditorUserId ? Repo::user()->get($this->firstEditorUserId) : null;
-        if ($firstEditorUser) {
-            Repo::user()->delete($firstEditorUser);
-        }
-
-        $secondEditorUser = $this->secondEditorUserId ? Repo::user()->get($this->secondEditorUserId) : null;
-        if ($secondEditorUser) {
-            Repo::user()->delete($secondEditorUser);
+        if (!empty($this->editorsUsersIds)) {
+            foreach ($this->editorsUsersIds as $editorUserId) {
+                $editorUser = Repo::user()->get($editorUserId, true);
+                if ($editorUser) {
+                    Repo::user()->delete($editorUser);
+                }
+            }
         }
 
         if (empty($this->stageAssignmentIds)) {
@@ -114,7 +107,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
         $stageAssignmentDAO = DAORegistry::getDAO('StageAssignmentDAO');
         foreach ($this->stageAssignmentIds as $stageAssignmentId) {
-            $stageAssignmentDAO->getById($stageAssignmentId);
+            $stageAssignment = $stageAssignmentDAO->getById($stageAssignmentId);
             $stageAssignmentDAO->deleteObject($stageAssignment);
         }
 
@@ -223,50 +216,34 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         Repo::submission()->edit($submission, ['currentPublicationId' => $this->publicationId]);
     }
 
-    private function createEditorUsers(bool $isSectionEditor = false)
+    private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false)
     {
-        $firstEditorUser = Repo::user()->newDataObject();
-        $firstEditorUser->setUsername('examplePeter');
-        $firstEditorUser->setEmail('peter@exemple.com');
-        $firstEditorUser->setPassword('examplepass');
-        $firstEditorUser->setGivenName('Peter', $this->locale);
-        $firstEditorUser->setFamilyName('Parker', $this->locale);
-        $firstEditorUser->setDateRegistered(Core::getCurrentDate());
-
-        $secondEditorUser = Repo::user()->newDataObject();
-        $secondEditorUser->setUsername('exampleJhon');
-        $secondEditorUser->setEmail('jhon@exemple.com');
-        $secondEditorUser->setPassword('exemplepass');
-        $secondEditorUser->setGivenName('Jhon', $this->locale);
-        $secondEditorUser->setFamilyName('Carter', $this->locale);
-        $secondEditorUser->setDateRegistered(Core::getCurrentDate());
-
-        $this->firstEditorUserId = Repo::user()->add($firstEditorUser);
-        $this->secondEditorUserId = Repo::user()->add($secondEditorUser);
-
-        if ($isSectionEditor) {
-            $this->sectionEditorGroupId = $this->createSectionEditorUserGroup();
-            $userGroup = Repo::userGroup()->get($this->sectionEditorGroupId);
-            Repo::userGroup()->assignUserToGroup($this->firstEditorUserId, $this->sectionEditorGroupId);
-            $this->createStageAssignments([$this->firstEditorUserId], $this->sectionEditorGroupId);
-            UserGroupStage::create([
-                'contextId' => $this->contextId,
-                'userGroupId' => $this->sectionEditorGroupId,
-                'stageId' => 5
-            ]);
-            return $firstEditorUser;
-        } else {
-            $this->editorGroupId = $this->createJournalEditorUserGroup();
-            Repo::userGroup()->assignUserToGroup($this->firstEditorUserId, $this->editorGroupId);
-            Repo::userGroup()->assignUserToGroup($this->secondEditorUserId, $this->editorGroupId);
-            $this->createStageAssignments([$this->firstEditorUserId, $this->secondEditorUserId], $this->editorGroupId);
-            UserGroupStage::create([
-                'contextId' => $this->contextId,
-                'userGroupId' => $this->editorGroupId,
-                'stageId' => 5
-            ]);
-            return [$firstEditorUser, $secondEditorUser];
+        $editorsUsers = [];
+        foreach ($editorsUsersData as $editorUserData) {
+            $editorUser = Repo::user()->newDataObject();
+            $editorUser->setAllData($editorUserData);
+            $editorsUsers[] = $editorUser;
         }
+
+        $this->editorUserGroupId = $asSectionEditors
+            ? $this->createSectionEditorUserGroup()
+            : $this->createJournalEditorUserGroup();
+
+        foreach ($editorsUsers as $editorUser) {
+            $editorUserId = Repo::user()->add($editorUser);
+
+            Repo::userGroup()->assignUserToGroup($editorUserId, $this->editorUserGroupId);
+            $this->createStageAssignments([$editorUserId], $this->editorUserGroupId);
+            $this->editorsUsersIds[] = $editorUserId;
+        }
+
+        UserGroupStage::create([
+            'contextId' => $this->contextId,
+            'userGroupId' => $this->editorUserGroupId,
+            'stageId' => 5
+        ]);
+
+        return $editorsUsers;
     }
 
     private function createReviewRound($submissionId)
@@ -315,7 +292,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionIsArticle(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -326,7 +303,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testArticleCreationWhenItHasNoTitles(): void
     {
         $this->clearDB();
@@ -346,10 +323,28 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsJournalEditors(): void
     {
-        $editorsUsers = $this->createEditorUsers();
+        $journalEditorsData = [
+            [
+                'userName' => 'examplePeter',
+                'email' => 'peter@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Peter"],
+                'familyName' => [$this->locale => "Parker"],
+                'dateRegistered' => Core::getCurrentDate()
+            ],
+            [
+                'userName' => 'exampleJhon',
+                'email' => 'jhon@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Jhon"],
+                'familyName' => [$this->locale => "Carter"],
+                'dateRegistered' => Core::getCurrentDate()
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData);
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -360,7 +355,41 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
+    public function testSubmissionGetsDisabledJournalEditors(): void
+    {
+        $journalEditorsData = [
+            [
+                'userName' => 'examplePeter',
+                'email' => 'peter@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Peter"],
+                'familyName' => [$this->locale => "Parker"],
+                'dateRegistered' => Core::getCurrentDate()
+            ],
+            [
+                'userName' => 'exampleCharles',
+                'email' => 'charles@example.com',
+                'password' => 'examplepass',
+                'givenName' => [$this->locale => "Charles"],
+                'familyName' => [$this->locale => "Xavier"],
+                'dateRegistered' => Core::getCurrentDate(),
+                'disabled' => true
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $expectedEditors = $editorsUsers[0]->getFullName()
+            . "," . $editorsUsers[1]->getFullName();
+        $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
+    }
+
+    /**
+     * @group OJS
+     */
     public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -371,10 +400,18 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsSectionEditor(): void
     {
-        $sectionEditorsUser = $this->createEditorUsers(true);
+        $sectionEditorData = [
+            'userName' => 'exampleJhon',
+            'email' => 'jhon@example.com',
+            'password' => 'examplepass',
+            'givenName' => [$this->locale => "Jhon"],
+            'familyName' => [$this->locale => "Carter"],
+            'dateRegistered' => Core::getCurrentDate()
+        ];
+        $sectionEditorsUser = $this->createEditorUsers([$sectionEditorData], true)[0];
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -384,13 +421,35 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
+    public function testSubmissionGetsDisabledSectionEditor(): void
+    {
+        $sectionEditorData = [
+            'userName' => 'exampleCharles',
+            'email' => 'charles@example.com',
+            'password' => 'examplepass',
+            'givenName' => [$this->locale => "Charles"],
+            'familyName' => [$this->locale => "Xavier"],
+            'dateRegistered' => Core::getCurrentDate(),
+            'disabled' => true
+        ];
+        $sectionEditorsUser = $this->createEditorUsers([$sectionEditorData], true)[0];
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
+    }
+
+    /**
+     * @group OJS
+     */
     public function testSubmissionGetsNoSectionEditor(): void
     {
-        $this->sectionEditorGroupId = $this->createSectionEditorUserGroup();
+        $this->editorUserGroupId = $this->createSectionEditorUserGroup();
         UserGroupStage::create([
             'contextId' => $this->contextId,
-            'userGroupId' => $this->sectionEditorGroupId,
+            'userGroupId' => $this->editorUserGroupId,
             'stageId' => 5
         ]);
 
@@ -403,7 +462,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsLastDecision(): void
     {
         $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -418,7 +477,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsLastDecisionOfNewRound(): void
     {
         $reviewRound = $this->createReviewRound($this->submissionId);
@@ -435,7 +494,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsNoLastDecision(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -446,7 +505,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsReviews(): void
     {
         $recommendation = ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
@@ -472,7 +531,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateInitialDecline(): void
     {
         $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
@@ -489,7 +548,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateDecline(): void
     {
         $finalDecisionCode = Decision::DECLINE;
@@ -506,7 +565,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     /**
      * @group OJS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDateAccept(): void
     {
         $finalDecisionCode = Decision::ACCEPT;

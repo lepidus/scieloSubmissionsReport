@@ -75,7 +75,11 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 
@@ -94,7 +98,11 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
 

@@ -41,7 +41,11 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'section editor') {
@@ -58,7 +62,11 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $journalEditors = [];
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), false);
+            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+            if (is_null($user)) {
+                continue;
+            }
+
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
             $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'journal editor') {

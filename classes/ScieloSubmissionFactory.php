@@ -68,7 +68,10 @@ class ScieloSubmissionFactory
             return '';
         }
 
-        $submitter = Repo::user()->get($userId);
+        $submitter = Repo::user()->get($userId, true);
+        if (is_null($submitter)) {
+            return '';
+        }
 
         return $submitter->getFullName();
     }
@@ -82,7 +85,11 @@ class ScieloSubmissionFactory
             return '';
         }
 
-        $submitter = Repo::user()->get($userId);
+        $submitter = Repo::user()->get($userId, true);
+        if (is_null($submitter)) {
+            return '';
+        }
+
         $submitterCountry = $submitter->getCountryLocalized();
 
         return !is_null($submitterCountry) ? $submitterCountry : '';
