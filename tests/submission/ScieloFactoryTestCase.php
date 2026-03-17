@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
 use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
@@ -10,6 +10,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 {
     protected $context;
     protected $submission;
+    protected $publication;
     protected $section;
     protected $authors = [];
 

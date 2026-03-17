@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;

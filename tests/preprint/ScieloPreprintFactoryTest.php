@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\preprint;
 
 use APP\core\Application;
 use APP\decision\Decision;
@@ -65,9 +65,26 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     protected function getAffectedTables()
     {
-        return ['notes', 'submissions', 'submission_settings', 'publications', 'publication_settings',
-            'users', 'user_groups', 'user_settings', 'user_group_settings', 'user_user_groups', 'event_log', 'sections',
-            'section_settings', 'authors', 'author_settings', 'edit_decisions', 'stage_assignments', 'user_group_stage'];
+        return [
+            'notes',
+            'submissions',
+            'submission_settings',
+            'publications',
+            'publication_settings',
+            'users',
+            'user_groups',
+            'user_settings',
+            'user_group_settings',
+            'user_user_groups',
+            'event_log',
+            'sections',
+            'section_settings',
+            'authors',
+            'author_settings',
+            'edit_decisions',
+            'stage_assignments',
+            'user_group_stage'
+        ];
     }
 
     private function createSubmission($statusCode): int
@@ -293,7 +310,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsFinalDecisionWithDatePosted(): void
     {
         $finalDecision = __('common.accepted', [], $this->locale);
@@ -312,7 +329,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionDecliningIsFinalDecisionEvenWhenHasPostedDate(): void
     {
         $datePosted = '2021-08-27';
@@ -333,7 +350,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsPublicationStatus(): void
     {
         $datePosted = '2021-08-27';
@@ -355,7 +372,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -366,7 +383,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionWithoutPublicationDOI(): void
     {
         $publication = Repo::publication()->get($this->publicationId);
@@ -382,7 +399,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionIsPreprint(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -441,7 +458,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsSectionModerator(): void
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
@@ -466,7 +483,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsNotes(): void
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
@@ -499,7 +516,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionDoesNotHaveNotes(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -510,7 +527,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionGetsStats(): void
     {
         $this->createMetrics();
@@ -524,7 +541,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
 
     /**
      * @group OPS
-    */
+     */
     public function testSubmissionDoesntGetViews(): void
     {
         $this->createMetrics();

@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\decision\Decision;
 use APP\facades\Repo;
@@ -50,8 +50,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $context->setAllData([
             'urlPath' => [$this->locale => 'test'],
             'primaryLocale' => $this->locale
-        ]);
-        ;
+        ]);;
 
         $this->contextId = $contextDAO->insertObject($context);
     }
