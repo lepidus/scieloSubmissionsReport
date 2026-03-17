@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClosedDateIntervalTest extends TestCase
 {
-    private $dateTnterval;
+    private $dateInterval;
     private $beginningDate = '2020-06-07';
     private $endDate = '2020-07-31';
 
