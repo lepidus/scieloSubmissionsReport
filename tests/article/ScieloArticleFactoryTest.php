@@ -2,20 +2,21 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\article;
 
-use APP\decision\Decision;
+use PKP\tests\DatabaseTestCase;
 use APP\facades\Repo;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
-use APP\submission\Submission;
 use PKP\core\Core;
+use APP\decision\Decision;
+use APP\submission\Submission;
+use PKP\stageAssignment\StageAssignment;
 use PKP\db\DAORegistry;
 use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 use PKP\submission\reviewRound\ReviewRound;
-use PKP\tests\DatabaseTestCase;
 use PKP\userGroup\relationships\UserGroupStage;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -105,27 +106,26 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             return;
         }
 
-        $stageAssignmentDAO = DAORegistry::getDAO('StageAssignmentDAO');
         foreach ($this->stageAssignmentIds as $stageAssignmentId) {
-            $stageAssignment = $stageAssignmentDAO->getById($stageAssignmentId);
-            $stageAssignmentDAO->deleteObject($stageAssignment);
+            StageAssignment::destroy($stageAssignmentId);
         }
 
         if ($this->reviewAssignmentId) {
-            $reviewRoundDAO = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $reviewAssignment = $reviewRoundDAO->getById($this->reviewAssignmentId);
-            $reviewRoundDAO->deleteObject($reviewAssignment);
+            $reviewAssignment = Repo::reviewAssignment()->get($this->reviewAssignmentId);
+            Repo::reviewAssignment()->delete($reviewAssignment);
         }
     }
 
     private function createSubmission(): int
     {
         $submission = Repo::submission()->newDataObject();
-        $submission->setData('contextId', $this->contextId);
-        $submission->setData('dateSubmitted', $this->dateSubmitted);
-        $submission->setData('status', $this->statusCode);
-        $submission->setData('locale', $this->locale);
-        $submission->setData('dateLastActivity', $this->dateLastActivity);
+        $submission->setAllData([
+            'contextId' => $this->contextId,
+            'dateSubmitted' => $this->dateSubmitted,
+            'status' => $this->statusCode,
+            'locale' => $this->locale,
+            'dateLastActivity' => $this->dateLastActivity,
+        ]);
 
         return Repo::submission()->dao->insert($submission);
     }
@@ -133,12 +133,14 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     private function createPublication(): int
     {
         $publication = Repo::publication()->newDataObject();
-        $publication->setData('submissionId', $this->submissionId);
-        $publication->setData('title', $this->title, $this->locale);
-        $publication->setData('sectionId', $this->sectionId);
-        $publication->setData('relationStatus', '1');
-        $publication->setData('vorDoi', $this->doi);
-        $publication->setData('status', $this->statusCode);
+        $publication->setAllData([
+            'submissionId' =>  $this->submissionId,
+            'title' => [$this->locale => $this->title],
+            'sectionId' =>  $this->sectionId,
+            'relationStatus' =>  '1',
+            'vorDoi' =>  $this->doi,
+            'status' =>  $this->statusCode
+        ]);
 
         return Repo::publication()->dao->insert($publication);
     }
@@ -151,9 +153,11 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'es' => 'editor de sección'
         ];
         $sectionEditorsUserGroup = Repo::userGroup()->newDataObject();
-        $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
-        $sectionEditorsUserGroup->setData('roleId', Role::ROLE_ID_SUB_EDITOR);
-        $sectionEditorsUserGroup->setData('contextId', $this->contextId);
+        $sectionEditorsUserGroup->setAllData([
+            'name' => $sectionEditorUserGroupLocalizedNames,
+            'roleId' => Role::ROLE_ID_SUB_EDITOR,
+            'contextId' => $this->contextId
+        ]);
         return Repo::userGroup()->add($sectionEditorsUserGroup);
     }
 
@@ -165,23 +169,27 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'es' => 'Editor/a de la revista'
         ];
         $editorsUserGroup = Repo::userGroup()->newDataObject();
-        $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
-        $editorsUserGroup->setData('roleId', Role::ROLE_ID_MANAGER);
-        $editorsUserGroup->setData('contextId', $this->contextId);
+        $editorsUserGroup->setAllData([
+            'name' => $editorUserGroupLocalizedNames,
+            'roleId' => Role::ROLE_ID_MANAGER,
+            'contextId' => $this->contextId
+        ]);
         return Repo::userGroup()->add($editorsUserGroup);
     }
 
     private function createSection(): int
     {
         $section = Repo::section()->newDataObject();
-        $section->setTitle($this->sectionName, $this->locale);
-        $section->setAbbrev(__('section.default.abbrev'), $this->locale);
-        $section->setMetaIndexed(true);
-        $section->setMetaReviewed(true);
-        $section->setPolicy(__('section.default.policy'), $this->locale);
-        $section->setEditorRestricted(false);
-        $section->setHideTitle(false);
-        $section->setContextId($this->contextId);
+        $section->setAllData([
+            'title' => [$this->locale => $this->sectionName],
+            'abbrev' => [$this->locale => __('section.default.abbrev')],
+            'metaIndexed' => true,
+            'metaReviewed' => true,
+            'policy' => [$this->locale => __('section.default.policy')],
+            'editorRestricted' => false,
+            'hideTitle' => false,
+            'contextId' => $this->contextId
+        ]);
         $sectionId = Repo::section()->add($section);
 
         return $sectionId;
@@ -191,18 +199,22 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $author1 = Repo::author()->newDataObject();
         $author2 = Repo::author()->newDataObject();
-        $author1->setData('publicationId', $this->publicationId);
-        $author2->setData('publicationId', $this->publicationId);
-        $author1->setData('email', 'anaalice@harvard.com');
-        $author2->setData('email', 'seizi.tagima@ufam.edu.br');
-        $author1->setGivenName('Ana Alice', $this->locale);
-        $author1->setFamilyName('Caldas Novas', $this->locale);
-        $author2->setGivenName('Seizi', $this->locale);
-        $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setAffiliation('Harvard University', $this->locale);
-        $author2->setAffiliation('Amazonas Federal University', $this->locale);
-        $author1->setData('country', 'US');
-        $author2->setData('country', 'BR');
+        $author1->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'anaalice@harvard.com',
+            'givenName' => [$this->locale => 'Ana Alice'],
+            'familyName' => [$this->locale => 'Caldas Novas'],
+            'affiliation' => [$this->locale => 'Harvard University'],
+            'country' => 'US'
+        ]);
+        $author2->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'seizi.tagima@ufam.edu.br',
+            'givenName' => [$this->locale => 'Seizi'],
+            'familyName' => [$this->locale => 'Tagima'],
+            'affiliation' => [$this->locale => 'Amazonas Federal University'],
+            'country' => 'BR'
+        ]);
 
         $this->author1Id = Repo::author()->dao->insert($author1);
         $this->author2Id = Repo::author()->dao->insert($author2);
@@ -279,14 +291,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createStageAssignments(array $userIds, $groupId): void
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         foreach ($userIds as $userId) {
-            $stageAssignment = $stageAssignmentDao->newDataObject();
-            $stageAssignment->setSubmissionId($this->submissionId);
-            $stageAssignment->setUserId($userId);
-            $stageAssignment->setUserGroupId($groupId);
-            $stageAssignment->setStageId(5);
-            $stageAssignmentIds[] = $stageAssignmentDao->insertObject($stageAssignment);
+            StageAssignment::create([
+                'submissionId' => $this->submissionId,
+                'userId' => $userId,
+                'userGroupId' => $groupId,
+                'stageId' => 5
+            ]);
         }
     }
 
