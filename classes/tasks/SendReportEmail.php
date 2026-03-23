@@ -16,7 +16,7 @@ class SendReportEmail extends ScheduledTask
 {
     public function executeActions()
     {
-        $application = substr(Application::getName(), 0, 3);
+        $application = Application::getName();
         $context = Application::get()->getRequest()->getContext();
         PluginRegistry::loadCategory('reports');
         $plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');

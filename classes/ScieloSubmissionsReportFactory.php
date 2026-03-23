@@ -25,7 +25,7 @@ class ScieloSubmissionsReportFactory
         $this->includeViews = $includeViews;
     }
 
-    public function createReport(): ScieloSubmissionsReport
+    public function createReport(): ?ScieloSubmissionsReport
     {
         $sections = [];
 
@@ -38,12 +38,14 @@ class ScieloSubmissionsReportFactory
             $submissionFactory = new ScieloPreprintFactory($this->includeViews);
             $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
             return new ScieloSubmissionsOPSReport($sections, $scieloSubmissions, $this->includeViews);
-        } elseif ($this->application == 'ojs') {
+        } elseif ($this->application == 'ojs2') {
             $submissionsDao = app(ScieloArticlesDAO::class);
             $submissionFactory = new ScieloArticleFactory();
             $scieloSubmissions = $this->getScieloSubmissions($submissionsDao, $submissionFactory);
             return new ScieloSubmissionsOJSReport($sections, $scieloSubmissions);
         }
+
+        return null;
     }
 
     private function getScieloSubmissions($submissionsDao, $submissionFactory): array

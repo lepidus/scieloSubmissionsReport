@@ -47,7 +47,7 @@ class ScieloSubmissionsReportForm extends Form
     public function __construct($plugin)
     {
         $this->plugin = $plugin;
-        $this->application = substr(Application::getName(), 0, 3);
+        $this->application = Application::getName();
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
         $this->sections = [];
@@ -158,7 +158,8 @@ class ScieloSubmissionsReportForm extends Form
                     'name' => __('plugins.reports.scieloSubmissionsReport.displayName')
                 ],
             ],
-            'pageTitle', __('plugins.reports.scieloSubmissionsReport.displayName')
+            'pageTitle',
+            __('plugins.reports.scieloSubmissionsReport.displayName')
         ]);
 
         $templateManager->display($this->plugin->getTemplateResource($template));

@@ -48,7 +48,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        if (Application::get()->getName() != 'ojs2') {
+        if (Application::getName() != 'ojs2') {
             $this->markTestSkipped(
                 'Not OJS',
             );
@@ -160,7 +160,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'roleId' => Role::ROLE_ID_SUB_EDITOR,
             'contextId' => $this->contextId
         ]);
-        
+
         return $sectionEditorUserGroup->id;
     }
 
