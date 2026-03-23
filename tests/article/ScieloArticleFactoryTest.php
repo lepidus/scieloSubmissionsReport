@@ -200,7 +200,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'email' => 'anaalice@harvard.com',
             'givenName' => [$this->locale => 'Ana Alice'],
             'familyName' => [$this->locale => 'Caldas Novas'],
-            'affiliation' => [$this->locale => 'Harvard University'],
             'country' => 'US'
         ]);
         $author2->setAllData([
@@ -208,7 +207,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'email' => 'seizi.tagima@ufam.edu.br',
             'givenName' => [$this->locale => 'Seizi'],
             'familyName' => [$this->locale => 'Tagima'],
-            'affiliation' => [$this->locale => 'Amazonas Federal University'],
             'country' => 'BR'
         ]);
 

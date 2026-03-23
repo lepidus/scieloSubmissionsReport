@@ -156,8 +156,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $author1->setFamilyName('Caldas Novas', $this->locale);
         $author2->setGivenName('Seizi', $this->locale);
         $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setAffiliation('Harvard University', $this->locale);
-        $author2->setAffiliation('Amazonas Federal University', $this->locale);
         $author1->setData('country', 'US');
         $author2->setData('country', 'BR');
 

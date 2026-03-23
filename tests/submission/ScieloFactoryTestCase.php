@@ -2,7 +2,9 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
+use APP\core\Application;
 use APP\facades\Repo;
+use PKP\affiliation\Affiliation;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use PKP\tests\DatabaseTestCase;
 
@@ -17,6 +19,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->mockRequest();
 
         $this->createContext();
         $this->createSection();
@@ -73,13 +76,19 @@ class ScieloFactoryTestCase extends DatabaseTestCase
     {
         $locale = $this->getLocale();
 
+        $firstAffiliation = new Affiliation();
+        $firstAffiliation->setName('Amazonas Federal University', $locale);
+
+        $secondAffiliation = new Affiliation();
+        $secondAffiliation->setName('Harvard University', $locale);
+
         return [
             'first' => [
                 'publicationId' => $this->publication->getId(),
                 'email' => 'anaalice@ufam.edu.br',
                 'givenName' => [$locale => 'Ana Alice'],
                 'familyName' => [$locale => 'Caldas Novas'],
-                'affiliation' => [$locale => 'Amazonas Federal University'],
+                'affiliations' => [$firstAffiliation],
                 'country' => 'BR'
             ],
             'second' => [
@@ -87,7 +96,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
                 'email' => 'seizi.tagima@harvard.com',
                 'givenName' => [$locale => 'Seizi'],
                 'familyName' => [$locale => 'Tagima'],
-                'affiliation' => [$locale => 'Harvard University'],
+                'affiliations' => [$secondAffiliation],
                 'country' => 'US'
             ],
         ];
@@ -95,7 +104,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 
     protected function createContext(): void
     {
-        $contextDAO = \Application::getContextDAO();
+        $contextDAO = Application::getContextDAO();
         $context = $contextDAO->newDataObject();
         $context->setAllData($this->getContextData());
         $contextDAO->insertObject($context);
@@ -135,10 +144,13 @@ class ScieloFactoryTestCase extends DatabaseTestCase
             $authorId = Repo::author()->add($author);
             $author = Repo::author()->get($authorId);
 
+            $affiliations = $author->getAffiliations();
+            $affiliation = array_shift($affiliations);
+
             $this->authors[] = new SubmissionAuthor(
                 $author->getFullName(),
                 $author->getCountryLocalized(),
-                $author->getLocalizedAffiliation()
+                $affiliation->getName($this->getLocale())
             );
         }
     }
@@ -152,7 +164,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 
     protected function deleteContext(): void
     {
-        $contextDAO = \Application::getContextDAO();
+        $contextDAO = Application::getContextDAO();
         $contextDAO->deleteObject($this->context);
     }
 }
