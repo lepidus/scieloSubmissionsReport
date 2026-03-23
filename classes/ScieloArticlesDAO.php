@@ -15,20 +15,20 @@ namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 use APP\decision\Decision;
 use APP\facades\Repo;
 use PKP\db\DAORegistry;
+use PKP\stageAssignment\StageAssignment;
 use PKP\security\Role;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
     public function getReviews($submissionId): array
     {
-        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $submissionReviews = $reviewAssignmentDao->getBySubmissionId($submissionId);
-        $completeReviews = false;
+        $submissionReviews = Repo::reviewAssignment()->getCollector()
+            ->filterBySubmissionIds([$submissionId])
+            ->getMany();
         $reviews = [];
 
         foreach ($submissionReviews as $review) {
             if ($review->getDateCompleted()) {
-                $completeReviews = true;
                 $reviews[] = $review->getLocalizedRecommendation();
             }
         }
@@ -37,16 +37,17 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getSectionEditor($submissionId): string
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = StageAssignment::withSubmissionIds([$submissionId])
+            ->withRoleIds([Role::ROLE_ID_SUB_EDITOR])
+            ->get();
 
-        while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+        foreach ($stageAssignmentsSectionEditorResults as $stageAssignment) {
+            $user = Repo::user()->get($stageAssignment->userId, true);
             if (is_null($user)) {
                 continue;
             }
 
-            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
+            $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
             $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'section editor') {
                 return $user->getFullName();
@@ -57,17 +58,18 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getJournalEditors($submissionId): array
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsEditorResults = StageAssignment::withSubmissionIds([$submissionId])
+            ->withRoleIds([Role::ROLE_ID_MANAGER])
+            ->get();
         $journalEditors = [];
 
-        while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+        foreach ($stageAssignmentsEditorResults as $stageAssignment) {
+            $user = Repo::user()->get($stageAssignment->userId, true);
             if (is_null($user)) {
                 continue;
             }
 
-            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
+            $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
             $currentUserGroupName = strtolower($userGroup->getName('en'));
             if ($currentUserGroupName == 'journal editor') {
                 array_push($journalEditors, $user->getFullName());
@@ -78,36 +80,23 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
 
     public function getDecisionMessage($decision)
     {
-        switch ($decision) {
-            case Decision::ACCEPT:
-                return __('editor.submission.decision.accept');
-            case Decision::PENDING_REVISIONS:
-                return __('editor.submission.decision.requestRevisions');
-            case Decision::RESUBMIT:
-                return __('editor.submission.decision.resubmit');
-            case Decision::DECLINE:
-                return __('editor.submission.decision.decline');
-            case Decision::SEND_TO_PRODUCTION:
-                return __('editor.submission.decision.sendToProduction');
-            case Decision::NEW_EXTERNAL_ROUND:
-                return __('editor.submission.decision.newRound');
-            case Decision::EXTERNAL_REVIEW:
-                return __('editor.submission.decision.sendExternalReview');
-            case Decision::INITIAL_DECLINE:
-                return __('editor.submission.decision.decline');
-            case Decision::REVERT_DECLINE:
-                return __('editor.submission.decision.revertDecline');
-            case Decision::RECOMMEND_ACCEPT:
-                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.accept')]);
-            case Decision::RECOMMEND_DECLINE:
-                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.decline')]);
-            case Decision::RECOMMEND_PENDING_REVISIONS:
-                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.requestRevisions')]);
-            case Decision::RECOMMEND_RESUBMIT:
-                return __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.resubmit')]);
-            default:
-                return '';
-        }
+        $decisionMessages = [
+            Decision::ACCEPT => __('editor.submission.decision.accept'),
+            Decision::PENDING_REVISIONS => __('editor.submission.decision.requestRevisions'),
+            Decision::RESUBMIT => __('editor.submission.decision.resubmit'),
+            Decision::DECLINE => __('editor.submission.decision.decline'),
+            Decision::SEND_TO_PRODUCTION => __('editor.submission.decision.sendToProduction'),
+            Decision::NEW_EXTERNAL_ROUND => __('editor.submission.decision.newRound'),
+            Decision::EXTERNAL_REVIEW => __('editor.submission.decision.sendExternalReview'),
+            Decision::INITIAL_DECLINE => __('editor.submission.decision.decline'),
+            Decision::REVERT_DECLINE => __('editor.submission.decision.revertDecline'),
+            Decision::RECOMMEND_ACCEPT => __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.accept')]),
+            Decision::RECOMMEND_DECLINE => __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.decline')]),
+            Decision::RECOMMEND_PENDING_REVISIONS => __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.requestRevisions')]),
+            Decision::RECOMMEND_RESUBMIT => __('editor.submission.recommendation.display', ['recommendation' => __('editor.submission.decision.resubmit')]),
+        ];
+
+        return $decisionMessages[$decision] ?? '';
     }
 
     public function getLastDecision($submissionId): string
