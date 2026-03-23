@@ -303,9 +303,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         ]);
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsFinalDecisionWithDatePosted(): void
     {
         $finalDecision = __('common.accepted', [], $this->locale);
@@ -322,9 +319,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionDecliningIsFinalDecisionEvenWhenHasPostedDate(): void
     {
         $datePosted = '2021-08-27';
@@ -343,9 +337,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloPreprint->getFinalDecisionDate());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsPublicationStatus(): void
     {
         $datePosted = '2021-08-27';
@@ -365,9 +356,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedPublicationStatus, $scieloPreprint->getPublicationStatus());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsPublicationDOI(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -376,9 +364,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->vorDoi, $scieloPreprint->getPublicationDOI());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionWithoutPublicationDOI(): void
     {
         $publication = Repo::publication()->get($this->publicationId);
@@ -392,9 +377,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getPublicationDOI());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionIsPreprint(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -403,9 +385,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloPreprint instanceof ScieloPreprint);
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsIfUserIsScieloJournal(): void
     {
         $submitterId = $this->createSubmitter();
@@ -421,9 +400,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals(__('common.yes'), $scieloPreprint->getSubmitterIsScieloJournal());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsResponsibles(): void
     {
         $responsiblesGroupId = $this->createResponsiblesUserGroup();
@@ -451,9 +427,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResponsibles, $scieloPreprint->getResponsibles());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsSectionModerator(): void
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
@@ -476,9 +449,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($userSectionModerator->getFullName(), $scieloPreprint->getSectionModerators());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsNotes(): void
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
@@ -509,9 +479,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedResult, $scieloPreprint->getNotes());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionDoesNotHaveNotes(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
@@ -520,9 +487,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noNotes'), $scieloPreprint->getNotes());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionGetsStats(): void
     {
         $this->createMetrics();
@@ -534,9 +498,6 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedStats, $scieloPreprint->getStats());
     }
 
-    /**
-     * @group OPS
-     */
     public function testSubmissionDoesntGetViews(): void
     {
         $this->createMetrics();

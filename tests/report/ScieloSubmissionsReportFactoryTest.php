@@ -54,7 +54,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $context->setAllData([
             'urlPath' => [$this->locale => 'test'],
             'primaryLocale' => $this->locale
-        ]);;
+        ]);
 
         $this->contextId = $contextDAO->insertObject($context);
     }
