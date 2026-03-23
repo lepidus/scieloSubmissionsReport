@@ -14,7 +14,6 @@ namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 use APP\decision\Decision;
 use APP\facades\Repo;
-use PKP\db\DAORegistry;
 use PKP\stageAssignment\StageAssignment;
 use PKP\security\Role;
 

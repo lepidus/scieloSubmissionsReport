@@ -17,8 +17,9 @@ use APP\decision\Decision;
 use APP\facades\Repo;
 use APP\publication\Publication;
 use APP\submission\Submission;
+use PKP\security\Role;
+use PKP\stageAssignment\StageAssignment;
 use Illuminate\Support\Facades\DB;
-use PKP\db\DAORegistry;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 {
@@ -59,7 +60,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $submitterUserGroups = Repo::userGroup()->userUserGroups($submitterId);
         foreach ($submitterUserGroups as $userGroup) {
             $journalGroupAbbrev = 'SciELO';
-            if ($userGroup->getLocalizedData('abbrev', 'pt_BR') == $journalGroupAbbrev) {
+            if ($userGroup->abbrev['pt_BR'] == $journalGroupAbbrev) {
                 return true;
             }
         }
@@ -69,19 +70,19 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getSectionModerators($submissionId): array
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-
         $sectionModeratorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = StageAssignment::withSubmissionIds([$submissionId])
+            ->withRoleIds([Role::ROLE_ID_SUB_EDITOR])
+            ->get();
 
-        while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+        foreach ($stageAssignmentsResults as $stageAssignment) {
+            $user = Repo::user()->get($stageAssignment->userId, true);
             if (is_null($user)) {
                 continue;
             }
 
-            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
+            $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
+            $currentUserGroupAbbrev = strtolower($userGroup->abbrev['en']);
 
             if ($currentUserGroupAbbrev == 'am') {
                 array_push($sectionModeratorUsers, $user->getFullName());
@@ -92,19 +93,19 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getResponsibles($submissionId): array
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-
         $moderatorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = StageAssignment::withSubmissionIds([$submissionId])
+            ->withRoleIds([Role::ROLE_ID_SUB_EDITOR])
+            ->get();
 
-        while ($stageAssignment = $stageAssignmentsResults->next()) {
-            $user = Repo::user()->get($stageAssignment->getUserId(), true);
+        foreach ($stageAssignmentsResults as $stageAssignment) {
+            $user = Repo::user()->get($stageAssignment->userId, true);
             if (is_null($user)) {
                 continue;
             }
 
-            $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupAbbrev = strtolower($userGroup->getData('abbrev', 'en'));
+            $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
+            $currentUserGroupAbbrev = strtolower($userGroup->abbrev['en']);
 
             if ($currentUserGroupAbbrev == 'resp') {
                 array_push($moderatorUsers, $user->getFullName());

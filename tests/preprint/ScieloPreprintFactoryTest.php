@@ -5,19 +5,23 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests\preprint;
 use APP\core\Application;
 use APP\decision\Decision;
 use APP\facades\Repo;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 use APP\publication\Publication;
 use APP\submission\Submission;
 use Illuminate\Support\Facades\DB;
 use PKP\core\Core;
 use PKP\db\DAORegistry;
 use PKP\log\event\PKPSubmissionEventLogEntry;
+use PKP\security\Role;
+use PKP\stageAssignment\StageAssignment;
+use PKP\note\Note;
 use PKP\statistics\PKPStatisticsHelper;
 use PKP\tests\DatabaseTestCase;
+use PKP\userGroup\UserGroup;
 use PKP\userGroup\relationships\UserGroupStage;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase
 {
@@ -40,6 +44,12 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private $relationStatus;
     private $abstractViews = 10;
     private $pdfViews = 21;
+    private $authorIds = [];
+    private $submitterId;
+    private $responsibleUserIds = [];
+    private $userGroupIds = [];
+    private $stageAssignmentIds = [];
+    private $additionalSubmissionIds = [];
 
     public function setUp(): void
     {
@@ -50,6 +60,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
                 'Not OPS',
             );
         }
+        $this->mockRequest();
 
         $this->sectionId = $this->createSection();
         $this->submissionId = $this->createSubmission($this->statusCode);
@@ -60,38 +71,82 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->addCurrentPublicationToSubmission($this->submissionId, $this->publicationId);
     }
 
-    protected function getAffectedTables()
+    protected function tearDown(): void
     {
-        return [
-            'notes',
-            'submissions',
-            'submission_settings',
-            'publications',
-            'publication_settings',
-            'users',
-            'user_groups',
-            'user_settings',
-            'user_group_settings',
-            'user_user_groups',
-            'event_log',
-            'sections',
-            'section_settings',
-            'authors',
-            'author_settings',
-            'edit_decisions',
-            'stage_assignments',
-            'user_group_stage'
-        ];
+        $this->clearDB();
+        parent::tearDown();
+    }
+
+    private function clearDB(): void
+    {
+        foreach ($this->additionalSubmissionIds as $subId) {
+            $submission = Repo::submission()->get($subId);
+            if ($submission) {
+                Repo::submission()->delete($submission);
+            }
+        }
+
+        $publication = Repo::publication()->get($this->publicationId);
+        if ($publication) {
+            Repo::publication()->dao->delete($publication);
+        }
+
+        $submission = Repo::submission()->get($this->submissionId);
+        if ($submission) {
+            Repo::submission()->delete($submission);
+        }
+
+        $section = Repo::section()->get($this->sectionId, $this->contextId);
+        if ($section) {
+            Repo::section()->delete($section);
+        }
+
+        foreach ($this->userGroupIds as $groupId) {
+            UserGroup::destroy($groupId);
+        }
+
+        foreach ($this->authorIds as $authorId) {
+            $author = Repo::author()->get($authorId);
+            if ($author) {
+                Repo::author()->delete($author);
+            }
+        }
+
+        if ($this->submitterId) {
+            $user = Repo::user()->get($this->submitterId, true);
+            if ($user) {
+                Repo::user()->delete($user);
+            }
+        }
+
+        if (!empty($this->responsibleUserIds)) {
+            foreach ($this->responsibleUserIds as $userId) {
+                $user = Repo::user()->get($userId, true);
+                if ($user) {
+                    Repo::user()->delete($user);
+                }
+            }
+        }
+
+        if (empty($this->stageAssignmentIds)) {
+            return;
+        }
+
+        foreach ($this->stageAssignmentIds as $stageAssignmentId) {
+            StageAssignment::destroy($stageAssignmentId);
+        }
     }
 
     private function createSubmission($statusCode): int
     {
         $submission = Repo::submission()->newDataObject();
-        $submission->setData('contextId', $this->contextId);
-        $submission->setData('dateSubmitted', $this->dateSubmitted);
-        $submission->setData('status', $statusCode);
-        $submission->setData('locale', $this->locale);
-        $submission->setData('dateLastActivity', $this->dateLastActivity);
+        $submission->setAllData([
+            'contextId' => $this->contextId,
+            'dateSubmitted' => $this->dateSubmitted,
+            'status' => $statusCode,
+            'locale' => $this->locale,
+            'dateLastActivity' => $this->dateLastActivity,
+        ]);
 
         return Repo::submission()->dao->insert($submission);
     }
@@ -99,14 +154,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private function createPublication($submissionId, $datePublished = null): int
     {
         $publication = Repo::publication()->newDataObject();
-        $publication->setData('submissionId', $submissionId);
-        $publication->setData('title', $this->title, $this->locale);
-        $publication->setData('sectionId', $this->sectionId);
-        $publication->setData('relationStatus', $this->relationStatus);
-        $publication->setData('vorDoi', $this->vorDoi);
-        if (!is_null($datePublished)) {
-            $publication->setData('datePublished', $datePublished);
-        }
+        $publication->setAllData([
+            'submissionId' => $submissionId,
+            'title' => [$this->locale => $this->title],
+            'sectionId' => $this->sectionId,
+            'relationStatus' => $this->relationStatus,
+            'vorDoi' => $this->vorDoi,
+            'datePublished' => $datePublished,
+        ]);
 
         return Repo::publication()->dao->insert($publication);
     }
@@ -127,16 +182,18 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private function createSection(): int
     {
         $section = Repo::section()->newDataObject();
-        $section->setTitle($this->sectionName, $this->locale);
-        $section->setAbbrev(__('section.default.abbrev'), $this->locale);
-        $section->setPath(__('section.default.path'));
-        $section->setMetaIndexed(true);
-        $section->setMetaReviewed(true);
-        $section->setPolicy(__('section.default.policy'), $this->locale);
-        $section->setEditorRestricted(false);
-        $section->setHideTitle(false);
-        $section->setContextId($this->contextId);
-        $sectionId = Repo::section()->dao->insert($section);
+        $section->setAllData([
+            'title' => [$this->locale => $this->sectionName],
+            'abbrev' => [$this->locale => __('section.default.abbrev')],
+            'path' => __('section.default.path'),
+            'metaIndexed' => true,
+            'metaReviewed' => true,
+            'policy' => [$this->locale => __('section.default.policy')],
+            'editorRestricted' => false,
+            'hideTitle' => false,
+            'contextId' => $this->contextId,
+        ]);
+        $sectionId = Repo::section()->add($section);
 
         return $sectionId;
     }
@@ -145,19 +202,23 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         $author1 = Repo::author()->newDataObject();
         $author2 = Repo::author()->newDataObject();
-        $author1->setData('publicationId', $this->publicationId);
-        $author2->setData('publicationId', $this->publicationId);
-        $author1->setData('email', 'anaalice@harvard.com');
-        $author2->setData('email', 'seizi.tagima@ufam.edu.br');
-        $author1->setGivenName('Ana Alice', $this->locale);
-        $author1->setFamilyName('Caldas Novas', $this->locale);
-        $author2->setGivenName('Seizi', $this->locale);
-        $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setData('country', 'US');
-        $author2->setData('country', 'BR');
+        $author1->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'anaalice@harvard.com',
+            'givenName' => [$this->locale => 'Ana Alice'],
+            'familyName' => [$this->locale => 'Caldas Novas'],
+            'country' => 'US',
+        ]);
+        $author2->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'seizi.tagima@ufam.edu.br',
+            'givenName' => [$this->locale => 'Seizi'],
+            'familyName' => [$this->locale => 'Tagima'],
+            'country' => 'BR',
+        ]);
 
-        Repo::author()->dao->insert($author1);
-        Repo::author()->dao->insert($author2);
+        $this->authorIds[] = Repo::author()->dao->insert($author1);
+        $this->authorIds[] = Repo::author()->dao->insert($author2);
 
         return [
             new SubmissionAuthor('Ana Alice Caldas Novas', 'United States', 'Harvard University'),
@@ -175,59 +236,63 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     private function createSubmitter(): int
     {
         $userSubmitter = Repo::user()->newDataObject();
-        $userSubmitter->setUsername('the_godfather');
-        $userSubmitter->setEmail('donvito@corleone.com');
-        $userSubmitter->setPassword('miaumiau');
-        $userSubmitter->setCountry('BR');
-        $userSubmitter->setGivenName('Don', $this->locale);
-        $userSubmitter->setFamilyName('Vito Corleone', $this->locale);
-        $userSubmitter->setDateRegistered(Core::getCurrentDate());
-        $userSubmitterId = Repo::user()->dao->insert($userSubmitter);
+        $userSubmitter->setAllData([
+            'userName' => 'the_godfather',
+            'email' => 'donvito@corleone.com',
+            'password' => 'miaumiau',
+            'country' => 'BR',
+            'givenName' => [$this->locale => 'Don'],
+            'familyName' => [$this->locale => 'Vito Corleone'],
+            'dateRegistered' => Core::getCurrentDate(),
+        ]);
+        $this->submitterId = Repo::user()->add($userSubmitter);
 
         $eventLog = Repo::eventLog()->newDataObject([
             'assocType' => Application::ASSOC_TYPE_SUBMISSION,
             'assocId' => $this->submissionId,
             'eventType' => PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT,
-            'userId' => $userSubmitterId,
+            'userId' => $this->submitterId,
             'dateLogged' => $this->dateSubmitted
         ]);
         Repo::eventLog()->add($eventLog);
 
-        return $userSubmitterId;
+        return $this->submitterId;
     }
 
     private function createResponsibleUsers(): array
     {
         $userResponsible = Repo::user()->newDataObject();
-        $userResponsible->setUsername('f4ustao');
-        $userResponsible->setEmail('faustosilva@noexists.com');
-        $userResponsible->setPassword('oloco');
-        $userResponsible->setGivenName('Fausto', $this->locale);
-        $userResponsible->setFamilyName('Silva', $this->locale);
-        $userResponsible->setDateRegistered(Core::getCurrentDate());
+        $userResponsible->setAllData([
+            'userName' => 'f4ustao',
+            'email' => 'faustosilva@noexists.com',
+            'password' => 'oloco',
+            'givenName' => [$this->locale => 'Fausto'],
+            'familyName' => [$this->locale => 'Silva'],
+            'dateRegistered' => Core::getCurrentDate(),
+        ]);
 
         $secondUserResponsible = Repo::user()->newDataObject();
-        $secondUserResponsible->setUsername('silvinho122');
-        $secondUserResponsible->setEmail('silvio@stb.com');
-        $secondUserResponsible->setPassword('aviaozinho');
-        $secondUserResponsible->setGivenName('Silvio', $this->locale);
-        $secondUserResponsible->setFamilyName('Santos', $this->locale);
-        $secondUserResponsible->setDateRegistered(Core::getCurrentDate());
+        $secondUserResponsible->setAllData([
+            'userName' => 'silvinho122',
+            'email' => 'silvio@stb.com',
+            'password' => 'aviaozinho',
+            'givenName' => [$this->locale => 'Silvio'],
+            'familyName' => [$this->locale => 'Santos'],
+            'dateRegistered' => Core::getCurrentDate(),
+        ]);
 
         return [$userResponsible, $secondUserResponsible];
     }
 
     private function createStageAssignments(array $userIds, $groupId): void
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-
         foreach ($userIds as $userId) {
-            $stageAssignment = $stageAssignmentDao->newDataObject();
-            $stageAssignment->setSubmissionId($this->submissionId);
-            $stageAssignment->setUserId($userId);
-            $stageAssignment->setUserGroupId($groupId);
-            $stageAssignment->setStageId(5);
-            $stageAssignmentDao->insertObject($stageAssignment);
+            StageAssignment::create([
+                'submissionId' => $this->submissionId,
+                'userId' => $userId,
+                'userGroupId' => $groupId,
+                'dateAssigned' => Core::getCurrentDate(),
+            ]);
         }
     }
 
@@ -238,12 +303,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
             'pt_BR' => 'resp',
             'es' => 'resp'
         ];
-        $responsiblesUserGroup = Repo::userGroup()->newDataObject();
-        $responsiblesUserGroup->setData('abbrev', $responsiblesUserGroupLocalizedAbbrev);
-        $responsiblesUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
-        $responsiblesUserGroup->setData('contextId', $this->contextId);
+        $responsiblesUserGroup = UserGroup::create([
+            'abbrev' => $responsiblesUserGroupLocalizedAbbrev,
+            'roleId' => Role::ROLE_ID_SUB_EDITOR,
+            'contextId' => $this->contextId,
+        ]);
+        $this->userGroupIds[] = $responsiblesUserGroup->id;
 
-        return Repo::userGroup()->add($responsiblesUserGroup);
+        return $responsiblesUserGroup->id;
     }
 
     private function createSectionModeratorUserGroup(): int
@@ -253,12 +320,14 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
             'pt_BR' => 'ma',
             'es' => 'ma'
         ];
-        $sectionModeratorUserGroup = Repo::userGroup()->newDataObject();
-        $sectionModeratorUserGroup->setData('abbrev', $sectionModeratorUserGroupLocalizedAbbrev);
-        $sectionModeratorUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
-        $sectionModeratorUserGroup->setData('contextId', $this->contextId);
+        $sectionModeratorUserGroup = UserGroup::create([
+            'abbrev' => $sectionModeratorUserGroupLocalizedAbbrev,
+            'roleId' => Role::ROLE_ID_SUB_EDITOR,
+            'contextId' => $this->contextId,
+        ]);
+        $this->userGroupIds[] = $sectionModeratorUserGroup->id;
 
-        return Repo::userGroup()->add($sectionModeratorUserGroup);
+        return $sectionModeratorUserGroup->id;
     }
 
     private function createScieloJournalUserGroup(): int
@@ -266,20 +335,22 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $scieloJournalUserGroupLocalizedNames = [
             'en' => 'SciELO Journal',
             'pt_BR' => 'Periódico SciELO',
-            'es_ES' => 'Revista SciELO'
+            'es' => 'Revista SciELO'
         ];
         $scieloJournalUserGroupLocalizedAbbrev = [
             'en' => 'SciELO',
             'pt_BR' => 'SciELO',
-            'es_ES' => 'SciELO'
+            'es' => 'SciELO'
         ];
-        $scieloJournalUserGroup = Repo::userGroup()->newDataObject();
-        $scieloJournalUserGroup->setData('name', $scieloJournalUserGroupLocalizedNames);
-        $scieloJournalUserGroup->setData('abbrev', $scieloJournalUserGroupLocalizedAbbrev);
-        $scieloJournalUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
-        $scieloJournalUserGroup->setData('contextId', $this->contextId);
+        $scieloJournalUserGroup = UserGroup::create([
+            'name' => $scieloJournalUserGroupLocalizedNames,
+            'abbrev' => $scieloJournalUserGroupLocalizedAbbrev,
+            'roleId' => Role::ROLE_ID_SUB_EDITOR,
+            'contextId' => $this->contextId,
+        ]);
+        $this->userGroupIds[] = $scieloJournalUserGroup->id;
 
-        return Repo::userGroup()->add($scieloJournalUserGroup);
+        return $scieloJournalUserGroup->id;
     }
 
     private function createMetrics(): void
@@ -309,6 +380,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $finalDecisionDate = '2021-07-31';
 
         $submissionId = $this->createSubmission(Submission::STATUS_PUBLISHED);
+        $this->additionalSubmissionIds[] = $submissionId;
         $publicationId = $this->createPublication($submissionId, $finalDecisionDate);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
 
@@ -325,7 +397,8 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $finalDecision = __('common.declined', [], $this->locale);
         $finalDecisionDate = '2021-08-30';
 
-        $submissionId = $this->createSubmission(STATUS_DECLINED);
+        $submissionId = $this->createSubmission(Submission::STATUS_DECLINED);
+        $this->additionalSubmissionIds[] = $submissionId;
         $publicationId = $this->createPublication($submissionId, $datePosted);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
         $this->createDecision($submissionId, Decision::DECLINE, $finalDecisionDate);
@@ -341,6 +414,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         $datePosted = '2021-08-27';
         $submissionId = $this->createSubmission(Submission::STATUS_PUBLISHED);
+        $this->additionalSubmissionIds[] = $submissionId;
         $publicationId = $this->createPublication($submissionId, $datePosted);
         $this->addCurrentPublicationToSubmission($submissionId, $publicationId);
 
@@ -356,7 +430,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedPublicationStatus, $scieloPreprint->getPublicationStatus());
     }
 
-    public function testSubmissionGetsPublicationDOI(): void
+    public function testSubmissionGetsPublicationDoi(): void
     {
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
@@ -364,7 +438,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $this->assertEquals($this->vorDoi, $scieloPreprint->getPublicationDOI());
     }
 
-    public function testSubmissionWithoutPublicationDOI(): void
+    public function testSubmissionWithoutPublicationDoi(): void
     {
         $publication = Repo::publication()->get($this->publicationId);
         $publication->setData('vorDoi', null);
@@ -405,8 +479,10 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
         $responsiblesGroupId = $this->createResponsiblesUserGroup();
 
         $responsibleUsers = $this->createResponsibleUsers();
-        $firstResponsibleId = Repo::user()->dao->insert($responsibleUsers[0]);
-        $secondResponsibleId = Repo::user()->dao->insert($responsibleUsers[1]);
+        $firstResponsibleId = Repo::user()->add($responsibleUsers[0]);
+        $secondResponsibleId = Repo::user()->add($responsibleUsers[1]);
+        $this->responsibleUserIds[] = $firstResponsibleId;
+        $this->responsibleUserIds[] = $secondResponsibleId;
 
         Repo::userGroup()->assignUserToGroup($firstResponsibleId, $responsiblesGroupId);
         Repo::userGroup()->assignUserToGroup($secondResponsibleId, $responsiblesGroupId);
@@ -431,6 +507,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
         $userSectionModeratorId = Repo::user()->add($userSectionModerator);
+        $this->responsibleUserIds[] = $userSectionModeratorId;
         $sectionModeratorUserGroupId = $this->createSectionModeratorUserGroup();
 
         Repo::userGroup()->assignUserToGroup($userSectionModeratorId, $sectionModeratorUserGroupId);
@@ -453,24 +530,24 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         $userSectionModerator = $this->createResponsibleUsers()[0];
         $userSectionModeratorId = Repo::user()->add($userSectionModerator);
+        $this->responsibleUserIds[] = $userSectionModeratorId;
 
-        $noteDao = DAORegistry::getDAO('NoteDAO');
         $contentsForFirstNote = 'Um breve resumo sobre a inteligência computacional';
         $contentsForSecondNote = 'Algoritmos Genéticos: Implementação no jogo do dino';
 
-        $note = $noteDao->newDataObject();
-        $note->setUserId($userSectionModeratorId);
-        $note->setContents($contentsForFirstNote);
-        $note->setAssocType(1048585);
-        $note->setAssocId($this->submissionId);
-        $noteDao->insertObject($note);
+        Note::create([
+            'userId' => $userSectionModeratorId,
+            'contents' => $contentsForFirstNote,
+            'assocType' => 1048585,
+            'assocId' => $this->submissionId,
+        ]);
 
-        $note = $noteDao->newDataObject();
-        $note->setUserId($userSectionModeratorId);
-        $note->setContents($contentsForSecondNote);
-        $note->setAssocType(1048585);
-        $note->setAssocId($this->submissionId);
-        $noteDao->insertObject($note);
+        Note::create([
+            'userId' => $userSectionModeratorId,
+            'contents' => $contentsForSecondNote,
+            'assocType' => 1048585,
+            'assocId' => $this->submissionId,
+        ]);
 
         $preprintFactory = new ScieloPreprintFactory();
         $scieloPreprint = $preprintFactory->createSubmission($this->submissionId, $this->locale);
