@@ -4,6 +4,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests\article;
 
 use PKP\tests\DatabaseTestCase;
 use APP\facades\Repo;
+use APP\core\Application;
 use PKP\core\Core;
 use APP\decision\Decision;
 use APP\submission\Submission;
@@ -48,11 +49,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
         $this->editorsUsersIds = [];
         $this->sectionId = $this->createSection();
-        $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication();
+        $this->createSubmission();
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en');
-        $this->addCurrentPublicationToSubmission();
     }
 
     protected function tearDown(): void
@@ -65,7 +64,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $publication = Repo::publication()->get($this->publicationId);
         if ($publication) {
-            Repo::publication()->delete($publication);
+            Repo::publication()->dao->delete($publication);
         }
 
         $submission = Repo::submission()->get($this->submissionId);
@@ -116,8 +115,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         }
     }
 
-    private function createSubmission(): int
+    private function createSubmission()
     {
+        $context = Application::get()->getContextDAO()->getById($this->contextId);
+
         $submission = Repo::submission()->newDataObject();
         $submission->setAllData([
             'contextId' => $this->contextId,
@@ -127,14 +128,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'dateLastActivity' => $this->dateLastActivity,
         ]);
 
-        return Repo::submission()->dao->insert($submission);
-    }
-
-    private function createPublication(): int
-    {
         $publication = Repo::publication()->newDataObject();
         $publication->setAllData([
-            'submissionId' =>  $this->submissionId,
             'title' => [$this->locale => $this->title],
             'sectionId' =>  $this->sectionId,
             'relationStatus' =>  '1',
@@ -142,7 +137,10 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'status' =>  $this->statusCode
         ]);
 
-        return Repo::publication()->dao->insert($publication);
+        $this->submissionId = Repo::submission()->add($submission, $publication, $context);
+
+        $submission = Repo::submission()->get($this->submissionId);
+        $this->publicationId = $submission->getData('currentPublicationId');
     }
 
     private function createSectionEditorUserGroup(): int
@@ -220,12 +218,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->author2Id = Repo::author()->dao->insert($author2);
 
         return [new SubmissionAuthor('Ana Alice Caldas Novas', 'United States', 'Harvard University'), new SubmissionAuthor('Seizi Tagima', 'Brazil', 'Amazonas Federal University')];
-    }
-
-    private function addCurrentPublicationToSubmission(): void
-    {
-        $submission = Repo::submission()->get($this->submissionId);
-        Repo::submission()->edit($submission, ['currentPublicationId' => $this->publicationId]);
     }
 
     private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false)
@@ -320,8 +312,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->clearDB();
         $this->title = null;
         $this->sectionId = $this->createSection();
-        $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication();
+        $this->createSubmission();
         $this->submissionAuthors = $this->createAuthors();
         $this->addCurrentPublicationToSubmission();
 
