@@ -48,7 +48,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $currentUserGroupName = strtolower($userGroup->getName('en'));
+            $currentUserGroupName = strtolower($userGroup->name['en']);
             if ($currentUserGroupName == 'section editor') {
                 return $user->getFullName();
             }
@@ -70,7 +70,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $currentUserGroupName = strtolower($userGroup->getName('en'));
+            $currentUserGroupName = strtolower($userGroup->name['en']);
             if ($currentUserGroupName == 'journal editor') {
                 array_push($journalEditors, $user->getFullName());
             }

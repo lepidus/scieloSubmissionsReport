@@ -8,9 +8,10 @@ use APP\core\Application;
 use PKP\core\Core;
 use APP\decision\Decision;
 use APP\submission\Submission;
-use PKP\stageAssignment\StageAssignment;
 use PKP\db\DAORegistry;
 use PKP\security\Role;
+use PKP\stageAssignment\StageAssignment;
+use PKP\userGroup\UserGroup;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 use PKP\submission\reviewRound\ReviewRound;
 use PKP\userGroup\relationships\UserGroupStage;
@@ -77,10 +78,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             Repo::section()->delete($section);
         }
 
-        $editorUserGroup = $this->editorUserGroupId ? Repo::userGroup()->get($this->editorUserGroupId) : null;
-        if ($editorUserGroup) {
-            Repo::userGroup()->delete($editorUserGroup);
-        }
+        UserGroup::destroy($this->editorUserGroupId);
 
         $author1 = $this->author1Id ? Repo::author()->get($this->author1Id) : null;
         if ($author1) {
@@ -130,7 +128,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
         $publication = Repo::publication()->newDataObject();
         $publication->setAllData([
-            'title' => [$this->locale => $this->title],
+            'title' => $this->title ? [$this->locale => $this->title] : null,
             'sectionId' =>  $this->sectionId,
             'relationStatus' =>  '1',
             'vorDoi' =>  $this->doi,
@@ -150,13 +148,14 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'pt_BR' => 'editor de seção',
             'es' => 'editor de sección'
         ];
-        $sectionEditorsUserGroup = Repo::userGroup()->newDataObject();
-        $sectionEditorsUserGroup->setAllData([
+
+        $sectionEditorUserGroup = UserGroup::create([
             'name' => $sectionEditorUserGroupLocalizedNames,
             'roleId' => Role::ROLE_ID_SUB_EDITOR,
             'contextId' => $this->contextId
         ]);
-        return Repo::userGroup()->add($sectionEditorsUserGroup);
+        
+        return $sectionEditorUserGroup->id;
     }
 
     private function createJournalEditorUserGroup(): int
@@ -166,13 +165,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'pt_BR' => 'Editor da revista',
             'es' => 'Editor/a de la revista'
         ];
-        $editorsUserGroup = Repo::userGroup()->newDataObject();
-        $editorsUserGroup->setAllData([
+        $editorsUserGroup = UserGroup::create([
             'name' => $editorUserGroupLocalizedNames,
             'roleId' => Role::ROLE_ID_MANAGER,
             'contextId' => $this->contextId
         ]);
-        return Repo::userGroup()->add($editorsUserGroup);
+        return $editorsUserGroup->id;
     }
 
     private function createSection(): int
@@ -288,7 +286,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
                 'submissionId' => $this->submissionId,
                 'userId' => $userId,
                 'userGroupId' => $groupId,
-                'stageId' => 5
+                'dateAssigned' => Core::getCurrentDate()
             ]);
         }
     }
@@ -314,7 +312,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->sectionId = $this->createSection();
         $this->createSubmission();
         $this->submissionAuthors = $this->createAuthors();
-        $this->addCurrentPublicationToSubmission();
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
