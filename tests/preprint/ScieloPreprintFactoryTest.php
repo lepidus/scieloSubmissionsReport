@@ -45,10 +45,7 @@ class ScieloPreprintFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $application = Application::get();
-        $applicationName = $application->getName();
-
-        if ($applicationName != 'ops') {
+        if (Application::get()->getName() != 'ops') {
             $this->markTestSkipped(
                 'Not OPS',
             );

@@ -5,6 +5,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOJSReportTest extends TestCase
@@ -16,6 +17,8 @@ class ScieloSubmissionsOJSReportTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
+
         $this->submissions = $this->createTestArticles();
         $this->report = new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
     }
@@ -49,7 +52,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         return [$article1, $article2, $article3, $article4, $article5];
     }
 
-    public function testGeneratedCSVHeadersFromOJSSubmissions()
+    public function testGeneratedCsvHeadersFromOjsSubmissions()
     {
         $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
@@ -130,7 +133,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
 
-    public function testGeneratedCSVHasArticlesData(): void
+    public function testGeneratedCsvHasArticlesData(): void
     {
         $this->submissions = ($this->createTestArticles())[0];
         $this->generateCSV();
@@ -146,7 +149,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $this->assertEquals($expectedLine, $firstLine);
     }
 
-    public function testGeneratedCSVHasAverageReviewingTime(): void
+    public function testGeneratedCsvHasAverageReviewingTime(): void
     {
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));

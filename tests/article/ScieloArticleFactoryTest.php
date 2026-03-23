@@ -48,6 +48,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
+        if (Application::get()->getName() != 'ojs2') {
+            $this->markTestSkipped(
+                'Not OJS',
+            );
+        }
+
         $this->editorsUsersIds = [];
         $this->sectionId = $this->createSection();
         $this->createSubmission();

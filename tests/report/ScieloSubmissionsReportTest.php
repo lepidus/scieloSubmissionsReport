@@ -3,6 +3,7 @@
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsReportTest extends TestCase
