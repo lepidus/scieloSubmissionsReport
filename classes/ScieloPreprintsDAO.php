@@ -63,7 +63,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
         foreach ($userUserGroups as $userUserGroup) {
             $userGroup = Repo::userGroup()->get($userUserGroup->userGroupId);
-            if ($userGroup && $userGroup->abbrev['pt_BR'] == $scieloJournalGroupAbbrev) {
+            if ($userGroup && ($userGroup->abbrev['pt_BR'] ?? null) == $scieloJournalGroupAbbrev) {
                 return true;
             }
         }
