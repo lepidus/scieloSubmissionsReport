@@ -69,13 +69,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function clearDB(): void
     {
-        $publication = Repo::publication()->get($this->publicationId);
-        if ($publication) {
-            Repo::publication()->dao->delete($publication);
-        }
-
         $submission = Repo::submission()->get($this->submissionId);
         if ($submission) {
+            Repo::publication()->dao->deleteById($submission->getData('currentPublicationId'));
             Repo::submission()->delete($submission);
         }
 
