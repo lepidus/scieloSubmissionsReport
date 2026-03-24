@@ -19,6 +19,7 @@ use APP\publication\Publication;
 use APP\submission\Submission;
 use PKP\security\Role;
 use PKP\stageAssignment\StageAssignment;
+use PKP\userGroup\relationships\UserUserGroup;
 use Illuminate\Support\Facades\DB;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
@@ -57,10 +58,12 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 
     public function getSubmitterIsScieloJournal($submitterId)
     {
-        $submitterUserGroups = Repo::userGroup()->userUserGroups($submitterId);
-        foreach ($submitterUserGroups as $userGroup) {
-            $journalGroupAbbrev = 'SciELO';
-            if ($userGroup->abbrev['pt_BR'] == $journalGroupAbbrev) {
+        $userUserGroups = UserUserGroup::withUserId($submitterId)->get();
+        $scieloJournalGroupAbbrev = 'SciELO';
+
+        foreach ($userUserGroups as $userUserGroup) {
+            $userGroup = Repo::userGroup()->get($userUserGroup->userGroupId);
+            if ($userGroup && $userGroup->abbrev['pt_BR'] == $scieloJournalGroupAbbrev) {
                 return true;
             }
         }
@@ -168,7 +171,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 
-        $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+        $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, Decision::INITIAL_DECLINE];
 
         return parent::getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions);
     }
