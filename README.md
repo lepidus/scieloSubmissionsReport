@@ -47,8 +47,8 @@ The information obtained only in OPS are:
 
 The latest release of this plugin is compatible with the following PKP applications:
 
-* OJS 3.4.0
-* OPS 3.4.0
+* OJS 3.5.0
+* OPS 3.5.0
 
 
 ## Plugin Download
@@ -59,7 +59,7 @@ To download the plugin, go to the [Releases page](https://github.com/lepidus/sci
 
 1. Enter the administration area of ​​your OJS/OPS website through the __Dashboard__.
 2. Navigate to `Settings`>` Website`> `Plugins`> `Upload a new plugin`.
-3. Under __Upload file__ select the file __ScieloSubmissionsReportPlugin.tar.gz__.
+3. Under __Upload file__ select the file __scieloSubmissionsReportPlugin.tar.gz__.
 4. Click __Save__ and the plugin will be installed on your website.
 
 ## Development: Running Unit Tests
@@ -67,23 +67,14 @@ To download the plugin, go to the [Releases page](https://github.com/lepidus/sci
 Run this command at application's (OJS or OPS) root directory:
 
 ``` bash
-find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group applicationToIgnoreTests -v "{}" ";"
+lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit.xml "plugins/reports/scieloSubmissionsReport/tests"
 ```
 
-Replace `applicationToIgnoreTests` with the application that tests will **not** run, because it's not the plugin's host application.
-
-Example command to run the tests in OJS:
-
-``` bash
-find plugins/reports/scieloSubmissionsReport -name tests -type d -exec php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit-env2.xml --exclude-group OPS -v "{}" ";"
-```
-
-Note: To run the tests your plugin can't be installed in OJS/OPS through a symbolic link,
-if it is, you must copy/move it directly to the plugins/report/ directory.
+Depending on the application you're using, some tests will be marked as skipped. This occurs because some tests are suitable only for one application (i.e. for OJS or OPS, but not both).
 
 # License
 __This plugin is licensed under the GNU General Public License v3.0__
 
-__Copyright (c) 2019-2021 Lepidus Tecnologia__
+__Copyright (c) 2019-2026 Lepidus Tecnologia__
 
-__Copyright (c) 2020-2021 SciELO__
+__Copyright (c) 2020-2026 SciELO__
