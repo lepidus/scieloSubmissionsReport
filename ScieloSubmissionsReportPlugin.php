@@ -16,15 +16,17 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
+use PKP\plugins\ReportPlugin;
+use PKP\plugins\interfaces\HasTaskScheduler;
+use PKP\scheduledTask\PKPScheduler;
 use PKP\config\Config;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
-use PKP\plugins\Hook;
-use PKP\plugins\ReportPlugin;
+use APP\plugins\reports\scieloSubmissionsReport\classes\tasks\SendReportEmail;
+use APP\plugins\reports\scieloSubmissionsReport\classes\form\ScieloSubmissionsReportSettingsForm;
 
-class ScieloSubmissionsReportPlugin extends ReportPlugin
+class ScieloSubmissionsReportPlugin extends ReportPlugin implements HasTaskScheduler
 {
     /**
      * @copydoc Plugin::register()
@@ -37,9 +39,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
 
         if ($success && Config::getVar('general', 'installed')) {
             $this->addLocaleData();
-
-            // Hook::add('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
         }
+
         return $success;
     }
 
@@ -58,11 +59,13 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         return __('plugins.reports.scieloSubmissionsReport.description');
     }
 
-    public function addPluginTasksToCrontab($hookName, $args)
+    public function registerSchedules(PKPScheduler $scheduler): void
     {
-        $taskFilesPath = &$args[0];
-        $taskFilesPath[] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'scheduledTasks.xml';
-        return false;
+        $scheduler
+            ->addSchedule(new SendReportEmail())
+            ->monthlyOn(10)
+            ->name(SendReportEmail::class)
+            ->withoutOverlapping();
     }
 
     public function display($args, $request)
