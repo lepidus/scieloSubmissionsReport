@@ -1,21 +1,24 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\article;
 
-use APP\decision\Decision;
+use PKP\tests\DatabaseTestCase;
 use APP\facades\Repo;
+use APP\core\Application;
+use PKP\core\Core;
+use APP\decision\Decision;
+use APP\submission\Submission;
+use PKP\db\DAORegistry;
+use PKP\security\Role;
+use PKP\stageAssignment\StageAssignment;
+use PKP\userGroup\UserGroup;
+use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\submission\reviewRound\ReviewRound;
+use PKP\userGroup\relationships\UserGroupStage;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
-use APP\submission\Submission;
-use PKP\core\Core;
-use PKP\db\DAORegistry;
-use PKP\security\Role;
-use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\submission\reviewRound\ReviewRound;
-use PKP\tests\DatabaseTestCase;
-use PKP\userGroup\relationships\UserGroupStage;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
@@ -45,13 +48,17 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         parent::setUp();
 
+        if (Application::getName() != 'ojs2') {
+            $this->markTestSkipped(
+                'Not OJS',
+            );
+        }
+
         $this->editorsUsersIds = [];
         $this->sectionId = $this->createSection();
-        $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication();
+        $this->createSubmission();
         $this->submissionAuthors = $this->createAuthors();
         $this->statusMessage = __('submission.status.published', [], 'en');
-        $this->addCurrentPublicationToSubmission();
     }
 
     protected function tearDown(): void
@@ -62,13 +69,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function clearDB(): void
     {
-        $publication = Repo::publication()->get($this->publicationId);
-        if ($publication) {
-            Repo::publication()->delete($publication);
-        }
-
         $submission = Repo::submission()->get($this->submissionId);
         if ($submission) {
+            Repo::publication()->dao->deleteById($submission->getData('currentPublicationId'));
             Repo::submission()->delete($submission);
         }
 
@@ -77,10 +80,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             Repo::section()->delete($section);
         }
 
-        $editorUserGroup = $this->editorUserGroupId ? Repo::userGroup()->get($this->editorUserGroupId) : null;
-        if ($editorUserGroup) {
-            Repo::userGroup()->delete($editorUserGroup);
-        }
+        UserGroup::destroy($this->editorUserGroupId);
 
         $author1 = $this->author1Id ? Repo::author()->get($this->author1Id) : null;
         if ($author1) {
@@ -105,42 +105,42 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             return;
         }
 
-        $stageAssignmentDAO = DAORegistry::getDAO('StageAssignmentDAO');
         foreach ($this->stageAssignmentIds as $stageAssignmentId) {
-            $stageAssignment = $stageAssignmentDAO->getById($stageAssignmentId);
-            $stageAssignmentDAO->deleteObject($stageAssignment);
+            StageAssignment::destroy($stageAssignmentId);
         }
 
         if ($this->reviewAssignmentId) {
-            $reviewRoundDAO = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $reviewAssignment = $reviewRoundDAO->getById($this->reviewAssignmentId);
-            $reviewRoundDAO->deleteObject($reviewAssignment);
+            $reviewAssignment = Repo::reviewAssignment()->get($this->reviewAssignmentId);
+            Repo::reviewAssignment()->delete($reviewAssignment);
         }
     }
 
-    private function createSubmission(): int
+    private function createSubmission()
     {
+        $context = Application::get()->getContextDAO()->getById($this->contextId);
+
         $submission = Repo::submission()->newDataObject();
-        $submission->setData('contextId', $this->contextId);
-        $submission->setData('dateSubmitted', $this->dateSubmitted);
-        $submission->setData('status', $this->statusCode);
-        $submission->setData('locale', $this->locale);
-        $submission->setData('dateLastActivity', $this->dateLastActivity);
+        $submission->setAllData([
+            'contextId' => $this->contextId,
+            'dateSubmitted' => $this->dateSubmitted,
+            'status' => $this->statusCode,
+            'locale' => $this->locale,
+            'dateLastActivity' => $this->dateLastActivity,
+        ]);
 
-        return Repo::submission()->dao->insert($submission);
-    }
-
-    private function createPublication(): int
-    {
         $publication = Repo::publication()->newDataObject();
-        $publication->setData('submissionId', $this->submissionId);
-        $publication->setData('title', $this->title, $this->locale);
-        $publication->setData('sectionId', $this->sectionId);
-        $publication->setData('relationStatus', '1');
-        $publication->setData('vorDoi', $this->doi);
-        $publication->setData('status', $this->statusCode);
+        $publication->setAllData([
+            'title' => $this->title ? [$this->locale => $this->title] : null,
+            'sectionId' =>  $this->sectionId,
+            'relationStatus' =>  '1',
+            'vorDoi' =>  $this->doi,
+            'status' =>  $this->statusCode
+        ]);
 
-        return Repo::publication()->dao->insert($publication);
+        $this->submissionId = Repo::submission()->add($submission, $publication, $context);
+
+        $submission = Repo::submission()->get($this->submissionId);
+        $this->publicationId = $submission->getData('currentPublicationId');
     }
 
     private function createSectionEditorUserGroup(): int
@@ -150,11 +150,14 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'pt_BR' => 'editor de seção',
             'es' => 'editor de sección'
         ];
-        $sectionEditorsUserGroup = Repo::userGroup()->newDataObject();
-        $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
-        $sectionEditorsUserGroup->setData('roleId', Role::ROLE_ID_SUB_EDITOR);
-        $sectionEditorsUserGroup->setData('contextId', $this->contextId);
-        return Repo::userGroup()->add($sectionEditorsUserGroup);
+
+        $sectionEditorUserGroup = UserGroup::create([
+            'name' => $sectionEditorUserGroupLocalizedNames,
+            'roleId' => Role::ROLE_ID_SUB_EDITOR,
+            'contextId' => $this->contextId
+        ]);
+
+        return $sectionEditorUserGroup->id;
     }
 
     private function createJournalEditorUserGroup(): int
@@ -164,24 +167,27 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'pt_BR' => 'Editor da revista',
             'es' => 'Editor/a de la revista'
         ];
-        $editorsUserGroup = Repo::userGroup()->newDataObject();
-        $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
-        $editorsUserGroup->setData('roleId', Role::ROLE_ID_MANAGER);
-        $editorsUserGroup->setData('contextId', $this->contextId);
-        return Repo::userGroup()->add($editorsUserGroup);
+        $editorsUserGroup = UserGroup::create([
+            'name' => $editorUserGroupLocalizedNames,
+            'roleId' => Role::ROLE_ID_MANAGER,
+            'contextId' => $this->contextId
+        ]);
+        return $editorsUserGroup->id;
     }
 
     private function createSection(): int
     {
         $section = Repo::section()->newDataObject();
-        $section->setTitle($this->sectionName, $this->locale);
-        $section->setAbbrev(__('section.default.abbrev'), $this->locale);
-        $section->setMetaIndexed(true);
-        $section->setMetaReviewed(true);
-        $section->setPolicy(__('section.default.policy'), $this->locale);
-        $section->setEditorRestricted(false);
-        $section->setHideTitle(false);
-        $section->setContextId($this->contextId);
+        $section->setAllData([
+            'title' => [$this->locale => $this->sectionName],
+            'abbrev' => [$this->locale => __('section.default.abbrev')],
+            'metaIndexed' => true,
+            'metaReviewed' => true,
+            'policy' => [$this->locale => __('section.default.policy')],
+            'editorRestricted' => false,
+            'hideTitle' => false,
+            'contextId' => $this->contextId
+        ]);
         $sectionId = Repo::section()->add($section);
 
         return $sectionId;
@@ -191,29 +197,25 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $author1 = Repo::author()->newDataObject();
         $author2 = Repo::author()->newDataObject();
-        $author1->setData('publicationId', $this->publicationId);
-        $author2->setData('publicationId', $this->publicationId);
-        $author1->setData('email', 'anaalice@harvard.com');
-        $author2->setData('email', 'seizi.tagima@ufam.edu.br');
-        $author1->setGivenName('Ana Alice', $this->locale);
-        $author1->setFamilyName('Caldas Novas', $this->locale);
-        $author2->setGivenName('Seizi', $this->locale);
-        $author2->setFamilyName('Tagima', $this->locale);
-        $author1->setAffiliation('Harvard University', $this->locale);
-        $author2->setAffiliation('Amazonas Federal University', $this->locale);
-        $author1->setData('country', 'US');
-        $author2->setData('country', 'BR');
+        $author1->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'anaalice@harvard.com',
+            'givenName' => [$this->locale => 'Ana Alice'],
+            'familyName' => [$this->locale => 'Caldas Novas'],
+            'country' => 'US'
+        ]);
+        $author2->setAllData([
+            'publicationId' => $this->publicationId,
+            'email' => 'seizi.tagima@ufam.edu.br',
+            'givenName' => [$this->locale => 'Seizi'],
+            'familyName' => [$this->locale => 'Tagima'],
+            'country' => 'BR'
+        ]);
 
         $this->author1Id = Repo::author()->dao->insert($author1);
         $this->author2Id = Repo::author()->dao->insert($author2);
 
         return [new SubmissionAuthor('Ana Alice Caldas Novas', 'United States', 'Harvard University'), new SubmissionAuthor('Seizi Tagima', 'Brazil', 'Amazonas Federal University')];
-    }
-
-    private function addCurrentPublicationToSubmission(): void
-    {
-        $submission = Repo::submission()->get($this->submissionId);
-        Repo::submission()->edit($submission, ['currentPublicationId' => $this->publicationId]);
     }
 
     private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false)
@@ -279,20 +281,16 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private function createStageAssignments(array $userIds, $groupId): void
     {
-        $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
         foreach ($userIds as $userId) {
-            $stageAssignment = $stageAssignmentDao->newDataObject();
-            $stageAssignment->setSubmissionId($this->submissionId);
-            $stageAssignment->setUserId($userId);
-            $stageAssignment->setUserGroupId($groupId);
-            $stageAssignment->setStageId(5);
-            $stageAssignmentIds[] = $stageAssignmentDao->insertObject($stageAssignment);
+            StageAssignment::create([
+                'submissionId' => $this->submissionId,
+                'userId' => $userId,
+                'userGroupId' => $groupId,
+                'dateAssigned' => Core::getCurrentDate()
+            ]);
         }
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionIsArticle(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -301,18 +299,13 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
     }
 
-    /**
-     * @group OJS
-     */
     public function testArticleCreationWhenItHasNoTitles(): void
     {
         $this->clearDB();
         $this->title = null;
         $this->sectionId = $this->createSection();
-        $this->submissionId = $this->createSubmission();
-        $this->publicationId = $this->createPublication();
+        $this->createSubmission();
         $this->submissionAuthors = $this->createAuthors();
-        $this->addCurrentPublicationToSubmission();
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -321,9 +314,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noTitles'), $scieloArticle->getTitle());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsJournalEditors(): void
     {
         $journalEditorsData = [
@@ -353,9 +343,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsDisabledJournalEditors(): void
     {
         $journalEditorsData = [
@@ -387,9 +374,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -398,9 +382,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noEditors'), $scieloArticle->getJournalEditors());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsSectionEditor(): void
     {
         $sectionEditorData = [
@@ -419,9 +400,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsDisabledSectionEditor(): void
     {
         $sectionEditorData = [
@@ -441,9 +419,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($sectionEditorsUser->getFullName(), $scieloArticle->getSectionEditor());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsNoSectionEditor(): void
     {
         $this->editorUserGroupId = $this->createSectionEditorUserGroup();
@@ -460,12 +435,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($noEditorMessage, $scieloArticle->getSectionEditor());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsLastDecision(): void
     {
-        $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
+        $decision = Decision::INITIAL_DECLINE;
         $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()));
 
         $articleFactory = new ScieloArticleFactory();
@@ -475,14 +447,11 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsLastDecisionOfNewRound(): void
     {
         $reviewRound = $this->createReviewRound($this->submissionId);
 
-        $decision = SUBMISSION_EDITOR_DECISION_NEW_ROUND;
+        $decision = Decision::NEW_EXTERNAL_ROUND;
         $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()), $reviewRound->getId());
 
         $articleFactory = new ScieloArticleFactory();
@@ -492,9 +461,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($scieloArticlesDAO->getDecisionMessage($decision), $scieloArticle->getLastDecision());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsNoLastDecision(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -503,9 +469,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals(__('plugins.reports.scieloSubmissionsReport.warning.noDecision'), $scieloArticle->getLastDecision());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsReviews(): void
     {
         $recommendation = ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT;
@@ -521,7 +484,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $reviewAssignment->setReviewRoundId($reviewRound->getId());
         $reviewAssignment->setDateCompleted(Core::getCurrentDate());
 
-        $this->reviewAssignmentId = DAORegistry::getDAO('ReviewAssignmentDAO')->insertObject($reviewAssignment);
+        $this->reviewAssignmentId = Repo::reviewAssignment()->add($reviewAssignment);
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
@@ -529,12 +492,9 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($reviewAssignment->getLocalizedRecommendation(), $scieloArticle->getReviews());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsFinalDecisionWithDateInitialDecline(): void
     {
-        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
+        $finalDecisionCode = Decision::INITIAL_DECLINE;
         $finalDecision = __('common.declined', [], $this->locale);
         $finalDecisionDate = '2021-05-29';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);
@@ -546,9 +506,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloArticle->getFinalDecisionDate());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsFinalDecisionWithDateDecline(): void
     {
         $finalDecisionCode = Decision::DECLINE;
@@ -563,9 +520,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->assertEquals($finalDecisionDate, $scieloArticle->getFinalDecisionDate());
     }
 
-    /**
-     * @group OJS
-     */
     public function testSubmissionGetsFinalDecisionWithDateAccept(): void
     {
         $finalDecisionCode = Decision::ACCEPT;

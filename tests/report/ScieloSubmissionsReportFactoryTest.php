@@ -1,8 +1,10 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\decision\Decision;
+use PKP\core\Core;
+use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
@@ -11,7 +13,7 @@ use PKP\tests\DatabaseTestCase;
 
 class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {
-    private $application = 'ojs';
+    private $application;
     private $locale = 'en';
     private $contextId;
     private $reportFactory;
@@ -27,6 +29,8 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->application = Application::getName();
         $this->createContext();
         $this->sectionsIds = $this->createTestSections();
         $this->submissionsIds = $this->createTestSubmissions();
@@ -38,20 +42,19 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
     {
         parent::tearDown();
 
-        $contextDAO = \Application::getContextDAO();
+        $contextDAO = Application::getContextDAO();
         $context = $contextDAO->getById($this->contextId);
         $contextDAO->deleteObject($context);
     }
 
     private function createContext(): void
     {
-        $contextDAO = \Application::getContextDAO();
+        $contextDAO = Application::getContextDAO();
         $context = $contextDAO->newDataObject();
         $context->setAllData([
             'urlPath' => [$this->locale => 'test'],
             'primaryLocale' => $this->locale
         ]);
-        ;
 
         $this->contextId = $contextDAO->insertObject($context);
     }
@@ -90,6 +93,7 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $submission->setData('contextId', $this->contextId);
         $submission->setData('locale', $this->locale);
         $submission->setData('status', Submission::STATUS_PUBLISHED);
+        $submission->setData('dateLastActivity', $dateSubmitted ?? Core::getCurrentDate());
 
         if (!is_null($dateSubmitted)) {
             $submission->setData('dateSubmitted', $dateSubmitted);
@@ -321,11 +325,14 @@ class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
         $this->assertEquals([$this->submissionsIds[2]], $scieloSubmissionsIds);
     }
 
-    /**
-     * @group OPS
-     */
-    public function testReportFilterByFinalDecisionDateInOPSGetsPostedSubmissions(): void
+    public function testReportFilterByFinalDecisionDateInOpsGetsPostedSubmissions(): void
     {
+        if ($this->application != 'ops') {
+            $this->markTestSkipped(
+                'Not OPS',
+            );
+        }
+
         $postedSubmissionId = $this->createSubmission('1921-06-14 04:30:08');
         $publicationId = $this->createPublication($postedSubmissionId, $this->sectionsIds[0], '1921-06-21 14:13:20');
         $this->addCurrentPublicationToSubmission($postedSubmissionId, $publicationId);

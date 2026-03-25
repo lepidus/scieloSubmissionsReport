@@ -126,10 +126,14 @@ class ScieloSubmissionFactory
             $author = Repo::author()->get($authorId);
             $fullName = $author->getFullName($locale);
             $country = $author->getCountryLocalized();
-            $affiliation = $author->getLocalizedData('affiliation', $locale);
 
-            $country = (!is_null($country)) ? ($country) : ('');
-            $affiliation = (!is_null($affiliation)) ? ($affiliation) : ('');
+            $affiliations = [];
+            foreach ($author->getAffiliations() as $affiliation) {
+                $affiliations[] = $affiliation->getLocalizedName($locale);
+            }
+
+            $country = !is_null($country) ? $country : '';
+            $affiliation = !empty($affiliations) ? implode('|', $affiliations) : '';
             $submissionAuthors[] = new SubmissionAuthor($fullName, $country, $affiliation);
         }
 

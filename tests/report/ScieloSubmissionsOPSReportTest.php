@@ -1,11 +1,12 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOPSReportTest extends TestCase
@@ -17,6 +18,8 @@ class ScieloSubmissionsOPSReportTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
+
         $this->submissions = $this->createTestPreprints();
         $includeViews = true;
         $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
@@ -53,7 +56,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         return [$preprint1, $preprint2, $preprint3];
     }
 
-    public function testGeneratedCSVHeadersFromOPSSubmissions(): void
+    public function testGeneratedCsvHeadersFromOpsSubmissions(): void
     {
         $this->generateCSV();
         $csvFile = fopen($this->filePath, 'r');
@@ -128,7 +131,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
     }
 
-    public function testGeneratedCSVHasAverageReviewingTime(): void
+    public function testGeneratedCsvHasAverageReviewingTime(): void
     {
         $this->generateCSV();
         $csvRows = array_map('str_getcsv', file($this->filePath));
@@ -140,7 +143,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $this->assertEquals($expectedAverageReviewingTime, $penultimateCellFromLastRow);
     }
 
-    public function testGeneratedCSVHasPreprintData(): void
+    public function testGeneratedCsvHasPreprintData(): void
     {
         $this->submissions = ($this->createTestPreprints())[0];
         $this->generateCSV();

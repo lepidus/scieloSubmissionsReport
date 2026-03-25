@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;

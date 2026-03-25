@@ -14,20 +14,27 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportF
 
 class SendReportEmail extends ScheduledTask
 {
-    public function executeActions()
+    public $plugin;
+
+    public function __construct(array $args = [])
     {
-        $application = substr(Application::getName(), 0, 3);
-        $context = Application::get()->getRequest()->getContext();
         PluginRegistry::loadCategory('reports');
-        $plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');
+        $this->plugin = PluginRegistry::getPlugin('reports', 'scielosubmissionsreportplugin');
 
-        $recipientEmails = $this->getRecipientEmails($plugin, $context->getId());
+        parent::__construct($args);
+    }
 
-        if ($application == 'ops' && !empty($recipientEmails)) {
+    protected function executeActions(): bool
+    {
+        $applicationName = Application::getName();
+        $context = Application::get()->getRequest()->getContext();
+        $recipientEmails = $this->getRecipientEmails($this->plugin, $context->getId());
+
+        if ($applicationName == 'ops' && !empty($recipientEmails)) {
             $locale = Locale::getLocale();
-            $plugin->addLocaleData($locale);
+            $this->plugin->addLocaleData($locale);
 
-            $report = $this->getReport($application, $context, $locale);
+            $report = $this->getReport($applicationName, $context, $locale);
             $reportFilePath = $this->writeReportFile($context, $report);
 
             $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);

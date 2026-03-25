@@ -1,8 +1,9 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\tests;
+namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReport;
+use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsReportTest extends TestCase
@@ -35,7 +36,7 @@ class ScieloSubmissionsReportTest extends TestCase
         $this->assertEquals($this->sections, $this->report->getSections());
     }
 
-    public function testGeneratedCSVHasUTF8Bytes(): void
+    public function testGeneratedCsvHasUtf8Bytes(): void
     {
         $this->createCSVReport();
         $csvFile = fopen($this->filePath, 'r');
@@ -46,7 +47,7 @@ class ScieloSubmissionsReportTest extends TestCase
         $this->assertEquals($csvFileUtils->getExpectedUTF8BOM(), $byteRead);
     }
 
-    public function testGeneratedCSVHasSections(): void
+    public function testGeneratedCsvHasSections(): void
     {
         $this->createCSVReport();
         $csvRows = array_map('str_getcsv', file($this->filePath));
@@ -58,7 +59,7 @@ class ScieloSubmissionsReportTest extends TestCase
         $this->assertEquals($expectedSections, $lastCellFromLastRow);
     }
 
-    public function testGeneratedCSVHasSecondHeaders(): void
+    public function testGeneratedCsvHasSecondHeaders(): void
     {
         $this->createCSVReport();
         $csvRows = array_map('str_getcsv', file($this->filePath));

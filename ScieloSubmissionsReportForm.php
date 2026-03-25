@@ -47,7 +47,7 @@ class ScieloSubmissionsReportForm extends Form
     public function __construct($plugin)
     {
         $this->plugin = $plugin;
-        $this->application = substr(Application::getName(), 0, 3);
+        $this->application = Application::getName();
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
         $this->sections = [];
@@ -113,7 +113,7 @@ class ScieloSubmissionsReportForm extends Form
     {
         $context = $request->getContext();
         header('content-type: text/comma-separated-values');
-        $acronym = PKPString::regexp_replace('/[^A-Za-z0-9 ]/', '', $context->getLocalizedAcronym());
+        $acronym = preg_replace('/[^A-Za-z0-9 ]/u', '', $context->getLocalizedAcronym(), -1);
         header('content-disposition: attachment; filename=submissions' . $acronym . '-' . date('YmdHis') . '.csv');
     }
 
@@ -139,7 +139,7 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager = TemplateManager::getManager();
         $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
         $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, [
-            'priority' => STYLE_SEQUENCE_CORE,
+            'priority' => TemplateManager::STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
         ]);
         $templateManager->assign('application', $this->application);
@@ -158,7 +158,8 @@ class ScieloSubmissionsReportForm extends Form
                     'name' => __('plugins.reports.scieloSubmissionsReport.displayName')
                 ],
             ],
-            'pageTitle', __('plugins.reports.scieloSubmissionsReport.displayName')
+            'pageTitle',
+            __('plugins.reports.scieloSubmissionsReport.displayName')
         ]);
 
         $templateManager->display($this->plugin->getTemplateResource($template));
