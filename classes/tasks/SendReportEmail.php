@@ -24,7 +24,7 @@ class SendReportEmail extends ScheduledTask
         parent::__construct($args);
     }
 
-    public function executeActions()
+    protected function executeActions(): bool
     {
         $applicationName = Application::getName();
         $context = Application::get()->getRequest()->getContext();
