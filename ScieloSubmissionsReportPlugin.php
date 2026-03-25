@@ -38,7 +38,7 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         if ($success && Config::getVar('general', 'installed')) {
             $this->addLocaleData();
 
-            Hook::add('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
+            // Hook::add('AcronPlugin::parseCronTab', [$this, 'addPluginTasksToCrontab']);
         }
         return $success;
     }
