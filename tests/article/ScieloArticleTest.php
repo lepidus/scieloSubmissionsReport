@@ -3,7 +3,7 @@
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\article;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticle;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use PHPUnit\Framework\TestCase;
 
 class ScieloArticleTest extends TestCase

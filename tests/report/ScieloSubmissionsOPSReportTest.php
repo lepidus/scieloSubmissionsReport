@@ -4,7 +4,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
 use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprint;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
 use PHPUnit\Framework\TestCase;

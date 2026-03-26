@@ -2,7 +2,7 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes\preprint;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 
 class ScieloPreprintFactory extends ScieloSubmissionFactory

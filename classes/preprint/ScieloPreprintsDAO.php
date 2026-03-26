@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/reports/scieloSubmissionsReport/classes/ScieloPreprintDAO.inc.php
+ * @file plugins/reports/scieloSubmissionsReport/classes/preprint/ScieloPreprintsDAO.php
  *
  * @class ScieloPreprintDAO
  *
@@ -22,7 +22,7 @@ use PKP\stageAssignment\StageAssignment;
 use PKP\userGroup\relationships\UserUserGroup;
 use Illuminate\Support\Facades\DB;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionsDAO;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 {

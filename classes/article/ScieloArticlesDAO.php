@@ -16,7 +16,7 @@ use APP\decision\Decision;
 use APP\facades\Repo;
 use PKP\stageAssignment\StageAssignment;
 use PKP\security\Role;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionsDAO;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {

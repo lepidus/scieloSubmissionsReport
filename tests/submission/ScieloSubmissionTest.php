@@ -2,8 +2,8 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmission;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmission;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 

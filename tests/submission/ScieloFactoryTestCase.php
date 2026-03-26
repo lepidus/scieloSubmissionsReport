@@ -5,7 +5,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 use APP\core\Application;
 use APP\facades\Repo;
 use PKP\affiliation\Affiliation;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use PKP\tests\DatabaseTestCase;
 
 class ScieloFactoryTestCase extends DatabaseTestCase

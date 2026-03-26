@@ -18,7 +18,7 @@ use PKP\userGroup\relationships\UserGroupStage;
 use APP\plugins\reports\scieloSubmissionsReport\classes\article\{
     ScieloArticle, ScieloArticleFactory, ScieloArticlesDAO
 };
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {

@@ -2,7 +2,7 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes\article;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionFactory;
 
 class ScieloArticleFactory extends ScieloSubmissionFactory
 {
