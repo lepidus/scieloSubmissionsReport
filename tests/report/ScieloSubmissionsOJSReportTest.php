@@ -2,7 +2,7 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;

@@ -3,6 +3,8 @@
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
 use APP\facades\Repo;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticlesDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticleFactory;
 
 class ScieloSubmissionsReportFactory
 {
