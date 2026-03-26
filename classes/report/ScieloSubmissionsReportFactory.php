@@ -1,8 +1,9 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\report;
 
 use APP\facades\Repo;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
 use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticlesDAO;
 use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticleFactory;
 use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprintsDAO;

@@ -16,14 +16,13 @@ namespace APP\plugins\reports\scieloSubmissionsReport;
 
 use APP\core\Application;
 use APP\facades\Repo;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 use APP\template\TemplateManager;
-use PKP\core\PKPString;
 use PKP\facades\Locale;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\report\ScieloSubmissionsReportFactory;
 
 class ScieloSubmissionsReportForm extends Form
 {
