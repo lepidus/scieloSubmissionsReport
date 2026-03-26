@@ -10,7 +10,7 @@
  * Operations for retrieving preprints and other data
  */
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\preprint;
 
 use APP\core\Services;
 use APP\decision\Decision;
@@ -21,6 +21,8 @@ use PKP\security\Role;
 use PKP\stageAssignment\StageAssignment;
 use PKP\userGroup\relationships\UserUserGroup;
 use Illuminate\Support\Facades\DB;
+use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsDAO;
 
 class ScieloPreprintsDAO extends ScieloSubmissionsDAO
 {
