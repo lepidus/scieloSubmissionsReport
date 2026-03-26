@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/reports/scieloSubmissionsReport/classes/ScieloSubmissionsDAO.inc.php
+ * @file plugins/reports/scieloSubmissionsReport/classes/submission/ScieloSubmissionsDAO.php
  *
  * @class ScieloSubmissionsDAO
  *
@@ -10,13 +10,15 @@
  * Operations for retrieving submissions and other data
  */
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\submission;
 
-use APP\decision\Decision;
 use DateTime;
+use APP\core\Application;
+use APP\decision\Decision;
 use Illuminate\Support\Facades\DB;
 use PKP\db\DAO;
 use PKP\log\event\PKPSubmissionEventLogEntry;
+use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 
 class ScieloSubmissionsDAO extends DAO
 {
@@ -163,7 +165,7 @@ class ScieloSubmissionsDAO extends DAO
     {
         $result = DB::table('event_log')
             ->where('event_type', PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT)
-            ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+            ->where('assoc_type', Application::ASSOC_TYPE_SUBMISSION)
             ->where('assoc_id', $submissionId)
             ->select('user_id')
             ->get();
@@ -189,7 +191,7 @@ class ScieloSubmissionsDAO extends DAO
 
         if ($row['decision'] == Decision::ACCEPT) {
             $decision = __('common.accepted', [], $locale);
-        } elseif ($row['decision'] == Decision::DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE) {
+        } elseif ($row['decision'] == Decision::DECLINE || $row['decision'] == Decision::INITIAL_DECLINE) {
             $decision = __('common.declined', [], $locale);
         }
 

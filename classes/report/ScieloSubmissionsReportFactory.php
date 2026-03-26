@@ -1,8 +1,13 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\report;
 
 use APP\facades\Repo;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticlesDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\ScieloArticleFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprintsDAO;
+use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprintFactory;
 
 class ScieloSubmissionsReportFactory
 {
@@ -14,7 +19,7 @@ class ScieloSubmissionsReportFactory
     private $finalDecisionDateInterval;
     private $includeViews;
 
-    public function __construct(string $application, int $contextId, array $sectionsIds, ClosedDateInterval $submissionDateInterval = null, ClosedDateInterval $finalDecisionDateInterval = null, string $locale, bool $includeViews)
+    public function __construct(string $application, int $contextId, array $sectionsIds, ?ClosedDateInterval $submissionDateInterval, ?ClosedDateInterval $finalDecisionDateInterval, string $locale, bool $includeViews)
     {
         $this->application = $application;
         $this->locale = $locale;

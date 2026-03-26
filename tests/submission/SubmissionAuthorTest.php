@@ -2,7 +2,7 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use PHPUnit\Framework\TestCase;
 
 final class SubmissionAuthorTest extends TestCase

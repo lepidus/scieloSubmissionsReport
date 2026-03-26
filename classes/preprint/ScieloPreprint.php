@@ -1,6 +1,9 @@
 <?php
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\preprint;
+
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmission;
+use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 
 class ScieloPreprint extends ScieloSubmission
 {
@@ -12,7 +15,7 @@ class ScieloPreprint extends ScieloSubmission
     private $notes;
     private $stats;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $responsibles, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, SubmissionStats $stats = null)
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $responsibles, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, ?SubmissionStats $stats = null)
     {
         parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
         $this->submitterIsScieloJournal = $submitterIsScieloJournal;

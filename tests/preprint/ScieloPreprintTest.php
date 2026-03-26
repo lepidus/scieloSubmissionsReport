@@ -2,8 +2,8 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\preprint;
 
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 use PHPUnit\Framework\TestCase;
 

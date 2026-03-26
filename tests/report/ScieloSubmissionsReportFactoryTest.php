@@ -2,14 +2,14 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\report;
 
+use PKP\tests\DatabaseTestCase;
 use APP\decision\Decision;
 use PKP\core\Core;
 use APP\core\Application;
 use APP\facades\Repo;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
 use APP\submission\Submission;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
+use APP\plugins\reports\scieloSubmissionsReport\classes\report\ScieloSubmissionsReportFactory;
 
 class ScieloSubmissionsReportFactoryTest extends DatabaseTestCase
 {

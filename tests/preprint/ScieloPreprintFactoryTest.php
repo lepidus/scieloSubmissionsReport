@@ -18,9 +18,9 @@ use PKP\statistics\PKPStatisticsHelper;
 use PKP\tests\DatabaseTestCase;
 use PKP\userGroup\UserGroup;
 use PKP\userGroup\relationships\UserGroupStage;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprintFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprint;
+use APP\plugins\reports\scieloSubmissionsReport\classes\preprint\ScieloPreprintFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 
 class ScieloPreprintFactoryTest extends DatabaseTestCase

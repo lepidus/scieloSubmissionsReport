@@ -15,10 +15,10 @@ use PKP\userGroup\UserGroup;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 use PKP\submission\reviewRound\ReviewRound;
 use PKP\userGroup\relationships\UserGroupStage;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticleFactory;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticlesDAO;
-use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\classes\article\{
+    ScieloArticle, ScieloArticleFactory, ScieloArticlesDAO
+};
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {

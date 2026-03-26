@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use PKP\plugins\PluginRegistry;
 use PKP\scheduledTask\ScheduledTask;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ClosedDateInterval;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsReportFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\report\ScieloSubmissionsReportFactory;
 
 class SendReportEmail extends ScheduledTask
 {

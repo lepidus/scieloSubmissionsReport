@@ -3,7 +3,7 @@
 namespace APP\plugins\reports\scieloSubmissionsReport\tests\submission;
 
 use APP\facades\Repo;
-use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionFactory;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionFactory;
 use APP\submission\Submission;
 use DateTime;
 use PKP\core\Core;

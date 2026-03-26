@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/reports/scieloSubmissionsReport/classes/ScieloArticlesDAO.inc.php
+ * @file plugins/reports/scieloSubmissionsReport/classes/article/ScieloArticlesDAO.php
  *
  * @class ScieloArticlesDAO
  *
@@ -10,12 +10,13 @@
  * Operations for retrieving articles and other data
  */
 
-namespace APP\plugins\reports\scieloSubmissionsReport\classes;
+namespace APP\plugins\reports\scieloSubmissionsReport\classes\article;
 
 use APP\decision\Decision;
 use APP\facades\Repo;
 use PKP\stageAssignment\StageAssignment;
 use PKP\security\Role;
+use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmissionsDAO;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
