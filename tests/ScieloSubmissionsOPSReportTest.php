@@ -6,6 +6,7 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloPreprint;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOPSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
+use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportPlugin;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOPSReportTest extends TestCase
@@ -17,9 +18,17 @@ class ScieloSubmissionsOPSReportTest extends TestCase
 
     public function setUp(): void
     {
+        $this->initializePluginLocaleData();
         $this->submissions = $this->createTestPreprints();
         $includeViews = true;
         $this->report = new ScieloSubmissionsOPSReport($this->sections, $this->submissions, $includeViews);
+    }
+
+    private function initializePluginLocaleData(): void
+    {
+        $plugin = new ScieloSubmissionsReportPlugin();
+        $plugin->pluginPath = 'plugins/reports/scieloSubmissionsReport';
+        $plugin->addLocaleData();
     }
 
     public function tearDown(): void
@@ -61,12 +70,15 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
+        fclose($csvFile);
+
         $expectedLine = [
             __('plugins.reports.scieloSubmissionsReport.header.submissionId'),
             __('submission.submissionTitle'),
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterIsScieloJournal'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),
@@ -85,8 +97,6 @@ class ScieloSubmissionsOPSReportTest extends TestCase
             __('submission.abstractViews'),
             __('plugins.reports.scieloSubmissionsReport.header.pdfViews'),
         ];
-        fclose($csvFile);
-
         $this->assertEquals($expectedLine, $firstLine);
     }
 
