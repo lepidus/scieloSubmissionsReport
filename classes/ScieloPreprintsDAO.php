@@ -15,6 +15,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 use APP\core\Services;
 use APP\decision\Decision;
 use APP\facades\Repo;
+use PKP\security\Role;
 use APP\publication\Publication;
 use APP\submission\Submission;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +73,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
         $sectionModeratorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), true);
@@ -95,7 +96,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
         $moderatorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), true);
@@ -167,7 +168,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             return new FinalDecision(__('common.accepted', [], $locale), $publicationDatePublished);
         }
 
-        $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+        $possibleFinalDecisions = [Decision::ACCEPT, Decision::DECLINE, Decision::INITIAL_DECLINE];
 
         return parent::getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions);
     }
