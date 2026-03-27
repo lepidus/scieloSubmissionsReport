@@ -139,7 +139,7 @@ class ScieloSubmissionsReportForm extends Form
         $templateManager = TemplateManager::getManager();
         $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/templates/scieloSubmissionsStyleSheet.css';
         $templateManager->addStyleSheet('scieloSubmissionsStyleSheet', $url, [
-            'priority' => STYLE_SEQUENCE_CORE,
+            'priority' => TemplateManager::STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
         ]);
         $templateManager->assign('application', $this->application);

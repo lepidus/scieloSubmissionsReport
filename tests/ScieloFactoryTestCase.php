@@ -10,6 +10,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 {
     protected $context;
     protected $submission;
+    protected $publication;
     protected $section;
     protected $authors = [];
 
