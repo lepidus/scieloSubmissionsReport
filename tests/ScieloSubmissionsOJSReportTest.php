@@ -5,6 +5,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportPlugin;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOJSReportTest extends TestCase
@@ -16,8 +17,16 @@ class ScieloSubmissionsOJSReportTest extends TestCase
 
     public function setUp(): void
     {
+        $this->initializePluginLocaleData();
         $this->submissions = $this->createTestArticles();
         $this->report = new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
+    }
+
+    private function initializePluginLocaleData(): void
+    {
+        $plugin = new ScieloSubmissionsReportPlugin();
+        $plugin->pluginPath = 'plugins/reports/scieloSubmissionsReport';
+        $plugin->addLocaleData();
     }
 
     public function tearDown(): void
@@ -57,11 +66,14 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
+        fclose($csvFile);
+
         $expectedLine = [
             __('plugins.reports.scieloSubmissionsReport.header.submissionId'),
             __('submission.submissionTitle'),
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),
@@ -77,8 +89,6 @@ class ScieloSubmissionsOJSReportTest extends TestCase
             __('plugins.reports.scieloSubmissionsReport.header.ReviewingTime'),
             __('plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval')
         ];
-
-        fclose($csvFile);
         $this->assertEquals($expectedLine, $firstLine);
     }
 
