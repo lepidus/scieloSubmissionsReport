@@ -135,6 +135,21 @@ class ScieloSubmissionsDAO extends DAO
         return $authorsIds;
     }
 
+    public function getPublicationDoi($publicationId)
+    {
+        $result = DB::table('publications AS p')
+            ->leftJoin('dois AS d', 'p.doi_id', '=', 'd.doi_id')
+            ->where('p.publication_id', $publicationId)
+            ->select('d.doi')
+            ->first();
+
+        if (is_null($result)) {
+            return '';
+        }
+
+        return get_object_vars($result)['doi'];
+    }
+
     public function getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions = [])
     {
         if (empty($possibleFinalDecisions)) {

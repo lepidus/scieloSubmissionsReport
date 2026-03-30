@@ -14,6 +14,13 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
 {
     private $submitterUser;
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->deleteSubmitterUser();
+    }
+
     protected function getSectionData(): array
     {
         return [
@@ -42,12 +49,6 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
                 $this->getLocale() => 'eXtreme Programming: A practical guide',
             ],
             'relationStatus' => 1,
-            'doiObject' => Repo::doi()->newDataObject(
-                [
-                    'doi' => '10.666/949494',
-                    'contextId' => $this->context->getId()
-                ]
-            ),
             'status' => Submission::STATUS_PUBLISHED
         ];
     }
@@ -121,6 +122,14 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
         $this->assertEquals($this->submitterUser->getCountryLocalized(), $scieloSubmission->getSubmitterCountry());
     }
 
+    public function testSubmissionGetsDoi(): void
+    {
+        $submissionFactory = new ScieloSubmissionFactory();
+        $scieloSubmission = $submissionFactory->createSubmission($this->submission->getId(), $this->getLocale());
+
+        $this->assertEquals($this->publication->getDoi(), $scieloSubmission->getDoi());
+    }
+    
     public function testSubmissionGetsDateSubmitted(): void
     {
         $submissionFactory = new ScieloSubmissionFactory();
@@ -172,12 +181,5 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
         $scieloSubmission = $submissionFactory->createSubmission($this->submission->getId(), $this->getLocale());
 
         $this->assertEquals($this->authors, $scieloSubmission->getAuthors());
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->deleteSubmitterUser();
     }
 }
