@@ -76,6 +76,9 @@ msgstr "Sem editores designados"
 msgid "plugins.reports.scieloSubmissionsReport.warning.noSubmitter"
 msgstr "Não foi encontrado o(a) autor(a) submissor(a)"
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noDoi"
+msgstr "Sem DOI"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus"
 msgstr "Sem estado de publicação"
 
