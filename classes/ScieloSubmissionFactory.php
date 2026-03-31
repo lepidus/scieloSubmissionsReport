@@ -18,7 +18,7 @@ class ScieloSubmissionFactory
         $submissionTitle = $scieloSubmissionsDao->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $doi = $scieloSubmissionsDao->getPublicationDoi($publicationId);
+        $doi = $scieloSubmissionsDao->getDoiOfPublication($publicationId);
         $dateSubmitted = $submission['date_submitted'];
         $status = $this->getStatusMessage($submission['status']);
         $sectionName = $scieloSubmissionsDao->getPublicationSection($publicationId, $locale);

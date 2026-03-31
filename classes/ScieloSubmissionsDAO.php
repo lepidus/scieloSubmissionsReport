@@ -135,7 +135,7 @@ class ScieloSubmissionsDAO extends DAO
         return $authorsIds;
     }
 
-    public function getPublicationDoi($publicationId)
+    public function getDoiOfPublication($publicationId)
     {
         $result = DB::table('publications AS p')
             ->join('dois AS d', 'p.doi_id', '=', 'd.doi_id')
