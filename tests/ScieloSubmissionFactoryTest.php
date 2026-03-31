@@ -129,7 +129,7 @@ class ScieloSubmissionFactoryTest extends ScieloFactoryTestCase
 
         $this->assertEquals($this->publication->getDoi(), $scieloSubmission->getDoi());
     }
-    
+
     public function testSubmissionGetsDateSubmitted(): void
     {
         $submissionFactory = new ScieloSubmissionFactory();
