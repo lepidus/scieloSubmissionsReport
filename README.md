@@ -13,6 +13,7 @@ The common information obtained for OJS and OPS are:
 - Submission ID
 - Submission title
 - Submitter
+- DOI
 - Date submitted
 - Days until status changing
 - Submission status (queued, published, declined or scheduled)
