@@ -15,6 +15,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
         $submissionTitle = $scieloArticlesDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
+        $doi = $scieloArticlesDAO->getPublicationDoi($publicationId);
         $dateSubmitted = $submission['date_submitted'];
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $status = $this->getStatusMessage($submission['status']);
@@ -33,6 +34,7 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
             $submissionTitle,
             $submitter,
             $submitterCountry,
+            $doi,
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,
