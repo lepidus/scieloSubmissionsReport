@@ -147,7 +147,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
             return '';
         }
 
-        return $publicationDOI = get_object_vars($result)['vorDoi'];
+        return get_object_vars($result)['vorDoi'];
     }
 
     public function getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions = [])
