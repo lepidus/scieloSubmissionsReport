@@ -12,6 +12,7 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
+use APP\core\Application;
 use APP\decision\Decision;
 use DateTime;
 use Illuminate\Support\Facades\DB;
@@ -134,6 +135,21 @@ class ScieloSubmissionsDAO extends DAO
         return $authorsIds;
     }
 
+    public function getDoiOfPublication($publicationId)
+    {
+        $result = DB::table('publications AS p')
+            ->join('dois AS d', 'p.doi_id', '=', 'd.doi_id')
+            ->where('p.publication_id', $publicationId)
+            ->select('d.doi')
+            ->first();
+
+        if (is_null($result)) {
+            return '';
+        }
+
+        return get_object_vars($result)['doi'];
+    }
+
     public function getFinalDecisionWithDate($submissionId, $locale, $possibleFinalDecisions = [])
     {
         if (empty($possibleFinalDecisions)) {
@@ -163,7 +179,7 @@ class ScieloSubmissionsDAO extends DAO
     {
         $result = DB::table('event_log')
             ->where('event_type', PKPSubmissionEventLogEntry::SUBMISSION_LOG_SUBMISSION_SUBMIT)
-            ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+            ->where('assoc_type', Application::ASSOC_TYPE_SUBMISSION)
             ->where('assoc_id', $submissionId)
             ->select('user_id')
             ->get();
@@ -189,7 +205,7 @@ class ScieloSubmissionsDAO extends DAO
 
         if ($row['decision'] == Decision::ACCEPT) {
             $decision = __('common.accepted', [], $locale);
-        } elseif ($row['decision'] == Decision::DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE) {
+        } elseif ($row['decision'] == Decision::DECLINE || $row['decision'] == Decision::INITIAL_DECLINE) {
             $decision = __('common.declined', [], $locale);
         }
 

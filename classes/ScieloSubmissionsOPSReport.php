@@ -20,6 +20,7 @@ class ScieloSubmissionsOPSReport extends ScieloSubmissionsReport
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterIsScieloJournal'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),

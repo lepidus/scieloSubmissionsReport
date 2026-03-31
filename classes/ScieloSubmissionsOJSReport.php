@@ -11,6 +11,7 @@ class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport
             __('submission.submissionTitle'),
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),

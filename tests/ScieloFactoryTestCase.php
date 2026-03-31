@@ -10,6 +10,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 {
     protected $context;
     protected $submission;
+    protected $publication;
     protected $section;
     protected $authors = [];
 
@@ -20,6 +21,7 @@ class ScieloFactoryTestCase extends DatabaseTestCase
         $this->createContext();
         $this->createSection();
         $this->createSubmission();
+        $this->createPublicationDoi();
         $this->createAuthors();
     }
 
@@ -117,6 +119,19 @@ class ScieloFactoryTestCase extends DatabaseTestCase
 
         $this->submission = Repo::submission()->get($submission->getId());
         $this->publication = Repo::publication()->get($publicationId);
+    }
+
+    private function createPublicationDoi()
+    {
+        $doi = Repo::doi()->newDataObject([
+            'doi' => '10.1234/TestSubmission',
+            'contextId' => $this->context->getId()
+        ]);
+        $doiId = Repo::doi()->add($doi);
+
+        $this->publication->setData('doiId', $doiId);
+        Repo::publication()->dao->update($this->publication);
+        $this->publication->setData('doiObject', $doi);
     }
 
     protected function createSection(): void

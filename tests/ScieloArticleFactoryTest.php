@@ -32,14 +32,12 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
 
     private $locale = 'en';
     private $title = 'eXtreme Programming: A practical guide';
-    private $submitter = 'Don Vito Corleone';
     private $dateSubmitted = '2021-05-31 15:38:24';
     private $statusCode = Submission::STATUS_PUBLISHED;
-    private $statusMessage;
     private $sectionName = 'Biological Sciences';
     private $dateLastActivity = '2021-06-03 16:00:00';
     private $submissionAuthors;
-    private $doi = '10.666/949494';
+    private $vorDoi = '10.666/949494';
 
     public function setUp(): void
     {
@@ -50,7 +48,6 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $this->submissionId = $this->createSubmission();
         $this->publicationId = $this->createPublication();
         $this->submissionAuthors = $this->createAuthors();
-        $this->statusMessage = __('submission.status.published', [], 'en');
         $this->addCurrentPublicationToSubmission();
     }
 
@@ -137,7 +134,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $publication->setData('title', $this->title, $this->locale);
         $publication->setData('sectionId', $this->sectionId);
         $publication->setData('relationStatus', '1');
-        $publication->setData('vorDoi', $this->doi);
+        $publication->setData('vorDoi', $this->vorDoi);
         $publication->setData('status', $this->statusCode);
 
         return Repo::publication()->dao->insert($publication);
@@ -465,7 +462,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsLastDecision(): void
     {
-        $decision = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
+        $decision = Decision::INITIAL_DECLINE;
         $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()));
 
         $articleFactory = new ScieloArticleFactory();
@@ -482,7 +479,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     {
         $reviewRound = $this->createReviewRound($this->submissionId);
 
-        $decision = SUBMISSION_EDITOR_DECISION_NEW_ROUND;
+        $decision = Decision::NEW_EXTERNAL_ROUND;
         $this->createDecision($this->submissionId, $decision, date(Core::getCurrentDate()), $reviewRound->getId());
 
         $articleFactory = new ScieloArticleFactory();
@@ -534,7 +531,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsFinalDecisionWithDateInitialDecline(): void
     {
-        $finalDecisionCode = SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE;
+        $finalDecisionCode = Decision::INITIAL_DECLINE;
         $finalDecision = __('common.declined', [], $this->locale);
         $finalDecisionDate = '2021-05-29';
         $this->createDecision($this->submissionId, $finalDecisionCode, $finalDecisionDate);

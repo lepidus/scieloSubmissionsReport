@@ -5,6 +5,7 @@ namespace APP\plugins\reports\scieloSubmissionsReport\tests;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloArticle;
 use APP\plugins\reports\scieloSubmissionsReport\classes\ScieloSubmissionsOJSReport;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionAuthor;
+use APP\plugins\reports\scieloSubmissionsReport\ScieloSubmissionsReportPlugin;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOJSReportTest extends TestCase
@@ -16,8 +17,16 @@ class ScieloSubmissionsOJSReportTest extends TestCase
 
     public function setUp(): void
     {
+        $this->initializePluginLocaleData();
         $this->submissions = $this->createTestArticles();
         $this->report = new ScieloSubmissionsOJSReport($this->sections, $this->submissions);
+    }
+
+    private function initializePluginLocaleData(): void
+    {
+        $plugin = new ScieloSubmissionsReportPlugin();
+        $plugin->pluginPath = 'plugins/reports/scieloSubmissionsReport';
+        $plugin->addLocaleData();
     }
 
     public function tearDown(): void
@@ -40,11 +49,11 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $finalDecisionDatesForArticles = ['2021-04-23', '2021-03-08', '2020-11-15', '', '2020-11-18'];
         $noReviews = ['', ''];
 
-        $article1 = new ScieloArticle(1, 'Title 1', 'Paola Franchesca', 'Brasil', $submittedDatesForArticles[0], 1, 'Posted', [new SubmissionAuthor('Paola Franchesca', 'Italy', 'University of Milan')], 'Fashion Design', 'en', 'Accepted', $finalDecisionDatesForArticles[0], ['Jean Paul Cardin'], 'Jean Paul Cardin', ['Accept', 'See comments'], 'Accept');
-        $article2 = new ScieloArticle(2, 'Titulo 2', 'Pablo Giorgio', 'Brasil', $submittedDatesForArticles[1], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', 'Accepted', $finalDecisionDatesForArticles[1], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
-        $article3 = new ScieloArticle(3, 'Titulo 3', 'Pablo Giorgio', 'Brasil', $submittedDatesForArticles[2], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', 'Accepted', $finalDecisionDatesForArticles[2], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
-        $article4 = new ScieloArticle(4, 'Titulo 4', 'Pablo Giorgio', 'Brasil', $submittedDatesForArticles[3], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', '', $finalDecisionDatesForArticles[3], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
-        $article5 = new ScieloArticle(5, 'Titulo 5', 'Pablo Giorgio', 'Brasil', $submittedDatesForArticles[4], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', '', $finalDecisionDatesForArticles[4], ['Richard Feynman'], 'Neil Tyson', $noReviews, 'Accept');
+        $article1 = new ScieloArticle(1, 'Title 1', 'Paola Franchesca', 'Brasil', '10.12334/TestArticle.1', $submittedDatesForArticles[0], 1, 'Posted', [new SubmissionAuthor('Paola Franchesca', 'Italy', 'University of Milan')], 'Fashion Design', 'en', 'Accepted', $finalDecisionDatesForArticles[0], ['Jean Paul Cardin'], 'Jean Paul Cardin', ['Accept', 'See comments'], 'Accept');
+        $article2 = new ScieloArticle(2, 'Titulo 2', 'Pablo Giorgio', 'Brasil', '10.12334/TestArticle.2', $submittedDatesForArticles[1], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', 'Accepted', $finalDecisionDatesForArticles[1], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
+        $article3 = new ScieloArticle(3, 'Titulo 3', 'Pablo Giorgio', 'Brasil', '10.12334/TestArticle.3', $submittedDatesForArticles[2], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', 'Accepted', $finalDecisionDatesForArticles[2], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
+        $article4 = new ScieloArticle(4, 'Titulo 4', 'Pablo Giorgio', 'Brasil', '10.12334/TestArticle.4', $submittedDatesForArticles[3], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', '', $finalDecisionDatesForArticles[3], ['Richard Feynman'], 'Neil Tyson', ['Accept', 'See comments'], 'Accept');
+        $article5 = new ScieloArticle(5, 'Titulo 5', 'Pablo Giorgio', 'Brasil', '10.12334/TestArticle.5', $submittedDatesForArticles[4], 6, 'Posted', [new SubmissionAuthor('Atila', 'Brazil', 'USP')], 'Biological', 'en', '', $finalDecisionDatesForArticles[4], ['Richard Feynman'], 'Neil Tyson', $noReviews, 'Accept');
 
         return [$article1, $article2, $article3, $article4, $article5];
     }
@@ -57,11 +66,14 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
+        fclose($csvFile);
+
         $expectedLine = [
             __('plugins.reports.scieloSubmissionsReport.header.submissionId'),
             __('submission.submissionTitle'),
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),
@@ -77,8 +89,6 @@ class ScieloSubmissionsOJSReportTest extends TestCase
             __('plugins.reports.scieloSubmissionsReport.header.ReviewingTime'),
             __('plugins.reports.scieloSubmissionsReport.header.SubmissionAndFinalDecisionDateInterval')
         ];
-
-        fclose($csvFile);
         $this->assertEquals($expectedLine, $firstLine);
     }
 
@@ -142,7 +152,7 @@ class ScieloSubmissionsOJSReportTest extends TestCase
         $firstLine = fgetcsv($csvFile);
         fclose($csvFile);
 
-        $expectedLine = ['1', 'Title 1', 'Paola Franchesca', 'Brasil', '2021-04-21', '1', 'Posted', 'Jean Paul Cardin', 'Jean Paul Cardin', 'Paola Franchesca, Italy, University of Milan', 'Fashion Design', 'en', 'Accept,See comments', 'Accept', 'Accepted', '2021-04-23', '2', '2'];
+        $expectedLine = ['1', 'Title 1', 'Paola Franchesca', 'Brasil', '10.12334/TestArticle.1', '2021-04-21', '1', 'Posted', 'Jean Paul Cardin', 'Jean Paul Cardin', 'Paola Franchesca, Italy, University of Milan', 'Fashion Design', 'en', 'Accept,See comments', 'Accept', 'Accepted', '2021-04-23', '2', '2'];
         $this->assertEquals($expectedLine, $firstLine);
     }
 
