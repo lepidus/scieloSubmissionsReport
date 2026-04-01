@@ -10,20 +10,8 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
+        $submissionData = $this->getSubmissionData($submissionId, $locale);
         $scieloArticlesDAO = app(ScieloArticlesDAO::class);
-        $submission = $scieloArticlesDAO->getSubmission($submissionId);
-        $publicationId = $submission['current_publication_id'];
-
-        $submissionTitle = $scieloArticlesDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
-        $submitter = $this->retrieveSubmitter($submissionId);
-        $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
-        $doi = $scieloArticlesDAO->getDoiOfPublication($publicationId);
-        $dateSubmitted = $submission['date_submitted'];
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
-        $status = $this->getStatusMessage($submission['status']);
-        $authors = $this->retrieveAuthors($publicationId, $locale);
-        $sectionName = $scieloArticlesDAO->getPublicationSection($publicationId, $locale);
-        $language = $submission['locale'];
 
         [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloArticlesDAO, $submissionId, $locale);
         $journalEditors = $scieloArticlesDAO->getJournalEditors($submissionId);
@@ -33,16 +21,16 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
 
         return new ScieloArticle(
             $submissionId,
-            $submissionTitle,
-            $submitter,
-            $submitterCountry,
-            $doi,
-            $dateSubmitted,
-            $daysUntilStatusChange,
-            $status,
-            $authors,
-            $sectionName,
-            $language,
+            $submissionData['title'],
+            $submissionData['submitter'],
+            $submissionData['submitterCountry'],
+            $submissionData['doi'],
+            $submissionData['dateSubmitted'],
+            $submissionData['daysUntilStatusChange'],
+            $submissionData['status'],
+            $submissionData['authors'],
+            $submissionData['sectionName'],
+            $submissionData['language'],
             $finalDecision,
             $finalDecisionDate,
             $journalEditors,

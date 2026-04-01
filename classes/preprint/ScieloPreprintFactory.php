@@ -17,21 +17,12 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 
     public function createSubmission(int $submissionId, string $locale)
     {
+        $submissionData = $this->getSubmissionData($submissionId, $locale);
         $scieloPreprintsDAO = new ScieloPreprintsDAO();
         $submission = $scieloPreprintsDAO->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
 
-        $submissionTitle = $scieloPreprintsDAO->getPublicationTitle($publicationId, $locale, $submission['locale']);
-        $submitter = $this->retrieveSubmitter($submissionId);
-        $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
         $submitterIsScieloJournal = $this->retrieveSubmitterIsScieloJournal($submissionId);
-        $doi = $scieloPreprintsDAO->getDoiOfPublication($publicationId);
-        $dateSubmitted = $submission['date_submitted'];
-        $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
-        $status = $this->getStatusMessage($submission['status']);
-        $authors = $this->retrieveAuthors($publicationId, $locale);
-        $sectionName = $scieloPreprintsDAO->getPublicationSection($publicationId, $locale);
-        $language = $submission['locale'];
         [$finalDecision, $finalDecisionDate] = $this->retrieveFinalDecisionAndFinalDecisionDate($scieloPreprintsDAO, $submissionId, $locale);
         $sectionModerators = $scieloPreprintsDAO->getSectionModerators($submissionId);
         $responsibles = $scieloPreprintsDAO->getResponsibles($submissionId);
@@ -48,17 +39,17 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
 
         return new ScieloPreprint(
             $submissionId,
-            $submissionTitle,
-            $submitter,
-            $submitterCountry,
+            $submissionData['title'],
+            $submissionData['submitter'],
+            $submissionData['submitterCountry'],
             $submitterIsScieloJournal,
-            $doi,
-            $dateSubmitted,
-            $daysUntilStatusChange,
-            $status,
-            $authors,
-            $sectionName,
-            $language,
+            $submissionData['doi'],
+            $submissionData['dateSubmitted'],
+            $submissionData['daysUntilStatusChange'],
+            $submissionData['status'],
+            $submissionData['authors'],
+            $submissionData['sectionName'],
+            $submissionData['language'],
             $finalDecision,
             $finalDecisionDate,
             $responsibles,
