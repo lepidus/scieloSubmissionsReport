@@ -25,6 +25,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
         $submitterIsScieloJournal = $this->retrieveSubmitterIsScieloJournal($submissionId);
+        $doi = $scieloPreprintsDAO->getDoiOfPublication($publicationId);
         $dateSubmitted = $submission['date_submitted'];
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $status = $this->getStatusMessage($submission['status']);
@@ -51,6 +52,7 @@ class ScieloPreprintFactory extends ScieloSubmissionFactory
             $submitter,
             $submitterCountry,
             $submitterIsScieloJournal,
+            $doi,
             $dateSubmitted,
             $daysUntilStatusChange,
             $status,
