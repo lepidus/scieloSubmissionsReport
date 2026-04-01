@@ -7,10 +7,13 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\report\ScieloSubmissions
 use APP\plugins\reports\scieloSubmissionsReport\classes\submission\SubmissionAuthor;
 use APP\plugins\reports\scieloSubmissionsReport\classes\SubmissionStats;
 use APP\plugins\reports\scieloSubmissionsReport\tests\CSVFileUtils;
+use APP\plugins\reports\scieloSubmissionsReport\tests\PluginTestTrait;
 use PHPUnit\Framework\TestCase;
 
 class ScieloSubmissionsOPSReportTest extends TestCase
 {
+    use PluginTestTrait;
+
     private $report;
     private $sections = ['Biological Sciences', 'Math', 'Human Sciences'];
     private $submissions;
@@ -19,6 +22,7 @@ class ScieloSubmissionsOPSReportTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->initializePluginLocaleData();
 
         $this->submissions = $this->createTestPreprints();
         $includeViews = true;
@@ -64,12 +68,15 @@ class ScieloSubmissionsOPSReportTest extends TestCase
         $csvFileUtils->readUTF8Bytes($csvFile);
 
         $firstLine = fgetcsv($csvFile);
+        fclose($csvFile);
+
         $expectedLine = [
             __('plugins.reports.scieloSubmissionsReport.header.submissionId'),
             __('submission.submissionTitle'),
             __('submission.submitter'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterCountry'),
             __('plugins.reports.scieloSubmissionsReport.header.submitterIsScieloJournal'),
+            __('metadata.property.displayName.doi'),
             __('common.dateSubmitted'),
             __('plugins.reports.scieloSubmissionsReport.header.daysChangeStatus'),
             __('plugins.reports.scieloSubmissionsReport.header.submissionStatus'),
@@ -88,8 +95,6 @@ class ScieloSubmissionsOPSReportTest extends TestCase
             __('submission.abstractViews'),
             __('plugins.reports.scieloSubmissionsReport.header.pdfViews'),
         ];
-        fclose($csvFile);
-
         $this->assertEquals($expectedLine, $firstLine);
     }
 
