@@ -15,9 +15,9 @@ class ScieloPreprint extends ScieloSubmission
     private $notes;
     private $stats;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $responsibles, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, ?SubmissionStats $stats = null)
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, bool $submitterIsScieloJournal, string $doi, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, array $responsibles, array $sectionModerators, string $publicationStatus, string $publicationDOI, array $notes, ?SubmissionStats $stats = null)
     {
-        parent::__construct($id, $title, $submitter, $submitterCountry, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
+        parent::__construct($id, $title, $submitter, $submitterCountry, $doi, $dateSubmitted, $daysUntilStatusChange, $status, $authors, $section, $language, $finalDecision, $finalDecisionDate);
         $this->submitterIsScieloJournal = $submitterIsScieloJournal;
         $this->responsibles = $responsibles;
         $this->sectionModerators = $sectionModerators;
@@ -29,7 +29,7 @@ class ScieloPreprint extends ScieloSubmission
 
     public function asRecord(): array
     {
-        $record = [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getResponsibles(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
+        $record = [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getSubmitterIsScieloJournal(), $this->getDoi(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->getSectionModerators(), $this->getResponsibles(), $this->authorsAsRecord(), $this->section, $this->language, $this->getPublicationStatus(), $this->getPublicationDOI(), $this->getNotes(), $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
 
         if (!is_null($this->stats)) {
             $record = array_merge($record, $this->stats->asRecord());

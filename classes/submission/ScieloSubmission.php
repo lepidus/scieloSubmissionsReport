@@ -10,6 +10,7 @@ class ScieloSubmission
     protected $title;
     protected $submitter;
     protected $submitterCountry;
+    protected $doi;
     protected $dateSubmitted;
     protected $daysUntilStatusChange;
     protected $status;
@@ -19,12 +20,13 @@ class ScieloSubmission
     protected $finalDecision;
     protected $finalDecisionDate;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate)
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $doi, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate)
     {
         $this->id = $id;
         $this->title = $title;
         $this->submitter = $submitter;
         $this->submitterCountry = $submitterCountry;
+        $this->doi = $doi;
         $this->dateSubmitted = $dateSubmitted;
         $this->daysUntilStatusChange = $daysUntilStatusChange;
         $this->status = $status;
@@ -75,6 +77,12 @@ class ScieloSubmission
     public function getSubmitterCountry(): string
     {
         return $this->submitterCountry;
+    }
+
+    public function getDoi(): string
+    {
+        $messageNoDoi = __('plugins.reports.scieloSubmissionsReport.warning.noDoi');
+        return $this->fillEmptyFields($this->doi, $messageNoDoi);
     }
 
     public function getDateSubmitted(): string
@@ -147,6 +155,6 @@ class ScieloSubmission
 
     public function asRecord(): array
     {
-        return [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
+        return [$this->id, $this->title, $this->submitter, $this->submitterCountry, $this->getDoi(), $this->dateSubmitted, $this->daysUntilStatusChange, $this->status, $this->authorsAsRecord(), $this->section, $this->language, $this->finalDecision, $this->finalDecisionDate, $this->getTimeUnderReview(), $this->getTimeBetweenSubmissionAndFinalDecision()];
     }
 }

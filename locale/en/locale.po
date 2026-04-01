@@ -76,6 +76,9 @@ msgstr "No editors assigned"
 msgid "plugins.reports.scieloSubmissionsReport.warning.noSubmitter"
 msgstr "The submitting author was not found"
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noDoi"
+msgstr "No DOI"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus"
 msgstr "No publication's status"
 

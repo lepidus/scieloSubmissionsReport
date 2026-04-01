@@ -11,6 +11,29 @@ class ScieloSubmissionFactory
 {
     public function createSubmission(int $submissionId, string $locale)
     {
+        $submissionData = $this->getSubmissionData($submissionId, $locale);
+        $finalDecision = '';
+        $finalDecisionDate = '';
+
+        return new ScieloSubmission(
+            $submissionId,
+            $submissionData['title'],
+            $submissionData['submitter'],
+            $submissionData['submitterCountry'],
+            $submissionData['doi'],
+            $submissionData['dateSubmitted'],
+            $submissionData['daysUntilStatusChange'],
+            $submissionData['status'],
+            $submissionData['authors'],
+            $submissionData['sectionName'],
+            $submissionData['language'],
+            $finalDecision,
+            $finalDecisionDate
+        );
+    }
+
+    protected function getSubmissionData(int $submissionId, string $locale): array
+    {
         $scieloSubmissionsDao = new ScieloSubmissionsDAO();
         $submission = $scieloSubmissionsDao->getSubmission($submissionId);
         $publicationId = $submission['current_publication_id'];
@@ -18,6 +41,7 @@ class ScieloSubmissionFactory
         $submissionTitle = $scieloSubmissionsDao->getPublicationTitle($publicationId, $locale, $submission['locale']);
         $submitter = $this->retrieveSubmitter($submissionId);
         $submitterCountry = $this->retrieveSubmitterCountry($submissionId);
+        $doi = $scieloSubmissionsDao->getDoiOfPublication($publicationId);
         $dateSubmitted = $submission['date_submitted'];
         $status = $this->getStatusMessage($submission['status']);
         $sectionName = $scieloSubmissionsDao->getPublicationSection($publicationId, $locale);
@@ -25,23 +49,18 @@ class ScieloSubmissionFactory
         $daysUntilStatusChange = $this->calculateDaysUntilStatusChange($dateSubmitted, $submission['date_last_activity']);
         $authors = $this->retrieveAuthors($publicationId, $locale);
 
-        $finalDecision = '';
-        $finalDecisionDate = '';
-
-        return new ScieloSubmission(
-            $submissionId,
-            $submissionTitle,
-            $submitter,
-            $submitterCountry,
-            $dateSubmitted,
-            $daysUntilStatusChange,
-            $status,
-            $authors,
-            $sectionName,
-            $language,
-            $finalDecision,
-            $finalDecisionDate
-        );
+        return [
+            'title' => $submissionTitle,
+            'submitter' => $submitter,
+            'submitterCountry' => $submitterCountry,
+            'doi' => $doi,
+            'dateSubmitted' => $dateSubmitted,
+            'status' => $status,
+            'sectionName' => $sectionName,
+            'language' => $language,
+            'daysUntilStatusChange' => $daysUntilStatusChange,
+            'authors' => $authors
+        ];
     }
 
     protected function retrieveFinalDecisionAndFinalDecisionDate($scieloSubmissionDAO, $submissionId, $locale): array

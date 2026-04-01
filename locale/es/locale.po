@@ -73,6 +73,9 @@ msgstr "Sin moderadores designados"
 msgid "plugins.reports.scieloSubmissionsReport.warning.noSubmitter"
 msgstr "No se encontró al autor que envió el envío"
 
+msgid "plugins.reports.scieloSubmissionsReport.warning.noDoi"
+msgstr "Sin DOI"
+
 msgid "plugins.reports.scieloSubmissionsReport.warning.noPublicationStatus"
 msgstr "Sin estado de publicación"
 
