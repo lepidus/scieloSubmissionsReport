@@ -111,11 +111,17 @@ class ScieloSubmissionsDAO extends DAO
         ->where('section_id', '=', $sectionId)
         ->where('setting_name', '=', 'title')
         ->select('locale', 'setting_value as title')
+        ->orderBy('locale')
         ->get();
 
         $sectionTitles = [];
         foreach ($result->toArray() as $row) {
             $section = get_object_vars($row);
+
+            if (!is_string($section['title']) || trim($section['title']) === '') {
+                continue;
+            }
+
             $sectionTitles[$section['locale']] = $section['title'];
         }
 
@@ -123,12 +129,14 @@ class ScieloSubmissionsDAO extends DAO
             return '';
         }
 
-        if (array_key_exists($locale, $sectionTitles)) {
-            return $sectionTitles[$locale];
+        $preferredLocales = array_unique(array_merge([$locale], AppLocale::getLocalePrecedence()));
+        foreach ($preferredLocales as $preferredLocale) {
+            if (array_key_exists($preferredLocale, $sectionTitles)) {
+                return $sectionTitles[$preferredLocale];
+            }
         }
 
-        $sectionTitles = array_reverse($sectionTitles);
-        return array_pop($sectionTitles);
+        return reset($sectionTitles);
     }
 
     public function getPublicationAuthors($publicationId)

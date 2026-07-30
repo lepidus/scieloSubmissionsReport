@@ -6,7 +6,6 @@ import('classes.publication.Publication');
 import('classes.journal.Section');
 import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
-import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
 import('classes.workflow.EditorDecisionActionsManager');
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
@@ -129,6 +128,17 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return $sectionId;
     }
 
+    private function addSectionTitleSetting(string $locale, $title): void
+    {
+        \Illuminate\Database\Capsule\Manager::table('section_settings')->insert([
+            'section_id' => $this->sectionId,
+            'locale' => $locale,
+            'setting_name' => 'title',
+            'setting_value' => $title,
+            'setting_type' => 'string'
+        ]);
+    }
+
     private function createAuthors(): array
     {
         $authorDao = DAORegistry::getDAO('AuthorDAO');
@@ -223,14 +233,25 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
      */
-    public function testPublicationSectionFallsBackWhenLocaleHasNoTranslation(): void
+    public function testArticleUsesAvailableSectionTranslationWhenLocaleHasNoTranslation(): void
     {
-        $scieloArticlesDAO = new ScieloArticlesDAO();
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, 'pt_BR');
 
-        $this->assertEquals(
-            $this->sectionName,
-            $scieloArticlesDAO->getPublicationSection($this->publicationId, 'pt_BR')
-        );
+        $this->assertEquals($this->sectionName, $scieloArticle->getSection());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testArticleIgnoresNullSectionTitleForRequestedLocale(): void
+    {
+        $this->addSectionTitleSetting('pt_BR', null);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, 'pt_BR');
+
+        $this->assertEquals($this->sectionName, $scieloArticle->getSection());
     }
 
     /**
