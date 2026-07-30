@@ -6,6 +6,7 @@ import('classes.publication.Publication');
 import('classes.journal.Section');
 import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
+import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticlesDAO');
 import('classes.workflow.EditorDecisionActionsManager');
 
 class ScieloArticleFactoryTest extends DatabaseTestCase
@@ -217,6 +218,19 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testPublicationSectionFallsBackWhenLocaleHasNoTranslation(): void
+    {
+        $scieloArticlesDAO = new ScieloArticlesDAO();
+
+        $this->assertEquals(
+            $this->sectionName,
+            $scieloArticlesDAO->getPublicationSection($this->publicationId, 'pt_BR')
+        );
     }
 
     /**

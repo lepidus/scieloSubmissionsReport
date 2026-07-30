@@ -110,12 +110,25 @@ class ScieloSubmissionsDAO extends DAO
         $result = Capsule::table('section_settings')
         ->where('section_id', '=', $sectionId)
         ->where('setting_name', '=', 'title')
-        ->where('locale', '=', $locale)
-        ->select('setting_value as title')
-        ->first();
+        ->select('locale', 'setting_value as title')
+        ->get();
 
-        $sectionTitle = get_object_vars($result)['title'];
-        return $sectionTitle;
+        $sectionTitles = [];
+        foreach ($result->toArray() as $row) {
+            $section = get_object_vars($row);
+            $sectionTitles[$section['locale']] = $section['title'];
+        }
+
+        if (empty($sectionTitles)) {
+            return '';
+        }
+
+        if (array_key_exists($locale, $sectionTitles)) {
+            return $sectionTitles[$locale];
+        }
+
+        $sectionTitles = array_reverse($sectionTitles);
+        return array_pop($sectionTitles);
     }
 
     public function getPublicationAuthors($publicationId)
