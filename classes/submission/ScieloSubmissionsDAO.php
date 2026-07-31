@@ -13,9 +13,10 @@
 namespace APP\plugins\reports\scieloSubmissionsReport\classes\submission;
 
 use DateTime;
+use Illuminate\Support\Facades\DB;
 use APP\core\Application;
 use APP\decision\Decision;
-use Illuminate\Support\Facades\DB;
+use PKP\facades\Locale;
 use PKP\db\DAO;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
@@ -102,7 +103,7 @@ class ScieloSubmissionsDAO extends DAO
         return array_pop(array_reverse($titles));
     }
 
-    public function getPublicationSection($publicationId, $locale)
+    public function getPublicationSection($publicationId, $preferredLocale)
     {
         $result = DB::table('publications')
             ->where('publication_id', '=', $publicationId)
@@ -113,12 +114,26 @@ class ScieloSubmissionsDAO extends DAO
         $result = DB::table('section_settings')
             ->where('section_id', '=', $sectionId)
             ->where('setting_name', '=', 'title')
-            ->where('locale', '=', $locale)
-            ->select('setting_value as title')
-            ->first();
+            ->select('locale', 'setting_value as title')
+            ->orderBy('locale')
+            ->get();
 
-        $sectionTitle = get_object_vars($result)['title'];
-        return $sectionTitle;
+        $sectionTitles = [];
+        foreach ($result->toArray() as $row) {
+            $section = get_object_vars($row);
+
+            if (!is_string($section['title']) || trim($section['title']) === '') {
+                continue;
+            }
+
+            $sectionTitles[$section['locale']] = $section['title'];
+        }
+
+        if (empty($sectionTitles)) {
+            return '';
+        }
+
+        return $this->getLocalizedValue($sectionTitles, $preferredLocale);
     }
 
     public function getPublicationAuthors($publicationId)
@@ -211,5 +226,17 @@ class ScieloSubmissionsDAO extends DAO
         }
 
         return new FinalDecision($decision, $dateDecided->format('Y-m-d'));
+    }
+
+    private function getLocalizedValue(array $dataValues, string $preferredLocale)
+    {
+        $preferredLocales = array_unique([$preferredLocale, Locale::getLocale()]);
+        foreach ($preferredLocales as $locale) {
+            if (array_key_exists($locale, $dataValues)) {
+                return $dataValues[$locale];
+            }
+        }
+
+        return reset($dataValues);
     }
 }
