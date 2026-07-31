@@ -12,11 +12,12 @@
 
 namespace APP\plugins\reports\scieloSubmissionsReport\classes;
 
-use APP\core\Application;
-use APP\decision\Decision;
 use DateTime;
 use Illuminate\Support\Facades\DB;
+use APP\core\Application;
+use APP\decision\Decision;
 use PKP\db\DAO;
+use PKP\core\DataObject;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionsDAO extends DAO
@@ -101,7 +102,7 @@ class ScieloSubmissionsDAO extends DAO
         return array_pop(array_reverse($titles));
     }
 
-    public function getPublicationSection($publicationId, $locale)
+    public function getPublicationSection($publicationId, $preferredLocale)
     {
         $result = DB::table('publications')
             ->where('publication_id', '=', $publicationId)
@@ -112,12 +113,25 @@ class ScieloSubmissionsDAO extends DAO
         $result = DB::table('section_settings')
             ->where('section_id', '=', $sectionId)
             ->where('setting_name', '=', 'title')
-            ->where('locale', '=', $locale)
-            ->select('setting_value as title')
-            ->first();
+            ->select('locale', 'setting_value as title')
+            ->orderBy('locale')
+            ->get();
 
-        $sectionTitle = get_object_vars($result)['title'];
-        return $sectionTitle;
+        $sectionTitles = [];
+        foreach ($result->toArray() as $row) {
+            $section = get_object_vars($row);
+
+            if (!is_string($section['title']) || trim($section['title']) === '') {
+                continue;
+            }
+
+            $sectionTitles[$section['locale']] = $section['title'];
+        }
+
+        $dummyObject = new DataObject();
+        $dummyObject->setData('title', $sectionTitles);
+
+        return $dummyObject->getLocalizedData('title', $preferredLocale);
     }
 
     public function getPublicationAuthors($publicationId)

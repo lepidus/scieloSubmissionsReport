@@ -184,6 +184,17 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return $sectionId;
     }
 
+    private function addSectionTitleSetting(string $locale, ?string $title): void
+    {
+        \Illuminate\Support\Facades\DB::table('section_settings')
+            ->insert([
+                'section_id' => $this->sectionId,
+                'locale' => $locale,
+                'setting_name' => 'title',
+                'setting_value' => $title,
+            ]);
+    }
+
     private function createAuthors(): array
     {
         $author1 = Repo::author()->newDataObject();
@@ -296,6 +307,30 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertTrue($scieloArticle instanceof ScieloArticle);
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testArticleGetsAvailableSectionTranslationWhenLocaleHasNoTranslation(): void
+    {
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, 'pt_BR');
+
+        $this->assertEquals($this->sectionName, $scieloArticle->getSection());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testArticleIgnoresNullSectionTitleForRequestedLocale(): void
+    {
+        $this->addSectionTitleSetting('pt_BR', null);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, 'pt_BR');
+
+        $this->assertEquals($this->sectionName, $scieloArticle->getSection());
     }
 
     /**
