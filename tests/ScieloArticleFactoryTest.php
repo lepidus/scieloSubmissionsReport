@@ -233,7 +233,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
      */
-    public function testArticleUsesAvailableSectionTranslationWhenLocaleHasNoTranslation(): void
+    public function testArticleGetsAvailableSectionTranslationWhenLocaleHasNoTranslation(): void
     {
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, 'pt_BR');
