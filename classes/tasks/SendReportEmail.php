@@ -39,6 +39,10 @@ class SendReportEmail extends ScheduledTask
 
             $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
             Mail::send($email);
+
+            if (file_exists($reportFilePath)) {
+                unlink($reportFilePath);
+            }
         }
 
         return true;
