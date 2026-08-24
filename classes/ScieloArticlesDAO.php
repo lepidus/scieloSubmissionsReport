@@ -19,6 +19,9 @@ use PKP\security\Role;
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
+    public const JOURNAL_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.editor';
+    public const SECTION_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.sectionEditor';
+
     public function getReviews($submissionId): array
     {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
@@ -47,8 +50,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en'));
-            if ($currentUserGroupName == 'section editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::SECTION_EDITOR_NAME_LOCALE_KEY) {
                 return $user->getFullName();
             }
         }
@@ -68,8 +71,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en'));
-            if ($currentUserGroupName == 'journal editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::JOURNAL_EDITOR_NAME_LOCALE_KEY) {
                 array_push($journalEditors, $user->getFullName());
             }
         }
