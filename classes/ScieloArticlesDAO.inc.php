@@ -13,11 +13,11 @@ import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import('plugins.reports.scieloSubmissionsReport.classes.FinalDecision');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsDAO');
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Collection;
-
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
+    public const JOURNAL_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.editor';
+    public const SECTION_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.sectionEditor';
+
     public function getReviews($submissionId): array
     {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
@@ -48,8 +48,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
-            if ($currentUserGroupName == 'section editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::SECTION_EDITOR_NAME_LOCALE_KEY) {
                 return $user->getFullName();
             }
         }
@@ -71,8 +71,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-            $currentUserGroupName = strtolower($userGroup->getName('en_US'));
-            if ($currentUserGroupName == 'journal editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::JOURNAL_EDITOR_NAME_LOCALE_KEY) {
                 array_push($journalEditors, $user->getFullName());
             }
         }
