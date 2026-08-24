@@ -8,6 +8,8 @@ import('classes.article.Author');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticleFactory');
 import('classes.workflow.EditorDecisionActionsManager');
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+
 class ScieloArticleFactoryTest extends DatabaseTestCase
 {
     private $locale = 'en_US';
@@ -88,6 +90,17 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return $publicationDao->insertObject($publication);
     }
 
+    private function createUserGroupSetting(int $userGroupId, string $settingName, string $settingValue)
+    {
+        Capsule::table('user_group_settings')->insert([
+            'user_group_id' => $userGroupId,
+            'locale' => '',
+            'setting_name' => $settingName,
+            'setting_value' => $settingValue,
+            'setting_type' => 'string'
+        ]);
+    }
+
     private function createSectionEditorUserGroup(bool $onlyPtName): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
@@ -99,12 +112,16 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $sectionEditorsUserGroup = new UserGroup();
         $sectionEditorsUserGroup->setData(
             'name',
-            $onlyPtName ? [$localizedNames['pt_BR']] : $localizedNames
+            $onlyPtName ? ['pt_BR' => $localizedNames['pt_BR']] : $localizedNames
         );
         $sectionEditorsUserGroup->setData('nameLocaleKey', ScieloArticlesDAO::SECTION_EDITOR_NAME_LOCALE_KEY);
         $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
         $sectionEditorsUserGroup->setData('contextId', $this->contextId);
-        return $userGroupDao->insertObject($sectionEditorsUserGroup);
+        $sectionEditorsUserGroupId = $userGroupDao->insertObject($sectionEditorsUserGroup);
+
+        $this->createUserGroupSetting($sectionEditorsUserGroupId, 'nameLocaleKey', ScieloArticlesDAO::SECTION_EDITOR_NAME_LOCALE_KEY);
+
+        return $sectionEditorsUserGroupId;
     }
 
     private function createJournalEditorUserGroup(bool $onlyPtName): int
@@ -118,12 +135,15 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $editorsUserGroup = new UserGroup();
         $editorsUserGroup->setData(
             'name',
-            $onlyPtName ? [$localizedNames['pt_BR']] : $localizedNames
+            $onlyPtName ? ['pt_BR' => $localizedNames['pt_BR']] : $localizedNames
         );
-        $editorsUserGroup->setData('nameLocaleKey', ScieloArticlesDAO::JOURNAL_EDITOR_NAME_LOCALE_KEY);
         $editorsUserGroup->setData('roleId', ROLE_ID_MANAGER);
         $editorsUserGroup->setData('contextId', $this->contextId);
-        return $userGroupDao->insertObject($editorsUserGroup);
+        $editorsUserGroupId = $userGroupDao->insertObject($editorsUserGroup);
+
+        $this->createUserGroupSetting($editorsUserGroupId, 'nameLocaleKey', ScieloArticlesDAO::JOURNAL_EDITOR_NAME_LOCALE_KEY);
+
+        return $editorsUserGroupId;
     }
 
     private function createSection(): int
@@ -450,7 +470,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
      */
     public function testSubmissionGetsNoSectionEditor(): void
     {
-        $sectionEditorGroupId = $this->createSectionEditorUserGroup();
+        $sectionEditorGroupId = $this->createSectionEditorUserGroup(false);
         DAORegistry::getDAO('UserGroupDAO')->assignGroupToStage($this->contextId, $sectionEditorGroupId, 5);
 
         $articleFactory = new ScieloArticleFactory();
