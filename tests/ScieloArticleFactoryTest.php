@@ -192,8 +192,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         }
 
         $editorUserGroupId = $asSectionEditors
-            ? $this->createSectionEditorUserGroup()
-            : $this->createJournalEditorUserGroup();
+            ? $this->createSectionEditorUserGroup($onlyPtName)
+            : $this->createJournalEditorUserGroup($onlyPtName);
 
         foreach ($editorsUsers as $editorUser) {
             $editorUserId = $userDao->insertObject($editorUser);
