@@ -88,31 +88,39 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         return $publicationDao->insertObject($publication);
     }
 
-    private function createSectionEditorUserGroup(): int
+    private function createSectionEditorUserGroup(bool $onlyPtName): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $sectionEditorUserGroupLocalizedNames = [
+        $localizedNames = [
             'en_US' => 'section editor',
             'pt_BR' => 'editor de seção',
             'es_ES' => 'editor de sección'
         ];
         $sectionEditorsUserGroup = new UserGroup();
-        $sectionEditorsUserGroup->setData('name', $sectionEditorUserGroupLocalizedNames);
+        $sectionEditorsUserGroup->setData(
+            'name',
+            $onlyPtName ? [$localizedNames['pt_BR']] : $localizedNames
+        );
+        $sectionEditorsUserGroup->setData('nameLocaleKey', ScieloArticlesDAO::SECTION_EDITOR_NAME_LOCALE_KEY);
         $sectionEditorsUserGroup->setData('roleId', ROLE_ID_SUB_EDITOR);
         $sectionEditorsUserGroup->setData('contextId', $this->contextId);
         return $userGroupDao->insertObject($sectionEditorsUserGroup);
     }
 
-    private function createJournalEditorUserGroup(): int
+    private function createJournalEditorUserGroup(bool $onlyPtName): int
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        $editorUserGroupLocalizedNames = [
+        $localizedNames = [
             'en_US' => 'Journal editor',
             'pt_BR' => 'Editor da revista',
             'es_ES' => 'Editor/a de la revista'
         ];
         $editorsUserGroup = new UserGroup();
-        $editorsUserGroup->setData('name', $editorUserGroupLocalizedNames);
+        $editorsUserGroup->setData(
+            'name',
+            $onlyPtName ? [$localizedNames['pt_BR']] : $localizedNames
+        );
+        $editorsUserGroup->setData('nameLocaleKey', ScieloArticlesDAO::JOURNAL_EDITOR_NAME_LOCALE_KEY);
         $editorsUserGroup->setData('roleId', ROLE_ID_MANAGER);
         $editorsUserGroup->setData('contextId', $this->contextId);
         return $userGroupDao->insertObject($editorsUserGroup);
@@ -171,7 +179,7 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $submissionDao->updateObject($submission);
     }
 
-    private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false)
+    private function createEditorUsers(array $editorsUsersData, bool $asSectionEditors = false, bool $onlyPtName = false)
     {
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $userDao = DAORegistry::getDAO('UserDAO');
@@ -337,6 +345,37 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
     /**
      * @group OJS
      */
+    public function testSubmissionGetsJournalEditorsWhenUserGroupHasOnlyPortugueseData(): void
+    {
+        $journalEditorsData = [
+            [
+                'username' => 'examplePedro',
+                'email' => 'pedro@exemplo.com',
+                'password' => 'senhaexemplo',
+                'givenName' => [$this->locale => "Pedro"],
+                'familyName' => [$this->locale => "Parque"]
+            ],
+            [
+                'username' => 'exemploCarlos',
+                'email' => 'carlos@exemplo.com',
+                'password' => 'senhaexemplo2',
+                'givenName' => [$this->locale => "Carlos"],
+                'familyName' => [$this->locale => "Xavier"],
+            ]
+        ];
+        $editorsUsers = $this->createEditorUsers($journalEditorsData, false, true);
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $expectedEditors = $editorsUsers[0]->getFullName()
+            . "," . $editorsUsers[1]->getFullName();
+        $this->assertEquals($expectedEditors, $scieloArticle->getJournalEditors());
+    }
+
+    /**
+     * @group OJS
+     */
     public function testSubmissionGetsNoJournalEditors(): void
     {
         $articleFactory = new ScieloArticleFactory();
@@ -379,6 +418,26 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
             'disabled' => true
         ];
         $sectionEditorUser = $this->createEditorUsers([$sectionEditorData], true)[0];
+
+        $articleFactory = new ScieloArticleFactory();
+        $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
+
+        $this->assertEquals($sectionEditorUser->getFullName(), $scieloArticle->getSectionEditor());
+    }
+
+    /**
+     * @group OJS
+     */
+    public function testSubmissionGetsSectionEditorWhenUserGroupHasOnlyPortugueseData(): void
+    {
+        $sectionEditorData = [
+            'username' => 'exemploJhon',
+            'email' => 'jhon@exemplo.com',
+            'password' => 'senhaexemplo',
+            'givenName' => [$this->locale => "Jhon"],
+            'familyName' => [$this->locale => "Castro"]
+        ];
+        $sectionEditorUser = $this->createEditorUsers([$sectionEditorData], true, true)[0];
 
         $articleFactory = new ScieloArticleFactory();
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
