@@ -41,7 +41,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     public function getSectionEditor($submissionId): string
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), true);
@@ -61,7 +61,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
     public function getJournalEditors($submissionId): array
     {
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_MANAGER);
         $journalEditors = [];
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {

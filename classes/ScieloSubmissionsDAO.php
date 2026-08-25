@@ -22,8 +22,6 @@ use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ScieloSubmissionsDAO extends DAO
 {
-    protected const SUBMISSION_STAGE_ID = 5;
-
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = DB::table('submissions AS s')

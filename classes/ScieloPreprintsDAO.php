@@ -73,7 +73,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
         $sectionModeratorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), true);
@@ -96,7 +96,7 @@ class ScieloPreprintsDAO extends ScieloSubmissionsDAO
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 
         $moderatorUsers = [];
-        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, Role::ROLE_ID_SUB_EDITOR);
 
         while ($stageAssignment = $stageAssignmentsResults->next()) {
             $user = Repo::user()->get($stageAssignment->getUserId(), true);
