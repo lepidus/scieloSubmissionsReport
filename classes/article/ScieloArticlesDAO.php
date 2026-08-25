@@ -51,7 +51,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            $nameLocaleKey = trim($userGroup->nameLocaleKey);
             if ($nameLocaleKey === self::SECTION_EDITOR_NAME_LOCALE_KEY) {
                 return $user->getFullName();
             }
@@ -73,7 +73,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            $nameLocaleKey = trim($userGroup->nameLocaleKey);
             if ($nameLocaleKey === self::JOURNAL_EDITOR_NAME_LOCALE_KEY) {
                 array_push($journalEditors, $user->getFullName());
             }
