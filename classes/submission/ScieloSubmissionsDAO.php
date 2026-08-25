@@ -23,8 +23,6 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\FinalDecision;
 
 class ScieloSubmissionsDAO extends DAO
 {
-    protected const SUBMISSION_STAGE_ID = 5;
-
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = DB::table('submissions AS s')
