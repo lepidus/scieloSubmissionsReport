@@ -20,8 +20,6 @@ use Illuminate\Support\Collection;
 
 class ScieloSubmissionsDAO extends DAO
 {
-    protected const SUBMISSION_STAGE_ID = 5;
-
     public function getSubmissions($locale, $contextId, $sectionsIds, $submissionDateInterval, $finalDecisionDateInterval)
     {
         $query = Capsule::table('submissions')

@@ -39,7 +39,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $userDao = DAORegistry::getDAO('UserDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsSectionEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_SUB_EDITOR);
 
         while ($stageAssignment = $stageAssignmentsSectionEditorResults->next()) {
             $user = $userDao->getById($stageAssignment->getUserId(), true);
@@ -61,7 +61,7 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
         $userDao = DAORegistry::getDAO('UserDAO');
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
         $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER, self::SUBMISSION_STAGE_ID);
+        $stageAssignmentsEditorResults = $stageAssignmentDao->getBySubmissionAndRoleId($submissionId, ROLE_ID_MANAGER);
         $journalEditors = array();
 
         while ($stageAssignment = $stageAssignmentsEditorResults->next()) {
