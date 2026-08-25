@@ -20,6 +20,9 @@ use APP\plugins\reports\scieloSubmissionsReport\classes\submission\ScieloSubmiss
 
 class ScieloArticlesDAO extends ScieloSubmissionsDAO
 {
+    public const JOURNAL_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.editor';
+    public const SECTION_EDITOR_NAME_LOCALE_KEY = 'default.groups.name.sectionEditor';
+
     public function getReviews($submissionId): array
     {
         $submissionReviews = Repo::reviewAssignment()->getCollector()
@@ -48,8 +51,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $currentUserGroupName = strtolower($userGroup->name['en']);
-            if ($currentUserGroupName == 'section editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::SECTION_EDITOR_NAME_LOCALE_KEY) {
                 return $user->getFullName();
             }
         }
@@ -70,8 +73,8 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             }
 
             $userGroup = Repo::userGroup()->get($stageAssignment->userGroupId);
-            $currentUserGroupName = strtolower($userGroup->name['en']);
-            if ($currentUserGroupName == 'journal editor') {
+            $nameLocaleKey = trim($userGroup->getData('nameLocaleKey'));
+            if ($nameLocaleKey === self::JOURNAL_EDITOR_NAME_LOCALE_KEY) {
                 array_push($journalEditors, $user->getFullName());
             }
         }
