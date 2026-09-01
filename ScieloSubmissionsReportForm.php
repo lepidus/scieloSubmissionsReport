@@ -72,6 +72,10 @@ class ScieloSubmissionsReportForm extends Form
 
     public function validateReportData($reportParams)
     {
+        if (!parent::validate()) {
+            return false;
+        }
+
         if (array_key_exists('sections', $reportParams)) {
             $this->sections = $reportParams['sections'];
         }
