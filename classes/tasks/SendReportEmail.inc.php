@@ -1,6 +1,7 @@
 <?php
 
 import('lib.pkp.classes.mail.Mail');
+import('lib.pkp.classes.file.TemporaryFileManager');
 import('lib.pkp.classes.scheduledTask.ScheduledTask');
 import('plugins.reports.scieloSubmissionsReport.classes.ClosedDateInterval');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReportFactory');
@@ -21,10 +22,7 @@ class SendReportEmail extends ScheduledTask
             $this->loadLocalesForTask($plugin, $locale);
 
             $report = $this->getReport($application, $context, $locale);
-            $reportFilePath = $this->writeReportFile($context, $report);
-
-            $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
-            $email->send();
+            $this->sendReport($context, $recipientEmails, $report);
         }
 
         return true;
@@ -49,14 +47,68 @@ class SendReportEmail extends ScheduledTask
         return $reportFactory->createReport();
     }
 
-    private function writeReportFile($context, $report): string
+    protected function sendReport($context, $recipientEmails, $report): void
     {
-        $acronym = $context->getLocalizedData('acronym');
-        $reportFilePath = DIRECTORY_SEPARATOR . "tmp" .  DIRECTORY_SEPARATOR . "{$acronym}_complete_report.csv";
-        $csvFile = fopen($reportFilePath, 'wt');
-        $report->buildCSV($csvFile);
+        $reportFilePath = $this->writeReportFile($report);
+
+        try {
+            $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
+            $this->sendEmail($email);
+        } finally {
+            $this->deleteReportFile($reportFilePath);
+        }
+    }
+
+    protected function getReportTemporaryDirectory(): string
+    {
+        $temporaryFileManager = new TemporaryFileManager();
+        $temporaryDirectory = $temporaryFileManager->getBasePath();
+        if (!is_dir($temporaryDirectory)) {
+            $temporaryFileManager->mkdirtree($temporaryDirectory);
+        }
+        if (!is_dir($temporaryDirectory)) {
+            throw new RuntimeException('Unable to prepare the report temporary directory.');
+        }
+
+        return $temporaryDirectory;
+    }
+
+    protected function writeReportFile($report): string
+    {
+        $reportFilePath = tempnam($this->getReportTemporaryDirectory(), 'scielo-report-');
+        if ($reportFilePath === false) {
+            throw new RuntimeException('Unable to create the temporary report file.');
+        }
+
+        $csvFile = fopen($reportFilePath, 'wb');
+        if ($csvFile === false) {
+            $this->deleteReportFile($reportFilePath);
+            throw new RuntimeException('Unable to open the temporary report file.');
+        }
+
+        try {
+            $report->buildCSV($csvFile);
+            if (!fclose($csvFile)) {
+                $csvFile = null;
+                throw new RuntimeException('Unable to close the temporary report file.');
+            }
+            $csvFile = null;
+        } catch (Throwable $exception) {
+            if (is_resource($csvFile)) {
+                fclose($csvFile);
+            }
+            $this->deleteReportFile($reportFilePath);
+            throw $exception;
+        }
 
         return $reportFilePath;
+    }
+
+    protected function deleteReportFile($reportFilePath): void
+    {
+        if (file_exists($reportFilePath) && !unlink($reportFilePath)) {
+            throw new RuntimeException('Unable to remove the temporary report file.');
+        }
     }
 
     private function getAllSectionsIds($contextId)
@@ -84,7 +136,7 @@ class SendReportEmail extends ScheduledTask
         return $recipientEmails;
     }
 
-    private function createReportEmail($context, $recipientEmails, $reportFilePath)
+    protected function createReportEmail($context, $recipientEmails, $reportFilePath)
     {
         $email = new Mail();
 
@@ -99,8 +151,13 @@ class SendReportEmail extends ScheduledTask
         $email->setSubject($subject);
         $email->setBody($body);
 
-        $email->addAttachment($reportFilePath);
+        $email->addAttachment($reportFilePath, 'complete_report.csv', 'text/csv');
 
         return $email;
+    }
+
+    protected function sendEmail($email): void
+    {
+        $email->send();
     }
 }
