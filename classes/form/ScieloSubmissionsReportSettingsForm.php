@@ -5,6 +5,8 @@ namespace APP\plugins\reports\scieloSubmissionsReport\classes\form;
 use APP\core\Application;
 use APP\template\TemplateManager;
 use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
 
 class ScieloSubmissionsReportSettingsForm extends Form
 {
@@ -19,6 +21,8 @@ class ScieloSubmissionsReportSettingsForm extends Form
         $this->plugin = $plugin;
         $this->contextId = $contextId;
         parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+        $this->addCheck(new FormValidatorPost($this));
+        $this->addCheck(new FormValidatorCSRF($this));
     }
 
     public function initData()
