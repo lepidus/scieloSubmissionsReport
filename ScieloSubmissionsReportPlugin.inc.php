@@ -107,8 +107,10 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 $form = new ScieloSubmissionsReportSettingsForm($this, $contextId);
                 if ($request->getUserVar('save')) {
                     $form->readInputData();
-                    $form->execute();
-                    return new JSONMessage(true);
+                    if ($form->validate()) {
+                        $form->execute();
+                        return new JSONMessage(true);
+                    }
                 } else {
                     $form->initData();
                 }

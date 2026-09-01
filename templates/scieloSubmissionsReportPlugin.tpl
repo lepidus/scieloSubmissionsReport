@@ -13,6 +13,7 @@
 
     <div class="app__contentPanel">
     <form id="scieloSubmissionsReportForm" method="post" action="">
+        {csrf}
         {include file="common/formErrors.tpl"}
 
         <h2>{translate key="plugins.reports.scieloSubmissionsReport.period"}</h2>
