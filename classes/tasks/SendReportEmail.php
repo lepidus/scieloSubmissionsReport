@@ -51,36 +51,22 @@ class SendReportEmail extends ScheduledTask
 
     protected function sendReport($context, $recipientEmails, $report): void
     {
-        $reportFilePath = $this->writeReportFile($report);
+        $reportFilePath = $this->writeReportFile($context, $report);
 
         try {
             $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
-            $this->sendEmail($email);
+            Mail::send($email);
         } finally {
             $this->deleteReportFile($reportFilePath);
         }
     }
 
-    protected function getReportTemporaryDirectory(): string
+    protected function writeReportFile($context, $report): string
     {
         $temporaryFileManager = new TemporaryFileManager();
         $temporaryDirectory = $temporaryFileManager->getBasePath();
-        if (!is_dir($temporaryDirectory)) {
-            $temporaryFileManager->mkdirtree($temporaryDirectory);
-        }
-        if (!is_dir($temporaryDirectory)) {
-            throw new RuntimeException('Unable to prepare the report temporary directory.');
-        }
-
-        return $temporaryDirectory;
-    }
-
-    protected function writeReportFile($report): string
-    {
-        $reportFilePath = tempnam($this->getReportTemporaryDirectory(), 'scielo-report-');
-        if ($reportFilePath === false) {
-            throw new RuntimeException('Unable to create the temporary report file.');
-        }
+        $acronym = $context->getLocalizedData('acronym');
+        $reportFilePath = tempnam($temporaryDirectory, "{$acronym}_complete_report.csv");
 
         $csvFile = fopen($reportFilePath, 'wb');
         if ($csvFile === false) {
@@ -156,10 +142,5 @@ class SendReportEmail extends ScheduledTask
         $email->attach($reportFilePath, ['as' => 'complete_report.csv', 'mime' => 'text/csv']);
 
         return $email;
-    }
-
-    protected function sendEmail($email): void
-    {
-        Mail::send($email);
     }
 }
