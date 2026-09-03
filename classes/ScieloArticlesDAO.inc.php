@@ -123,6 +123,10 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             $lastDecision = $decisions['decision'];
         }
 
+        if (empty($decisionsSubmission) && !is_null($this->getArchivedDeclineDate($submissionId))) {
+            $lastDecision = SUBMISSION_EDITOR_DECISION_DECLINE;
+        }
+
         return $this->getDecisionMessage($lastDecision);
     }
 }
