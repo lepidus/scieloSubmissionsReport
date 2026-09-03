@@ -15,6 +15,8 @@ class ScieloSubmissionsReportSettingsForm extends Form
         $this->plugin = $plugin;
         $this->contextId = $contextId;
         parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+        $this->addCheck(new FormValidatorPost($this));
+        $this->addCheck(new FormValidatorCSRF($this));
     }
 
     public function initData()

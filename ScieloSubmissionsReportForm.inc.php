@@ -24,10 +24,8 @@ class ScieloSubmissionsReportForm extends Form
     private $plugin;
 
     private $application;
-    private $sections;
     private $submissionDateInterval;
     private $finalDecisionDateInterval;
-    private $includeViews;
 
     /**
      * Constructor
@@ -39,10 +37,8 @@ class ScieloSubmissionsReportForm extends Form
         $this->application = substr(Application::getName(), 0, 3);
         $request = Application::get()->getRequest();
         $this->contextId = $request->getContext()->getId();
-        $this->sections = array();
         $this->submissionDateInterval = null;
         $this->finalDecisionDateInterval = null;
-        $this->includeViews = false;
 
         parent::__construct($plugin->getTemplateResource('scieloSubmissionsReportPlugin.tpl'));
         $this->addCheck(new FormValidatorPost($this));
@@ -59,18 +55,29 @@ class ScieloSubmissionsReportForm extends Form
         $this->setData('scieloSubmissionsReport', $plugin->getSetting($contextId, 'scieloSubmissionsReport'));
     }
 
-    public function validateReportData($reportParams)
+    public function readInputData()
     {
-        if (array_key_exists('sections', $reportParams)) {
-            $this->sections = $reportParams['sections'];
-        }
-        if (array_key_exists('includeViews', $reportParams)) {
-            $this->includeViews = $reportParams['includeViews'];
-        }
-        $filteringType = $reportParams['selectFilterTypeDate'];
+        $this->readUserVars([
+            'sections',
+            'includeViews',
+            'selectFilterTypeDate',
+            'startSubmissionDateInterval',
+            'endSubmissionDateInterval',
+            'startFinalDecisionDateInterval',
+            'endFinalDecisionDateInterval'
+        ]);
+    }
+
+    public function validate($callHooks = true)
+    {
+        $filteringType = $this->getData('selectFilterTypeDate');
 
         if ($filteringType == 'filterBySubmission' || $filteringType == 'filterByBoth') {
-            $submissionDateInterval = $this->validateDateInterval($reportParams['startSubmissionDateInterval'], $reportParams['endSubmissionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate');
+            $submissionDateInterval = $this->validateDateInterval(
+                $this->getData('startSubmissionDateInterval'),
+                $this->getData('endSubmissionDateInterval'),
+                'plugins.reports.scieloSubmissionsReport.warning.errorSubmittedDate'
+            );
             if (is_null($submissionDateInterval)) {
                 return false;
             }
@@ -78,14 +85,18 @@ class ScieloSubmissionsReportForm extends Form
         }
 
         if ($filteringType == 'filterByFinalDecision' || $filteringType == 'filterByBoth') {
-            $finalDecisionDateInterval = $this->validateDateInterval($reportParams['startFinalDecisionDateInterval'], $reportParams['endFinalDecisionDateInterval'], 'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate');
+            $finalDecisionDateInterval = $this->validateDateInterval(
+                $this->getData('startFinalDecisionDateInterval'),
+                $this->getData('endFinalDecisionDateInterval'),
+                'plugins.reports.scieloSubmissionsReport.warning.errorDecisionDate'
+            );
             if (is_null($finalDecisionDateInterval)) {
                 return false;
             }
             $this->finalDecisionDateInterval = $finalDecisionDateInterval;
         }
 
-        return true;
+        return parent::validate();
     }
 
     private function validateDateInterval($startInterval, $endInterval, $errorMessage)

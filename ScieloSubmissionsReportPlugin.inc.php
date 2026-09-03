@@ -64,9 +64,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         $form->initData();
         $requestHandler = new PKPRequest();
         if ($requestHandler->isPost($request)) {
-            $reportParams = $requestHandler->getUserVars($request);
-            $validationResult = $form->validateReportData($reportParams);
-            if ($validationResult) {
+            $form->readInputData();
+            if ($form->validate()) {
                 $form->generateReport($request);
             }
         } else {
@@ -107,8 +106,10 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
                 $form = new ScieloSubmissionsReportSettingsForm($this, $contextId);
                 if ($request->getUserVar('save')) {
                     $form->readInputData();
-                    $form->execute();
-                    return new JSONMessage(true);
+                    if ($form->validate()) {
+                        $form->execute();
+                        return new JSONMessage(true);
+                    }
                 } else {
                     $form->initData();
                 }
