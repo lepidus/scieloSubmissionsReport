@@ -64,9 +64,8 @@ class ScieloSubmissionsReportPlugin extends ReportPlugin
         $form->initData();
         $requestHandler = new PKPRequest();
         if ($requestHandler->isPost($request)) {
-            $reportParams = $requestHandler->getUserVars($request);
-            $validationResult = $form->validateReportData($reportParams);
-            if ($validationResult) {
+            $form->readInputData();
+            if ($form->validate()) {
                 $form->generateReport($request);
             }
         } else {

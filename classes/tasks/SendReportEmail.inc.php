@@ -47,35 +47,25 @@ class SendReportEmail extends ScheduledTask
         return $reportFactory->createReport();
     }
 
-    protected function sendReport($context, $recipientEmails, $report): void
+    private function sendReport($context, $recipientEmails, $report): void
     {
-        $reportFilePath = $this->writeReportFile($report);
+        $reportFilePath = $this->writeReportFile($context, $report);
 
         try {
             $email = $this->createReportEmail($context, $recipientEmails, $reportFilePath);
-            $this->sendEmail($email);
+            $email->send();
         } finally {
             $this->deleteReportFile($reportFilePath);
         }
     }
 
-    protected function getReportTemporaryDirectory(): string
+    private function writeReportFile($context, $report): string
     {
         $temporaryFileManager = new TemporaryFileManager();
         $temporaryDirectory = $temporaryFileManager->getBasePath();
-        if (!is_dir($temporaryDirectory)) {
-            $temporaryFileManager->mkdirtree($temporaryDirectory);
-        }
-        if (!is_dir($temporaryDirectory)) {
-            throw new RuntimeException('Unable to prepare the report temporary directory.');
-        }
+        $acronym = $context->getLocalizedData('acronym');
+        $reportFilePath = tempnam($temporaryDirectory, "{$acronym}_complete_report.csv");
 
-        return $temporaryDirectory;
-    }
-
-    protected function writeReportFile($report): string
-    {
-        $reportFilePath = tempnam($this->getReportTemporaryDirectory(), 'scielo-report-');
         if ($reportFilePath === false) {
             throw new RuntimeException('Unable to create the temporary report file.');
         }
@@ -104,7 +94,7 @@ class SendReportEmail extends ScheduledTask
         return $reportFilePath;
     }
 
-    protected function deleteReportFile($reportFilePath): void
+    private function deleteReportFile($reportFilePath): void
     {
         if (file_exists($reportFilePath) && !unlink($reportFilePath)) {
             throw new RuntimeException('Unable to remove the temporary report file.');
@@ -136,7 +126,7 @@ class SendReportEmail extends ScheduledTask
         return $recipientEmails;
     }
 
-    protected function createReportEmail($context, $recipientEmails, $reportFilePath)
+    private function createReportEmail($context, $recipientEmails, $reportFilePath)
     {
         $email = new Mail();
 
@@ -154,10 +144,5 @@ class SendReportEmail extends ScheduledTask
         $email->addAttachment($reportFilePath, 'complete_report.csv', 'text/csv');
 
         return $email;
-    }
-
-    protected function sendEmail($email): void
-    {
-        $email->send();
     }
 }
