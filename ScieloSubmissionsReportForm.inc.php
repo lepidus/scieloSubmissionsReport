@@ -122,7 +122,15 @@ class ScieloSubmissionsReportForm extends Form
         $this->emitHttpHeaders($request);
 
         $locale = AppLocale::getLocale();
-        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory($this->application, $this->contextId, $this->sections, $this->submissionDateInterval, $this->finalDecisionDateInterval, $locale, $this->includeViews);
+        $scieloSubmissionsReportFactory = new ScieloSubmissionsReportFactory(
+            $this->application,
+            $this->contextId,
+            $this->getData('sections') ?? [],
+            $this->submissionDateInterval,
+            $this->finalDecisionDateInterval,
+            $locale,
+            $this->getData('includeViews') ?? false
+        );
         $scieloSubmissionsReport = $scieloSubmissionsReportFactory->createReport();
 
         $csvFile = fopen('php://output', 'wt');
