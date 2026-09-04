@@ -163,12 +163,41 @@ class ScieloSubmissionsDAO extends DAO
         ->first();
 
         if (is_null($result)) {
-            return null;
+            $archivedDeclineDate = $this->getArchivedDeclineDate($submissionId);
+            if (is_null($archivedDeclineDate)) {
+                return null;
+            }
+
+            return $this->finalDecisionFromRow([
+                'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
+                'date_decided' => $archivedDeclineDate
+            ], $locale);
         }
 
         $finalDecisionWithDate = $this->finalDecisionFromRow(get_object_vars($result), $locale);
 
         return $finalDecisionWithDate;
+    }
+
+    protected function getArchivedDeclineDate($submissionId)
+    {
+        $result = Capsule::table('submissions')
+        ->join('event_log', 'event_log.assoc_id', '=', 'submissions.submission_id')
+        ->leftJoin('edit_decisions', 'edit_decisions.submission_id', '=', 'submissions.submission_id')
+        ->where('submissions.submission_id', $submissionId)
+        ->where('submissions.status', STATUS_DECLINED)
+        ->where('event_log.assoc_type', ASSOC_TYPE_SUBMISSION)
+        ->where('event_log.event_type', SUBMISSION_LOG_EDITOR_ARCHIVE)
+        ->whereNull('edit_decisions.edit_decision_id')
+        ->orderBy('event_log.date_logged', 'desc')
+        ->select('event_log.date_logged')
+        ->first();
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        return get_object_vars($result)['date_logged'];
     }
 
     public function getIdOfSubmitterUser($submissionId)
