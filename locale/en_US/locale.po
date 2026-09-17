@@ -167,3 +167,6 @@ msgstr "{$contextName}'s submissions report"
 
 msgid "plugins.reports.scieloSubmissionsReport.reportEmail.body"
 msgstr "Attached is the complete report of submissions from {$contextName}"
+
+msgid "plugins.reports.scieloSubmissionsReport.decision.quickSubmissionOrImport"
+msgstr "Quick submission/import"

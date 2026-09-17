@@ -158,3 +158,6 @@ msgstr "Informe de envíos de {$contextName}"
 
 msgid "plugins.reports.scieloSubmissionsReport.reportEmail.body"
 msgstr "Se adjunta el informe completo de envíos de {$contextName}"
+
+msgid "plugins.reports.scieloSubmissionsReport.decision.quickSubmissionOrImport"
+msgstr "Envío rápido/importación"

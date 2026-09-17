@@ -28,7 +28,7 @@ class ScieloSubmissionsReport
         $submissions = array();
 
         foreach ($this->submissions as $submission) {
-            if (!empty($submission->getFinalDecision())) {
+            if (!empty($submission->getFinalDecision()) && !empty($submission->getFinalDecisionDate())) {
                 $submissions[] = $submission;
             }
         }

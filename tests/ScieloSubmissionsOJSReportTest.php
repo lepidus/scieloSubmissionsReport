@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloArticle');
+import('plugins.reports.scieloSubmissionsReport.classes.SubmissionAuthor');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsReport');
 import('plugins.reports.scieloSubmissionsReport.classes.ScieloSubmissionsOJSReport');
 import('plugins.reports.scieloSubmissionsReport.tests.CSVFileUtils');
@@ -104,6 +105,37 @@ class ScieloSubmissionsOJSReportTest extends TestCase
 
         $expectedReviewingTime = 4;
         $this->assertEquals($expectedReviewingTime, $report->getAverageReviewingTime());
+    }
+
+    public function testAverageReviewingTimeIgnoresDecisionWithoutDate(): void
+    {
+        $articleWithoutDecisionDate = new ScieloArticle(
+            6,
+            "Titulo 6",
+            "Pablo Giorgio",
+            "Brasil",
+            "2020-11-8",
+            6,
+            "Posted",
+            array(new SubmissionAuthor("Atila", "Brazil", "USP")),
+            "Biological",
+            "en_US",
+            "Quick submission/import",
+            "",
+            ["Richard Feynman"],
+            "Neil Tyson",
+            ["Accept"],
+            "Quick submission/import",
+            true
+        );
+        $report = new ScieloSubmissionsOJSReport(
+            $this->sections,
+            [$this->submissions[0], $articleWithoutDecisionDate]
+        );
+
+        $this->assertEquals(2, $report->getAverageReviewingTime());
+        $this->assertNull($articleWithoutDecisionDate->asRecord()[16]);
+        $this->assertSame('', $articleWithoutDecisionDate->asRecord()[17]);
     }
 
     public function testAverageReviewingTimeWhenASubmissionDoesNotHaveReviews(): void
