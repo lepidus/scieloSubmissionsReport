@@ -519,6 +519,8 @@ class ScieloArticleFactoryTest extends DatabaseTestCase
         $scieloArticle = $articleFactory->createSubmission($this->submissionId, $this->locale);
 
         $this->assertEquals(__("plugins.reports.scieloSubmissionsReport.warning.noDecision"), $scieloArticle->getLastDecision());
+        $this->assertNull($scieloArticle->getTimeUnderReview());
+        $this->assertSame('', $scieloArticle->getTimeBetweenSubmissionAndFinalDecision());
     }
 
     /**

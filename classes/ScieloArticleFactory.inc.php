@@ -47,7 +47,8 @@ class ScieloArticleFactory extends ScieloSubmissionFactory
             $journalEditors,
             $sectionEditor,
             $reviews,
-            $lastDecision
+            $lastDecision,
+            in_array((int) $submission['status'], [STATUS_PUBLISHED, STATUS_DECLINED], true)
         );
     }
 }

@@ -127,6 +127,10 @@ class ScieloArticlesDAO extends ScieloSubmissionsDAO
             $lastDecision = SUBMISSION_EDITOR_DECISION_DECLINE;
         }
 
+        if (empty($decisionsSubmission) && $this->isQuickSubmissionOrImport($submissionId)) {
+            return __('plugins.reports.scieloSubmissionsReport.decision.quickSubmissionOrImport');
+        }
+
         return $this->getDecisionMessage($lastDecision);
     }
 }

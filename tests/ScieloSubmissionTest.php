@@ -121,9 +121,31 @@ class ScieloSubmissionTest extends TestCase
         $submission = $this->createSubmissionWithoutFinalDecision();
 
         $expectedReviewingTime = date_diff(new DateTime(trim($this->dateSubmitted)), new DateTime());
-        $expectedReviewingTime = $expectedReviewingTime->format('%a');
+        $expectedReviewingTime = (int) $expectedReviewingTime->format('%a');
 
         $this->assertEquals($expectedReviewingTime, $submission->getTimeUnderReview());
+    }
+
+    public function testTerminalSubmissionWithoutFinalDecisionDateHasNoReviewingTime(): void
+    {
+        $submission = new ScieloSubmission(
+            $this->submissionId,
+            $this->title,
+            $this->submitter,
+            $this->submitterCountry,
+            $this->dateSubmitted,
+            $this->daysUntilStatusChange,
+            $this->status,
+            $this->authors,
+            $this->section,
+            $this->language,
+            $this->finalDecision,
+            "",
+            true
+        );
+
+        $this->assertNull($submission->getTimeUnderReview());
+        $this->assertSame('', $submission->getTimeBetweenSubmissionAndFinalDecision());
     }
 
     public function testTimeBetweenSubmissionAndFinalDecisionWithFinalDecision(): void

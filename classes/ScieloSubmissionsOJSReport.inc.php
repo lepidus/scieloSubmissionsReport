@@ -33,7 +33,11 @@ class ScieloSubmissionsOJSReport extends ScieloSubmissionsReport
         $submissions = array();
 
         foreach ($this->submissions as $submission) {
-            if (!empty($submission->getFinalDecision()) && $submission->hasReviews()) {
+            if (
+                !empty($submission->getFinalDecision())
+                && !empty($submission->getFinalDecisionDate())
+                && $submission->hasReviews()
+            ) {
                 $submissions[] = $submission;
             }
         }

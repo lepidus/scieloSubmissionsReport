@@ -43,7 +43,7 @@ class ScieloSubmissionsDAO extends DAO
             if (!is_null($finalDecisionDateInterval)) {
                 $finalDecisionWithDate = $this->getFinalDecisionWithDate($submissionId, $locale);
 
-                if (!is_null($finalDecisionWithDate)) {
+                if (!is_null($finalDecisionWithDate) && !empty($finalDecisionWithDate->getDateDecided())) {
                     $finalDecisionDate = $finalDecisionWithDate->getDateDecided();
                     if ($finalDecisionDateInterval->isInsideInterval($finalDecisionDate)) {
                         $submissions[] = $submissionId;
@@ -154,7 +154,11 @@ class ScieloSubmissionsDAO extends DAO
 
     public function getFinalDecisionWithDate($submissionId, $locale)
     {
-        $possibleFinalDecisions = [SUBMISSION_EDITOR_DECISION_ACCEPT, SUBMISSION_EDITOR_DECISION_DECLINE, SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE];
+        $possibleFinalDecisions = [
+            SUBMISSION_EDITOR_DECISION_ACCEPT,
+            SUBMISSION_EDITOR_DECISION_DECLINE,
+            SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE
+        ];
 
         $result = Capsule::table('edit_decisions')
         ->where('submission_id', $submissionId)
@@ -163,15 +167,30 @@ class ScieloSubmissionsDAO extends DAO
         ->first();
 
         if (is_null($result)) {
+            $result = Capsule::table('edit_decisions')
+            ->where('submission_id', $submissionId)
+            ->where('decision', SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION)
+            ->orderBy('date_decided', 'desc')
+            ->first();
+        }
+
+        if (is_null($result)) {
             $archivedDeclineDate = $this->getArchivedDeclineDate($submissionId);
-            if (is_null($archivedDeclineDate)) {
-                return null;
+            if (!is_null($archivedDeclineDate)) {
+                return $this->finalDecisionFromRow([
+                    'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
+                    'date_decided' => $archivedDeclineDate
+                ], $locale);
             }
 
-            return $this->finalDecisionFromRow([
-                'decision' => SUBMISSION_EDITOR_DECISION_DECLINE,
-                'date_decided' => $archivedDeclineDate
-            ], $locale);
+            if ($this->isQuickSubmissionOrImport($submissionId)) {
+                return new FinalDecision(
+                    __('plugins.reports.scieloSubmissionsReport.decision.quickSubmissionOrImport', [], $locale),
+                    $this->getFirstPublicationDate($submissionId) ?? ''
+                );
+            }
+
+            return null;
         }
 
         $finalDecisionWithDate = $this->finalDecisionFromRow(get_object_vars($result), $locale);
@@ -183,12 +202,10 @@ class ScieloSubmissionsDAO extends DAO
     {
         $result = Capsule::table('submissions')
         ->join('event_log', 'event_log.assoc_id', '=', 'submissions.submission_id')
-        ->leftJoin('edit_decisions', 'edit_decisions.submission_id', '=', 'submissions.submission_id')
         ->where('submissions.submission_id', $submissionId)
         ->where('submissions.status', STATUS_DECLINED)
         ->where('event_log.assoc_type', ASSOC_TYPE_SUBMISSION)
         ->where('event_log.event_type', SUBMISSION_LOG_EDITOR_ARCHIVE)
-        ->whereNull('edit_decisions.edit_decision_id')
         ->orderBy('event_log.date_logged', 'desc')
         ->select('event_log.date_logged')
         ->first();
@@ -198,6 +215,52 @@ class ScieloSubmissionsDAO extends DAO
         }
 
         return get_object_vars($result)['date_logged'];
+    }
+
+    protected function isQuickSubmissionOrImport($submissionId): bool
+    {
+        $submission = Capsule::table('submissions')
+        ->where('submission_id', $submissionId)
+        ->where('status', STATUS_PUBLISHED)
+        ->where('stage_id', WORKFLOW_STAGE_ID_PRODUCTION)
+        ->where('submission_progress', 0)
+        ->first();
+
+        if (is_null($submission)) {
+            return false;
+        }
+
+        $hasDecisions = Capsule::table('edit_decisions')
+        ->where('submission_id', $submissionId)
+        ->exists();
+
+        if ($hasDecisions) {
+            return false;
+        }
+
+        return !Capsule::table('event_log')
+        ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+        ->where('assoc_id', $submissionId)
+        ->where('event_type', SUBMISSION_LOG_SUBMISSION_SUBMIT)
+        ->exists();
+    }
+
+    protected function getFirstPublicationDate($submissionId)
+    {
+        $result = Capsule::table('event_log')
+        ->where('assoc_type', ASSOC_TYPE_SUBMISSION)
+        ->where('assoc_id', $submissionId)
+        ->where('event_type', SUBMISSION_LOG_METADATA_PUBLISH)
+        ->whereIn('message', ['publication.event.published', 'publication.event.versionPublished'])
+        ->orderBy('date_logged', 'asc')
+        ->select('date_logged')
+        ->first();
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        return (new DateTime(get_object_vars($result)['date_logged']))->format('Y-m-d');
     }
 
     public function getIdOfSubmitterUser($submissionId)
@@ -228,7 +291,10 @@ class ScieloSubmissionsDAO extends DAO
         $dateDecided = new DateTime($row['date_decided']);
         $decision = "";
 
-        if ($row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT) {
+        if (
+            $row['decision'] == SUBMISSION_EDITOR_DECISION_ACCEPT
+            || $row['decision'] == SUBMISSION_EDITOR_DECISION_SEND_TO_PRODUCTION
+        ) {
             $decision = __('common.accepted', [], $locale);
         } elseif ($row['decision'] == SUBMISSION_EDITOR_DECISION_DECLINE || $row['decision'] == SUBMISSION_EDITOR_DECISION_INITIAL_DECLINE) {
             $decision = __('common.declined', [], $locale);

@@ -14,8 +14,9 @@ class ScieloSubmission
     protected $language;
     protected $finalDecision;
     protected $finalDecisionDate;
+    protected $isTerminal;
 
-    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate)
+    public function __construct(int $id, string $title, string $submitter, string $submitterCountry, string $dateSubmitted, int $daysUntilStatusChange, string $status, array $authors, string $section, string $language, string $finalDecision, string $finalDecisionDate, bool $isTerminal = false)
     {
         $this->id = $id;
         $this->title = $title;
@@ -29,6 +30,7 @@ class ScieloSubmission
         $this->language = $language;
         $this->finalDecision = $finalDecision;
         $this->finalDecisionDate = $finalDecisionDate;
+        $this->isTerminal = $isTerminal;
     }
 
     protected function fillEmptyFields($field, $messageIfEmpty)
@@ -113,21 +115,25 @@ class ScieloSubmission
         return $this->finalDecisionDate;
     }
 
-    public function getTimeUnderReview(): int
+    public function getTimeUnderReview(): ?int
     {
+        if (empty($this->finalDecisionDate) && $this->isTerminal) {
+            return null;
+        }
+
         $dateFinal = new DateTime(trim($this->finalDecisionDate));
         $dateBegin = new DateTime(trim($this->dateSubmitted));
         $reviewingTime = $dateFinal->diff($dateBegin);
-        return $reviewingTime->format('%a');
+        return (int) $reviewingTime->format('%a');
     }
 
     public function getTimeBetweenSubmissionAndFinalDecision(): string
     {
-        if (!empty($this->finalDecisionDate)) {
-            return $this->getTimeUnderReview();
+        if (empty($this->finalDecisionDate)) {
+            return "";
         }
 
-        return "";
+        return (string) $this->getTimeUnderReview();
     }
 
     protected function authorsAsRecord(): string
