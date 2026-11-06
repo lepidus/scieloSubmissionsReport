@@ -69,4 +69,40 @@ class ScieloSubmissionsReportTest extends TestCase
 
         $this->assertEquals($expectedPenultimateRow, $penultimateRow);
     }
+
+    private function createSubmissionWithRecord(array $record)
+    {
+        return new class ($record) {
+            private $record;
+
+            public function __construct(array $record)
+            {
+                $this->record = $record;
+            }
+
+            public function asRecord(): array
+            {
+                return $this->record;
+            }
+
+            public function getFinalDecision(): string
+            {
+                return '';
+            }
+        };
+    }
+
+    public function testGeneratedCsvNeutralizesSpreadsheetFormulas(): void
+    {
+        $record = [7, '=HYPERLINK("https://example.com","x")', '+cmd', '-2+3', '@SUM(A1)', "\tTabbed", 'Plain title', '2021-04-21', -3, '-5'];
+        $this->report = new ScieloSubmissionsReport(['=Formula section', 'Math'], [$this->createSubmissionWithRecord($record)]);
+        $this->createCSVReport();
+        $csvRows = array_map('str_getcsv', file($this->filePath));
+
+        $expectedRecord = ['7', '\'=HYPERLINK("https://example.com","x")', "'+cmd", "'-2+3", "'@SUM(A1)", "'\tTabbed", 'Plain title', '2021-04-21', '-3', '-5'];
+        $this->assertEquals($expectedRecord, $csvRows[1]);
+
+        $lastRow = $csvRows[sizeof($csvRows) - 1];
+        $this->assertEquals("'=Formula section,Math", $lastRow[sizeof($lastRow) - 1]);
+    }
 }
