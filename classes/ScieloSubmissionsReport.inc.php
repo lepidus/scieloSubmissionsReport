@@ -85,16 +85,38 @@ class ScieloSubmissionsReport
     public function buildCSV($fileDescriptor): void
     {
         fprintf($fileDescriptor, $this->UTF8_BOM);
-        fputcsv($fileDescriptor, $this->getHeaders());
+        $this->writeCSVRow($fileDescriptor, $this->getHeaders());
 
         foreach ($this->submissions as $submission) {
-            fputcsv($fileDescriptor, $submission->asRecord());
+            $this->writeCSVRow($fileDescriptor, $submission->asRecord());
         }
 
         $blankLine = ["", "", ""];
-        fputcsv($fileDescriptor, $blankLine);
-        fputcsv($fileDescriptor, $this->getSecondHeaders());
+        $this->writeCSVRow($fileDescriptor, $blankLine);
+        $this->writeCSVRow($fileDescriptor, $this->getSecondHeaders());
         $sections = implode(",", $this->getSections());
-        fputcsv($fileDescriptor, [$this->getAverageReviewingTime(), $sections]);
+        $this->writeCSVRow($fileDescriptor, [$this->getAverageReviewingTime(), $sections]);
+    }
+
+    private function writeCSVRow($fileDescriptor, array $row): void
+    {
+        fputcsv($fileDescriptor, array_map([$this, 'neutralizeSpreadsheetFormula'], $row));
+    }
+
+    /**
+     * Prefixes with an apostrophe the text cells that a spreadsheet would
+     * evaluate as a formula, such as titles and names typed by users.
+     */
+    private function neutralizeSpreadsheetFormula($value)
+    {
+        if (!is_string($value) || $value === '' || is_numeric($value)) {
+            return $value;
+        }
+
+        if (in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'" . $value;
+        }
+
+        return $value;
     }
 }
